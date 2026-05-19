@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+
+  nominatim:
+    image: mediagis/nominatim:4.3
+    container_name: fietsrouten-nominatim
+    restart: unless-stopped
+    ports:
+      - "7070:8080"
+    environment:
+      PBF_PATH: /nominatim/data/netherlands-latest.osm.pbf
+      REPLICATION_URL: https://download.geofabrik.de/europe/netherlands-updates/
+      NOMINATIM_PASSWORD: nominatim
+      IMPORT_WIKIPEDIA: "false"
+      IMPORT_TIGER_ADDRESSES: "false"
+    volumes:
+      - ./data:/nominatim/data:ro
+      - nominatim-data:/var/lib/postgresql/14/main
+    shm_size: '1gb'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/search?q=amsterdam&format=json"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+      start_period: 300s
+
+  graphhopper:
+    image: graphhopper/graphhopper:latest
+    container_name: fietsrouten-graphhopper
+    restart: unless-stopped
+    ports:
+      - "8989:8989"
+    volumes:
+      - ./data:/data
+      - ./graphhopper/config.yml:/graphhopper/config.yml:ro
+      - graphhopper-cache:/graphhopper/graph-cache
+    environment:
+      JAVA_OPTS: "-Xmx2g -Xms512m"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8989/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+  tileserver:
+    image: maptiler/tileserver-gl:latest
+    container_name: fietsrouten-tileserver
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/data
+      - ./tileserver/config.json:/etc/tileserver-gl/config.json:ro
+    command: ["--config", "/etc/tileserver-gl/config.json", "--port", "8080"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  nominatim-data:
+  graphhopper-cache:

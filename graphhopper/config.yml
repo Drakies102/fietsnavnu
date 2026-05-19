@@ -1,0 +1,30 @@
+graphhopper:
+  datareader.file: /data/netherlands-latest.osm.pbf
+  graph.location: /graphhopper/graph-cache
+
+  profiles:
+    - name: bike
+      vehicle: bike
+      weighting: fastest
+      turn_costs: false
+    - name: mtb
+      vehicle: mtb
+      weighting: fastest
+      turn_costs: false
+    - name: racingbike
+      vehicle: racingbike
+      weighting: fastest
+      turn_costs: false
+
+  profiles_ch:
+    - profile: bike
+    - profile: mtb
+    - profile: racingbike
+
+server:
+  application_connectors:
+    - type: http
+      port: 8989
+      bind_host: 0.0.0.0
+  request_log:
+    appenders: []

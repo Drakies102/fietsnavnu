@@ -1,0 +1,12 @@
+{
+  "options": {
+    "paths": {
+      "mbtiles": "/data"
+    }
+  },
+  "data": {
+    "netherlands": {
+      "mbtiles": "netherlands.mbtiles"
+    }
+  }
+}

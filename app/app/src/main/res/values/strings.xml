@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fiets Routen</string>
+    <string name="hint_from">Van (startadres)</string>
+    <string name="hint_to">Naar (bestemming)</string>
+    <string name="btn_find_route">Vind fietsroute</string>
+    <string name="distance_placeholder">Afstand: —</string>
+    <string name="duration_placeholder">Tijd: —</string>
+</resources>
