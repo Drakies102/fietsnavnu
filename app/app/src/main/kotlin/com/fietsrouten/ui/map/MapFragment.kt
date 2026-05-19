@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Filter
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -85,29 +86,56 @@ class MapFragment : Fragment() {
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
     }
 
+    // ArrayAdapter that skips the built-in prefix filter so Nominatim results are shown as-is.
+    private fun makePassthroughAdapter() = object : ArrayAdapter<String>(
+        requireContext(), android.R.layout.simple_dropdown_item_1line
+    ) {
+        override fun getFilter() = object : Filter() {
+            override fun performFiltering(c: CharSequence?) = FilterResults().apply {
+                val items = (0 until count).mapNotNull { getItem(it) }
+                values = items; count = items.size
+            }
+            override fun publishResults(c: CharSequence?, r: FilterResults?) = notifyDataSetChanged()
+        }
+    }
+
     private fun observeViewModel() {
+        var fromResults = emptyList<com.fietsrouten.data.model.NominatimResult>()
+        var toResults = emptyList<com.fietsrouten.data.model.NominatimResult>()
+
+        val fromAdapter = makePassthroughAdapter()
+        val toAdapter = makePassthroughAdapter()
+
+        binding.actvFrom.setAdapter(fromAdapter)
+        binding.actvFrom.setOnItemClickListener { _, _, pos, _ ->
+            viewModel.fromLocation = fromResults[pos]
+            binding.actvFrom.setText(fromResults[pos].displayName, false)
+        }
+
+        binding.actvTo.setAdapter(toAdapter)
+        binding.actvTo.setOnItemClickListener { _, _, pos, _ ->
+            viewModel.toLocation = toResults[pos]
+            binding.actvTo.setText(toResults[pos].displayName, false)
+        }
+
         lifecycleScope.launch {
             viewModel.fromSuggestions.collect { suggestions ->
-                val adapter = ArrayAdapter(requireContext(),
-                    android.R.layout.simple_dropdown_item_1line,
-                    suggestions.map { it.displayName })
-                binding.actvFrom.setAdapter(adapter)
-                binding.actvFrom.setOnItemClickListener { _, _, pos, _ ->
-                    viewModel.fromLocation = suggestions[pos]
-                    binding.actvFrom.setText(suggestions[pos].displayName, false)
-                }
+                fromResults = suggestions
+                fromAdapter.setNotifyOnChange(false)
+                fromAdapter.clear()
+                fromAdapter.addAll(suggestions.map { it.displayName })
+                fromAdapter.notifyDataSetChanged()
+                if (suggestions.isNotEmpty() && binding.actvFrom.hasFocus()) binding.actvFrom.showDropDown()
             }
         }
         lifecycleScope.launch {
             viewModel.toSuggestions.collect { suggestions ->
-                val adapter = ArrayAdapter(requireContext(),
-                    android.R.layout.simple_dropdown_item_1line,
-                    suggestions.map { it.displayName })
-                binding.actvTo.setAdapter(adapter)
-                binding.actvTo.setOnItemClickListener { _, _, pos, _ ->
-                    viewModel.toLocation = suggestions[pos]
-                    binding.actvTo.setText(suggestions[pos].displayName, false)
-                }
+                toResults = suggestions
+                toAdapter.setNotifyOnChange(false)
+                toAdapter.clear()
+                toAdapter.addAll(suggestions.map { it.displayName })
+                toAdapter.notifyDataSetChanged()
+                if (suggestions.isNotEmpty() && binding.actvTo.hasFocus()) binding.actvTo.showDropDown()
             }
         }
         lifecycleScope.launch {
