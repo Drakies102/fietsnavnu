@@ -1,0 +1,10 @@
+# Android build & IDE
+app/.gradle/
+app/.idea/
+app/app/build/
+app/local.properties
+
+# Data files (large binaries)
+data/*.pbf
+data/*.mbtiles
+data/default-gh/

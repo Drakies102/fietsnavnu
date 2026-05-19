@@ -4,22 +4,22 @@ graphhopper:
 
   profiles:
     - name: bike
-      vehicle: bike
-      weighting: fastest
-      turn_costs: false
+      custom_model_files: [bike.json]
     - name: mtb
-      vehicle: mtb
-      weighting: fastest
-      turn_costs: false
+      custom_model_files: [mtb.json]
     - name: racingbike
-      vehicle: racingbike
-      weighting: fastest
-      turn_costs: false
+      custom_model_files: [racingbike.json]
 
   profiles_ch:
     - profile: bike
     - profile: mtb
     - profile: racingbike
+
+  profiles_lm: []
+
+  graph.encoded_values: road_class, roundabout, road_environment, max_speed, ferry_speed, bike_access, bike_average_speed, bike_priority, bike_road_access, bike_network, mtb_rating, hike_rating, mtb_priority, mtb_network, mtb_access, mtb_average_speed, racingbike_priority, racingbike_access, racingbike_average_speed
+
+  import.osm.ignored_highways: ''
 
 server:
   application_connectors:

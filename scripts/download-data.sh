@@ -29,6 +29,8 @@ if [ ! -f "$MBTILES" ]; then
     ghcr.io/systemed/tilemaker:master \
     --input /data/netherlands-latest.osm.pbf \
     --output /data/netherlands.mbtiles \
+    --config /usr/src/app/resources/config-openmaptiles.json \
+    --process /usr/src/app/resources/process-openmaptiles.lua \
     --bbox 3.3,50.7,7.3,53.6
   echo "Tile generation complete."
 else
