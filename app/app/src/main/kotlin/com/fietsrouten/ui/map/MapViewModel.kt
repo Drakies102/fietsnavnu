@@ -1,5 +1,6 @@
 package com.fietsrouten.ui.map
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fietsrouten.data.model.NominatimResult
@@ -7,6 +8,9 @@ import com.fietsrouten.data.model.RouteResult
 import com.fietsrouten.data.repository.RouteRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
 class MapViewModel : ViewModel() {
@@ -31,21 +35,51 @@ class MapViewModel : ViewModel() {
     var fromLocation: NominatimResult? = null
     var toLocation: NominatimResult? = null
 
-    fun searchFrom(query: String) {
-        if (query.length < 3) { _fromSuggestions.value = emptyList(); return }
+    private val fromQuery = MutableStateFlow("")
+    private val toQuery = MutableStateFlow("")
+
+    init {
         viewModelScope.launch {
-            runCatching { repository.searchAddress(query) }
-                .onSuccess { _fromSuggestions.value = it }
+            fromQuery
+                .debounce(300)
+                .flatMapLatest { query ->
+                    flow {
+                        Log.d("Autocomplete", "[FROM] querying Nominatim: \"$query\" (length=${query.length})")
+                        if (query.length >= 3) {
+                            val result = runCatching { repository.searchAddress(query) }
+                            Log.d("Autocomplete", "[FROM] Nominatim result: ${result.map { it.size }} items, error=${result.exceptionOrNull()?.message}")
+                            emit(result.getOrDefault(emptyList()))
+                        } else {
+                            Log.d("Autocomplete", "[FROM] skipped — query too short")
+                            emit(emptyList())
+                        }
+                    }
+                }
+                .collect { _fromSuggestions.value = it }
+        }
+        viewModelScope.launch {
+            toQuery
+                .debounce(300)
+                .flatMapLatest { query ->
+                    flow {
+                        Log.d("Autocomplete", "[TO] querying Nominatim: \"$query\" (length=${query.length})")
+                        if (query.length >= 3) {
+                            val result = runCatching { repository.searchAddress(query) }
+                            Log.d("Autocomplete", "[TO] Nominatim result: ${result.map { it.size }} items, error=${result.exceptionOrNull()?.message}")
+                            emit(result.getOrDefault(emptyList()))
+                        } else {
+                            Log.d("Autocomplete", "[TO] skipped — query too short")
+                            emit(emptyList())
+                        }
+                    }
+                }
+                .collect { _toSuggestions.value = it }
         }
     }
 
-    fun searchTo(query: String) {
-        if (query.length < 3) { _toSuggestions.value = emptyList(); return }
-        viewModelScope.launch {
-            runCatching { repository.searchAddress(query) }
-                .onSuccess { _toSuggestions.value = it }
-        }
-    }
+    fun searchFrom(query: String) { fromQuery.value = query }
+
+    fun searchTo(query: String) { toQuery.value = query }
 
     fun calculateRoute() {
         val from = fromLocation ?: run { _error.value = "Selecteer eerst een startadres."; return }

@@ -40,7 +40,6 @@
                 android:hint="@string/hint_from"
                 android:inputType="text"
                 android:imeOptions="actionNext"
-                android:threshold="3"
                 android:drawableStart="@android:drawable/ic_menu_mylocation"
                 android:drawablePadding="8dp" />
 
@@ -58,7 +57,6 @@
                 android:hint="@string/hint_to"
                 android:inputType="text"
                 android:imeOptions="actionSearch"
-                android:threshold="3"
                 android:drawableStart="@android:drawable/ic_menu_directions"
                 android:drawablePadding="8dp" />
 

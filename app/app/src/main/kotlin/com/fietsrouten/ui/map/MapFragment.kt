@@ -1,6 +1,7 @@
 package com.fietsrouten.ui.map
 
 import android.Manifest
+import android.util.Log
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.Editable
@@ -75,13 +76,17 @@ class MapFragment : Fragment() {
     }
 
     private fun setupSearch() {
-        binding.actvFrom.addTextChangedListener(watcher { viewModel.searchFrom(it) })
-        binding.actvTo.addTextChangedListener(watcher { viewModel.searchTo(it) })
+        binding.actvFrom.addTextChangedListener(watcher("FROM") { viewModel.searchFrom(it) })
+        binding.actvTo.addTextChangedListener(watcher("TO") { viewModel.searchTo(it) })
         binding.btnRoute.setOnClickListener { viewModel.calculateRoute() }
     }
 
-    private fun watcher(onChanged: (String) -> Unit) = object : TextWatcher {
-        override fun afterTextChanged(s: Editable?) = onChanged(s.toString())
+    private fun watcher(tag: String, onChanged: (String) -> Unit) = object : TextWatcher {
+        override fun afterTextChanged(s: Editable?) {
+            val text = s.toString()
+            Log.d("Autocomplete", "[$tag] typed: \"$text\" (length=${text.length})")
+            onChanged(text)
+        }
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
     }
@@ -120,22 +125,28 @@ class MapFragment : Fragment() {
 
         lifecycleScope.launch {
             viewModel.fromSuggestions.collect { suggestions ->
+                Log.d("Autocomplete", "[FROM] got ${suggestions.size} results: ${suggestions.map { it.displayName }}")
                 fromResults = suggestions
                 fromAdapter.setNotifyOnChange(false)
                 fromAdapter.clear()
                 fromAdapter.addAll(suggestions.map { it.displayName })
                 fromAdapter.notifyDataSetChanged()
-                if (suggestions.isNotEmpty() && binding.actvFrom.hasFocus()) binding.actvFrom.showDropDown()
+                val hasFocus = binding.actvFrom.hasFocus()
+                Log.d("Autocomplete", "[FROM] hasFocus=$hasFocus → ${if (suggestions.isNotEmpty() && hasFocus) "showDropDown" else "skip"}")
+                if (suggestions.isNotEmpty() && hasFocus) binding.actvFrom.showDropDown()
             }
         }
         lifecycleScope.launch {
             viewModel.toSuggestions.collect { suggestions ->
+                Log.d("Autocomplete", "[TO] got ${suggestions.size} results: ${suggestions.map { it.displayName }}")
                 toResults = suggestions
                 toAdapter.setNotifyOnChange(false)
                 toAdapter.clear()
                 toAdapter.addAll(suggestions.map { it.displayName })
                 toAdapter.notifyDataSetChanged()
-                if (suggestions.isNotEmpty() && binding.actvTo.hasFocus()) binding.actvTo.showDropDown()
+                val hasFocus = binding.actvTo.hasFocus()
+                Log.d("Autocomplete", "[TO] hasFocus=$hasFocus → ${if (suggestions.isNotEmpty() && hasFocus) "showDropDown" else "skip"}")
+                if (suggestions.isNotEmpty() && hasFocus) binding.actvTo.showDropDown()
             }
         }
         lifecycleScope.launch {
