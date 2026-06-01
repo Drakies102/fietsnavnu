@@ -1,7 +1,13 @@
 {
   "options": {
     "paths": {
-      "mbtiles": "/data"
+      "mbtiles": "/data",
+      "styles": "/styles"
+    }
+  },
+  "styles": {
+    "basic-preview": {
+      "style": "basic-preview/style.json"
     }
   },
   "data": {
