@@ -24,6 +24,8 @@ services:
       timeout: 10s
       retries: 5
       start_period: 300s
+    networks:
+      - shared_proxy
 
   graphhopper:
     image: israelhikingmap/graphhopper:latest
@@ -44,6 +46,8 @@ services:
       timeout: 10s
       retries: 10
       start_period: 120s
+    networks:
+      - shared_proxy
 
   tileserver:
     image: maptiler/tileserver-gl:latest
@@ -60,7 +64,12 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-
+    networks:
+      - shared_proxy
 volumes:
   nominatim-data:
   graphhopper-cache:
+
+networks:
+  shared_proxy:
+    external: true
