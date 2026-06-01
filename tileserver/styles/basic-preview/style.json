@@ -133,7 +133,7 @@
       "source-layer": "place",
       "filter": ["in", "class", "city", "town"],
       "layout": {
-        "text-field": ["coalesce", ["get", "name:nl"], ["get", "name"]],
+        "text-field": ["get", "name:latin"],
         "text-font": ["Noto Sans Regular"],
         "text-size": ["interpolate", ["linear"], ["zoom"], 8, 10, 14, 16],
         "text-anchor": "center"
@@ -147,7 +147,7 @@
       "source-layer": "transportation_name",
       "minzoom": 14,
       "layout": {
-        "text-field": ["coalesce", ["get", "name:nl"], ["get", "name"]],
+        "text-field": ["get", "name:latin"],
         "text-font": ["Noto Sans Regular"],
         "text-size": 11,
         "symbol-placement": "line"
