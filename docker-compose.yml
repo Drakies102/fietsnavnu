@@ -59,6 +59,7 @@ services:
       - ./data:/data
       - ./tileserver/config.json:/etc/tileserver-gl/config.json:ro
       - ./tileserver/styles:/styles:ro
+      - ./tileserver/fonts:/fonts:ro
     command: ["--config", "/etc/tileserver-gl/config.json", "--port", "8080"]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
