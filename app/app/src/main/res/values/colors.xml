@@ -8,4 +8,9 @@
     <color name="error_red">#FFD32F2F</color>
     <color name="route_blue">#FF0066CC</color>
     <color name="divider">#FFE0E0E0</color>
+    <color name="nav_bg_dark">#FF1A1A2E</color>
+    <color name="nav_next_bg">#FFE8F0FE</color>
+    <color name="cycling_route_ncn">#FFFF6B35</color>
+    <color name="cycling_route_rcn">#FF2E7D32</color>
+    <color name="cycling_route_lcn">#FF9E9E9E</color>
 </resources>

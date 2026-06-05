@@ -27,16 +27,12 @@ class RouteRepository {
         nominatimApi.search(query)
 
     suspend fun getRoute(
-        fromLat: Double, fromLon: Double,
-        toLat: Double, toLon: Double,
+        waypoints: List<Pair<Double, Double>>,
         profile: String = "bike"
     ): RouteResult {
         // GraphHopper expects [longitude, latitude] order
         val request = GraphHopperRequest(
-            points = listOf(
-                listOf(fromLon, fromLat),
-                listOf(toLon, toLat)
-            ),
+            points = waypoints.map { (lat, lon) -> listOf(lon, lat) },
             profile = profile
         )
         val response = graphHopperApi.getRoute(request)
@@ -48,4 +44,10 @@ class RouteRepository {
             instructions = path.instructions
         )
     }
+
+    suspend fun getRoute(
+        fromLat: Double, fromLon: Double,
+        toLat: Double, toLon: Double,
+        profile: String = "bike"
+    ): RouteResult = getRoute(listOf(fromLat to fromLon, toLat to toLon), profile)
 }

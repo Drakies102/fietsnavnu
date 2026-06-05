@@ -6,4 +6,15 @@
     <string name="btn_find_route">Vind fietsroute</string>
     <string name="distance_placeholder">Afstand: —</string>
     <string name="duration_placeholder">Tijd: —</string>
+    <string name="btn_start_navigation">Start navigatie</string>
+    <string name="btn_stop_navigation">Stop navigatie</string>
+    <string name="nav_turn_icon_desc">Afslagrichting</string>
+    <string name="nav_then">dan</string>
+    <string name="nav_off_route">Herberekenen route…</string>
+    <string name="mode_address">Adres</string>
+    <string name="mode_knooppunten">Route Plannen</string>
+    <string name="planner_hint">Tik op knooppunten om je route te plannen</string>
+    <string name="btn_clear_planner">Wis</string>
+    <string name="btn_calculate_planner_route">Bereken route</string>
+    <string name="fab_layers_desc">Fietsroutes tonen</string>
 </resources>

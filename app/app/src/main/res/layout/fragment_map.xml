@@ -15,7 +15,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Address search card (top) -->
+    <!-- ═══════════════════════════════════════════════════════════
+         ADDRESS SEARCH / PLANNER CARD — hidden during navigation
+         ═══════════════════════════════════════════════════════════ -->
     <androidx.cardview.widget.CardView
         android:id="@+id/searchCard"
         android:layout_width="0dp"
@@ -33,42 +35,183 @@
             android:orientation="vertical"
             android:padding="12dp">
 
-            <AutoCompleteTextView
-                android:id="@+id/actvFrom"
+            <!-- Mode toggle -->
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/modeToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_from"
-                android:inputType="text"
-                android:imeOptions="actionNext"
-                android:drawableStart="@android:drawable/ic_menu_mylocation"
-                android:drawablePadding="8dp" />
+                android:layout_marginBottom="8dp"
+                app:singleSelection="true"
+                app:selectionRequired="true"
+                app:checkedButton="@id/btnModeAddress">
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:background="@color/divider" />
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnModeAddress"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/mode_address" />
 
-            <AutoCompleteTextView
-                android:id="@+id/actvTo"
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnModeKnooppunten"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/mode_knooppunten" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <!-- Address mode content -->
+            <LinearLayout
+                android:id="@+id/addressModeContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_to"
-                android:inputType="text"
-                android:imeOptions="actionSearch"
-                android:drawableStart="@android:drawable/ic_menu_directions"
-                android:drawablePadding="8dp" />
+                android:orientation="vertical">
 
-            <Button
-                android:id="@+id/btnRoute"
+                <AutoCompleteTextView
+                    android:id="@+id/actvFrom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_from"
+                    android:inputType="text"
+                    android:imeOptions="actionNext"
+                    android:drawableStart="@android:drawable/ic_menu_mylocation"
+                    android:drawablePadding="8dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:background="@color/divider" />
+
+                <AutoCompleteTextView
+                    android:id="@+id/actvTo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/hint_to"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch"
+                    android:drawableStart="@android:drawable/ic_menu_directions"
+                    android:drawablePadding="8dp" />
+
+                <Button
+                    android:id="@+id/btnRoute"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/btn_find_route" />
+
+            </LinearLayout>
+
+            <!-- Knooppunten mode hint (shown when no nodes selected yet) -->
+            <LinearLayout
+                android:id="@+id/knooppuntenModeContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/btn_find_route" />
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/planner_hint"
+                    android:textAlignment="center"
+                    android:padding="8dp"
+                    android:textColor="#FF757575"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         NAVIGATION INSTRUCTION BAR — TomTom style, full width
+         ═══════════════════════════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/navInstructionCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/white"
+        android:elevation="8dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="90dp"
+            android:layout_height="match_parent"
+            android:background="@color/route_blue"
+            android:gravity="center"
+            android:minHeight="90dp">
+
+            <ImageView
+                android:id="@+id/ivTurnIcon"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:contentDescription="@string/nav_turn_icon_desc" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvCurrentInstruction"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:textColor="#FF212121"
+                android:maxLines="2"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/tvDistanceToTurn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:textColor="@color/route_blue" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="64dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="8dp"
+            android:background="@color/nav_next_bg">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/nav_then"
+                android:textSize="10sp"
+                android:textColor="#FF757575" />
+
+            <ImageView
+                android:id="@+id/ivNextTurnIcon"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginTop="4dp"
+                android:visibility="invisible"
+                android:contentDescription="@string/nav_turn_icon_desc" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
     <!-- Loading indicator -->
     <ProgressBar
@@ -95,7 +238,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Route summary (bottom) — hidden until a route is calculated -->
+    <!-- Cycling routes layer FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabLayers"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="@string/fab_layers_desc"
+        app:srcCompat="@drawable/ic_layers"
+        app:fabSize="mini"
+        app:backgroundTint="@color/white"
+        app:layout_constraintTop_toBottomOf="@id/searchCard"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- ═══════════════════════════════════════════════════════════
+         ROUTE SUMMARY PANEL — shown after route calculation (both modes)
+         ═══════════════════════════════════════════════════════════ -->
     <LinearLayout
         android:id="@+id/instructionsPanel"
         android:layout_width="0dp"
@@ -116,28 +275,155 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 android:padding="12dp">
 
-                <TextView
-                    android:id="@+id/tvDistance"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:textStyle="bold"
-                    android:text="@string/distance_placeholder" />
+                    android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/tvDuration"
-                    android:layout_width="0dp"
+                    <TextView
+                        android:id="@+id/tvDistance"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textStyle="bold"
+                        android:text="@string/distance_placeholder" />
+
+                    <TextView
+                        android:id="@+id/tvDuration"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="end"
+                        android:textStyle="bold"
+                        android:text="@string/duration_placeholder" />
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btnStartNavigation"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:textStyle="bold"
-                    android:text="@string/duration_placeholder" />
+                    android:layout_marginTop="8dp"
+                    android:text="@string/btn_start_navigation" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         KNOOPPUNTEN PLANNER PANEL — shown while building a route
+         ═══════════════════════════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/plannerPanel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardElevation="6dp"
+            app:cardCornerRadius="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:id="@+id/llNodeChips"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingBottom="4dp" />
+
+                </HorizontalScrollView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="8dp">
+
+                    <Button
+                        android:id="@+id/btnClearPlanner"
+                        style="@style/Widget.AppCompat.Button.Borderless"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4dp"
+                        android:text="@string/btn_clear_planner" />
+
+                    <Button
+                        android:id="@+id/btnCalculatePlannerRoute"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/btn_calculate_planner_route" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         NAVIGATION BOTTOM BAR — dark TomTom-style, shown during nav
+         ═══════════════════════════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/navBottomBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="@color/nav_bg_dark"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/tvNavRemaining"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvNavEta"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="#FFAAAACC"
+            android:textSize="16sp"
+            android:gravity="center" />
+
+        <Button
+            android:id="@+id/btnStopNavigation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_stop_navigation"
+            android:backgroundTint="@color/error_red"
+            android:textColor="@color/white" />
 
     </LinearLayout>
 

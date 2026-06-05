@@ -48,3 +48,42 @@ data class RouteResult(
     val durationMs: Long,
     val instructions: List<RouteInstruction>
 )
+
+data class Knooppunt(
+    val id: Long,
+    val lat: Double,
+    val lon: Double,
+    val ref: String
+)
+
+data class CyclingRoute(
+    val id: Long,
+    val name: String,
+    val network: String,
+    val segments: List<List<List<Double>>>
+)
+
+data class OverpassResponse(
+    val elements: List<OverpassElement>
+)
+
+data class OverpassElement(
+    val type: String,
+    val id: Long,
+    val lat: Double?,
+    val lon: Double?,
+    val tags: Map<String, String>?,
+    val members: List<OverpassMember>?
+)
+
+data class OverpassMember(
+    val type: String,
+    val ref: Long,
+    val role: String,
+    val geometry: List<OverpassGeomPoint>?
+)
+
+data class OverpassGeomPoint(
+    val lat: Double,
+    val lon: Double
+)
