@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.fietsrouten.data.model.CyclingRoute
 import com.fietsrouten.data.model.Knooppunt
+import com.fietsrouten.data.model.Poi
+import com.fietsrouten.data.repository.PoiServiceRepository
 import com.fietsrouten.data.model.NominatimResult
 import com.fietsrouten.data.model.RouteResult
 import com.fietsrouten.data.repository.OverpassRepository
@@ -25,6 +27,7 @@ class MapViewModel : ViewModel() {
 
     private val repository = RouteRepository()
     private val overpassRepository = OverpassRepository()
+    private val poiRepository = PoiServiceRepository()
     private val navigationEngine = NavigationEngine()
 
     // ── Address search ────────────────────────────────────────────
@@ -100,10 +103,45 @@ class MapViewModel : ViewModel() {
                 }
                 .collect { _toSuggestions.value = it }
         }
+        viewModelScope.launch {
+            plannerCityQuery.debounce(300)
+                .flatMapLatest { query ->
+                    flow {
+                        if (query.length >= 3) emit(runCatching { repository.searchAddress(query) }.getOrDefault(emptyList()))
+                        else emit(emptyList())
+                    }
+                }
+                .collect { _plannerCitySuggestions.value = it }
+        }
     }
 
     fun searchFrom(query: String) { fromQuery.value = query }
     fun searchTo(query: String) { toQuery.value = query }
+    fun searchPlannerCity(query: String) { plannerCityQuery.value = query }
+    fun selectPlannerCity(result: NominatimResult) {
+        _plannerCityLocation.value = result.lat.toDouble() to result.lon.toDouble()
+    }
+
+    fun getLegDistances(nodes: List<Knooppunt>): List<Double> =
+        nodes.zipWithNext { a, b -> haversineMeters(a.lat, a.lon, b.lat, b.lon) }
+
+    private fun haversineMeters(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+        val r = 6371000.0
+        val phi1 = Math.toRadians(lat1); val phi2 = Math.toRadians(lat2)
+        val dPhi = Math.toRadians(lat2 - lat1); val dLon = Math.toRadians(lon2 - lon1)
+        val a = Math.sin(dPhi / 2).let { it * it } + Math.cos(phi1) * Math.cos(phi2) * Math.sin(dLon / 2).let { it * it }
+        return 2 * r * Math.asin(Math.sqrt(a))
+    }
+
+    // ── Planner city search ───────────────────────────────────────
+
+    private val _plannerCitySuggestions = MutableStateFlow<List<NominatimResult>>(emptyList())
+    val plannerCitySuggestions: StateFlow<List<NominatimResult>> = _plannerCitySuggestions
+
+    private val _plannerCityLocation = MutableStateFlow<Pair<Double, Double>?>(null)
+    val plannerCityLocation: StateFlow<Pair<Double, Double>?> = _plannerCityLocation
+
+    private val plannerCityQuery = MutableStateFlow("")
 
     // ── Mode switching ────────────────────────────────────────────
 
@@ -113,6 +151,8 @@ class MapViewModel : ViewModel() {
         _visibleKnoopunten.value = emptyList()
         _route.value = null
         _error.value = null
+        _pois.value = emptyList()
+        _poisVisible.value = false
     }
 
     // ── Address-mode routing ──────────────────────────────────────
@@ -130,7 +170,8 @@ class MapViewModel : ViewModel() {
                 )
             }.onSuccess { route ->
                 _route.value = route
-                loadKnoopuntenAlongRoute(route)
+                _pois.value = emptyList()
+                _poisVisible.value = false
             }.onFailure {
                 _error.value = "Route niet gevonden: ${it.message}"
             }
@@ -163,9 +204,10 @@ class MapViewModel : ViewModel() {
                 repository.getRoute(nodes.map { it.lat to it.lon })
             }.onSuccess { route ->
                 _route.value = route
-                // Keep selected nodes as visible route markers, clear selection state
                 _visibleKnoopunten.value = _selectedNodes.value
                 _selectedNodes.value = emptyList()
+                _pois.value = emptyList()
+                _poisVisible.value = false
             }.onFailure {
                 _error.value = "Route niet gevonden: ${it.message}"
             }
@@ -197,6 +239,40 @@ class MapViewModel : ViewModel() {
             node.lat in minLat..maxLat && node.lon in minLon..maxLon
         }
         _visibleKnoopunten.value = overpassRepository.filterKnoopuntenNearRoute(inBox, coords)
+    }
+
+    // ── POI layer ─────────────────────────────────────────────────
+
+    private val _pois = MutableStateFlow<List<Poi>>(emptyList())
+    val pois: StateFlow<List<Poi>> = _pois
+
+    private val _poisVisible = MutableStateFlow(false)
+    val poisVisible: StateFlow<Boolean> = _poisVisible
+
+    fun togglePois() {
+        val route = _route.value ?: return
+        val newState = !_poisVisible.value
+        _poisVisible.value = newState
+        if (newState) loadPoisAlongRoute(route)
+        else _pois.value = emptyList()
+    }
+
+    private fun loadPoisAlongRoute(route: RouteResult) {
+        viewModelScope.launch {
+            val coords = route.coordinates
+            val south = coords.minOf { it[1] }
+            val north = coords.maxOf { it[1] }
+            val west  = coords.minOf { it[0] }
+            val east  = coords.maxOf { it[0] }
+            runCatching {
+                poiRepository.getPoisInBbox(south, west, north, east)
+            }.onSuccess { all ->
+                _pois.value = poiRepository.filterNearRoute(all, coords)
+            }.onFailure {
+                Log.w("MapViewModel", "POI load failed: ${it.message}")
+                _poisVisible.value = false
+            }
+        }
     }
 
     // ── Cycling routes layer ──────────────────────────────────────

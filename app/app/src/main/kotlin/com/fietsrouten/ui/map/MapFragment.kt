@@ -15,6 +15,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Filter
+import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -25,6 +27,7 @@ import com.fietsrouten.Config
 import com.fietsrouten.R
 import com.fietsrouten.data.model.CyclingRoute
 import com.fietsrouten.data.model.Knooppunt
+import com.fietsrouten.data.model.Poi
 import com.fietsrouten.databinding.FragmentMapBinding
 import com.fietsrouten.navigation.NavigationSession
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -110,6 +113,7 @@ class MapFragment : Fragment() {
                 addRouteLayer(style)
                 addKnoopuntenLayers(style)
                 addCyclingRoutesLayer(style)
+                addPoiLayer(style)
                 checkAndRequestLocation()
             }
             mapLibreMap.cameraPosition = CameraPosition.Builder()
@@ -175,8 +179,42 @@ class MapFragment : Fragment() {
                 R.id.btnModeAddress -> MapViewModel.PlannerMode.ADDRESS
                 else -> MapViewModel.PlannerMode.KNOOPPUNTEN
             }
-            if (newMode != viewModel.plannerMode.value) {
-                viewModel.setMode(newMode)
+            if (newMode != viewModel.plannerMode.value) viewModel.setMode(newMode)
+        }
+
+        // City search autocomplete
+        val cityAdapter = makePassthroughAdapter()
+        var cityResults = emptyList<com.fietsrouten.data.model.NominatimResult>()
+        binding.actvPlannerCity.setAdapter(cityAdapter)
+        binding.actvPlannerCity.addTextChangedListener(watcher { viewModel.searchPlannerCity(it) })
+        binding.actvPlannerCity.setOnItemClickListener { _, _, pos, _ ->
+            val result = cityResults[pos]
+            viewModel.selectPlannerCity(result)
+            binding.actvPlannerCity.setText(result.displayName.substringBefore(","), false)
+            binding.actvPlannerCity.clearFocus()
+        }
+        lifecycleScope.launch {
+            viewModel.plannerCitySuggestions.collect { suggestions ->
+                cityResults = suggestions
+                cityAdapter.setNotifyOnChange(false)
+                cityAdapter.clear()
+                cityAdapter.addAll(suggestions.map { it.displayName })
+                cityAdapter.notifyDataSetChanged()
+                if (suggestions.isNotEmpty() && binding.actvPlannerCity.hasFocus())
+                    binding.actvPlannerCity.showDropDown()
+            }
+        }
+        lifecycleScope.launch {
+            viewModel.plannerCityLocation.collect { loc ->
+                loc ?: return@collect
+                map?.animateCamera(
+                    CameraUpdateFactory.newCameraPosition(
+                        CameraPosition.Builder()
+                            .target(LatLng(loc.first, loc.second))
+                            .zoom(13.0)
+                            .build()
+                    )
+                )
             }
         }
 
@@ -194,6 +232,14 @@ class MapFragment : Fragment() {
             val bounds = m.projection.visibleRegion.latLngBounds
             val sw = bounds.southWest; val ne = bounds.northEast
             viewModel.toggleCyclingRoutes(sw.latitude, sw.longitude, ne.latitude, ne.longitude)
+        }
+
+        binding.fabPois.setOnClickListener {
+            viewModel.togglePois()
+        }
+
+        binding.tvPoiClose.setOnClickListener {
+            binding.poiInfoCard.visibility = View.GONE
         }
     }
 
@@ -243,23 +289,49 @@ class MapFragment : Fragment() {
     // ── Map click (knooppunt selection) ───────────────────────────
 
     private fun onMapClick(latLng: LatLng): Boolean {
-        if (viewModel.plannerMode.value != MapViewModel.PlannerMode.KNOOPPUNTEN) return false
         val m = map ?: return false
         val point = m.projection.toScreenLocation(latLng)
         val density = resources.displayMetrics.density
         val slop = 24 * density
-        val features = m.queryRenderedFeatures(
-            RectF(point.x - slop, point.y - slop, point.x + slop, point.y + slop),
-            "knooppunt-circles"
-        )
-        if (features.isEmpty()) return false
-        val props = features.first().properties() ?: return false
-        val id = props.get("nid")?.asLong ?: return true
-        val ref = props.get("ref")?.asString ?: return true
-        val lat = props.get("lat")?.asDouble ?: return true
-        val lon = props.get("lon")?.asDouble ?: return true
-        viewModel.toggleKnooppunt(Knooppunt(id, lat, lon, ref))
-        return true
+        val rect = RectF(point.x - slop, point.y - slop, point.x + slop, point.y + slop)
+
+        // POI tap (checked first — always active when layer is visible)
+        val poiFeatures = m.queryRenderedFeatures(rect, "poi-circles")
+        if (poiFeatures.isNotEmpty()) {
+            val props = poiFeatures.first().properties()
+            val name = props?.get("name")?.asString ?: return true
+            val amenity = props.get("amenity")?.asString ?: ""
+            binding.tvPoiName.text = name
+            binding.tvPoiType.text = amenityLabel(amenity)
+            binding.poiInfoCard.visibility = View.VISIBLE
+            return true
+        }
+
+        // Knooppunt tap (only in Route Plannen mode)
+        if (viewModel.plannerMode.value == MapViewModel.PlannerMode.KNOOPPUNTEN) {
+            val features = m.queryRenderedFeatures(rect, "knooppunt-circles")
+            if (features.isNotEmpty()) {
+                val props = features.first().properties() ?: return false
+                val id  = props.get("nid")?.asLong ?: return true
+                val ref = props.get("ref")?.asString ?: return true
+                val lat = props.get("lat")?.asDouble ?: return true
+                val lon = props.get("lon")?.asDouble ?: return true
+                viewModel.toggleKnooppunt(Knooppunt(id, lat, lon, ref))
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun amenityLabel(amenity: String): String = when (amenity) {
+        "cafe"       -> "Café / Koffieshop"
+        "restaurant" -> "Restaurant"
+        "fast_food"  -> "Snackbar / Fast food"
+        "bar"        -> "Bar"
+        "pub"        -> "Pub"
+        "bakery"     -> "Bakkerij"
+        "ice_cream"  -> "IJssalon"
+        else         -> amenity.replaceFirstChar { it.uppercase() }
     }
 
     // ── ViewModel observation ─────────────────────────────────────
@@ -307,6 +379,8 @@ class MapFragment : Fragment() {
                 if (route == null) {
                     drawRoute(emptyList())
                     binding.instructionsPanel.visibility = View.GONE
+                    binding.fabPois.visibility = View.GONE
+                    binding.poiInfoCard.visibility = View.GONE
                     return@collect
                 }
                 drawRoute(route.coordinates)
@@ -316,6 +390,7 @@ class MapFragment : Fragment() {
                     binding.instructionsPanel.visibility = View.VISIBLE
                     binding.plannerPanel.visibility = View.GONE
                 }
+                binding.fabPois.visibility = View.VISIBLE
             }
         }
         lifecycleScope.launch {
@@ -385,7 +460,20 @@ class MapFragment : Fragment() {
             viewModel.selectedNodes.collect { selected ->
                 val selectedIds = selected.map { it.id }.toSet()
                 updateKnoopuntenLayer(viewModel.visibleKnoopunten.value, selectedIds)
-                updatePlannerChips(selected)
+                updateRouteList(selected)
+            }
+        }
+
+        // POI layer
+        lifecycleScope.launch {
+            viewModel.pois.collect { pois -> updatePoiLayer(pois) }
+        }
+        lifecycleScope.launch {
+            viewModel.poisVisible.collect { visible ->
+                val tint = if (visible) R.color.route_blue else android.R.color.darker_gray
+                binding.fabPois.imageTintList = android.content.res.ColorStateList.valueOf(
+                    ContextCompat.getColor(requireContext(), tint)
+                )
             }
         }
 
@@ -406,34 +494,133 @@ class MapFragment : Fragment() {
         }
     }
 
-    // ── Planner chip strip ────────────────────────────────────────
+    // ── Planner route list ────────────────────────────────────────
 
-    private fun updatePlannerChips(nodes: List<Knooppunt>) {
-        binding.llNodeChips.removeAllViews()
+    private fun updateRouteList(nodes: List<Knooppunt>) {
+        binding.llRouteList.removeAllViews()
+
+        if (nodes.isEmpty()) {
+            binding.plannerPanel.visibility = View.GONE
+            return
+        }
+
         val dp = resources.displayMetrics.density
+        val distances = viewModel.getLegDistances(nodes)
+        val totalMeters = distances.sum()
+
         nodes.forEachIndexed { index, node ->
-            if (index > 0) {
-                val arrow = TextView(requireContext()).apply {
-                    text = " → "
-                    textSize = 14f
-                    setTextColor(ContextCompat.getColor(requireContext(), R.color.route_blue))
-                }
-                binding.llNodeChips.addView(arrow)
+            // Row: [circle] [label column] [remove button]
+            val row = LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.HORIZONTAL
+                gravity = android.view.Gravity.CENTER_VERTICAL
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).also { it.setMargins(0, (4 * dp).toInt(), 0, (4 * dp).toInt()) }
             }
-            val chip = TextView(requireContext()).apply {
+
+            // Node number circle
+            val circle = TextView(requireContext()).apply {
                 text = node.ref
-                textSize = 13f
+                textSize = 11f
                 setTextColor(0xFFFFFFFF.toInt())
-                setPadding((12 * dp).toInt(), (6 * dp).toInt(), (12 * dp).toInt(), (6 * dp).toInt())
+                gravity = android.view.Gravity.CENTER
+                val size = (36 * dp).toInt()
+                layoutParams = LinearLayout.LayoutParams(size, size)
+                    .also { it.setMargins(0, 0, (12 * dp).toInt(), 0) }
                 background = GradientDrawable().apply {
-                    shape = GradientDrawable.RECTANGLE
-                    cornerRadius = 16 * dp
+                    shape = GradientDrawable.OVAL
                     setColor(ContextCompat.getColor(requireContext(), R.color.route_blue))
                 }
             }
-            binding.llNodeChips.addView(chip)
+            row.addView(circle)
+
+            // Info column
+            val info = LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.VERTICAL
+                layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f)
+            }
+            val label = TextView(requireContext()).apply {
+                text = if (index == 0) getString(R.string.planner_startpunt)
+                       else formatDistance(distances[index - 1])
+                textSize = 13f
+                setTextColor(if (index == 0) 0xFF212121.toInt() else 0xFF555555.toInt())
+                if (index == 0) setTypeface(null, android.graphics.Typeface.BOLD)
+            }
+            info.addView(label)
+            row.addView(info)
+
+            // Remove button
+            val removeBtn = TextView(requireContext()).apply {
+                text = "×"
+                textSize = 18f
+                setTextColor(0xFF9E9E9E.toInt())
+                setPadding((8 * dp).toInt(), 0, 0, 0)
+                setOnClickListener { viewModel.toggleKnooppunt(node) }
+            }
+            row.addView(removeBtn)
+            binding.llRouteList.addView(row)
+
+            // Connector line between nodes
+            if (index < nodes.size - 1) {
+                val line = View(requireContext()).apply {
+                    layoutParams = LinearLayout.LayoutParams(
+                        (2 * dp).toInt(), (20 * dp).toInt()
+                    ).also { it.setMargins((17 * dp).toInt(), 0, 0, 0) }
+                    setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.route_blue))
+                }
+                binding.llRouteList.addView(line)
+            }
         }
-        binding.plannerPanel.visibility = if (nodes.isNotEmpty()) View.VISIBLE else View.GONE
+
+        // "?" next node placeholder
+        val connectorToNext = View(requireContext()).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                (2 * dp).toInt(), (20 * dp).toInt()
+            ).also { it.setMargins((17 * dp).toInt(), 0, 0, 0) }
+            setBackgroundColor(0xFFCCCCCC.toInt())
+        }
+        binding.llRouteList.addView(connectorToNext)
+
+        val placeholder = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).also { it.setMargins(0, (4 * dp).toInt(), 0, 0) }
+        }
+        val qCircle = TextView(requireContext()).apply {
+            text = "?"
+            textSize = 13f
+            setTextColor(0xFF757575.toInt())
+            gravity = android.view.Gravity.CENTER
+            val size = (36 * dp).toInt()
+            layoutParams = LinearLayout.LayoutParams(size, size)
+                .also { it.setMargins(0, 0, (12 * dp).toInt(), 0) }
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(0xFFEEEEEE.toInt())
+                setStroke((1.5f * dp).toInt(), 0xFFAAAAAA.toInt())
+            }
+        }
+        val nextHint = TextView(requireContext()).apply {
+            text = getString(R.string.planner_next_hint)
+            textSize = 13f
+            setTextColor(0xFF757575.toInt())
+        }
+        placeholder.addView(qCircle)
+        placeholder.addView(nextHint)
+        binding.llRouteList.addView(placeholder)
+
+        // Total distance
+        binding.tvPlannerTotal.text = if (totalMeters >= 1000)
+            "Totaal %.1f km".format(totalMeters / 1000)
+        else
+            "Totaal ${totalMeters.toInt()} m"
+
+        binding.btnCalculatePlannerRoute.isEnabled = nodes.size >= 2
+        binding.plannerPanel.visibility = View.VISIBLE
     }
 
     // ── Map layers ────────────────────────────────────────────────
@@ -716,6 +903,42 @@ class MapFragment : Fragment() {
     }
 
     // ── Map layer helpers ─────────────────────────────────────────
+
+    private fun addPoiLayer(style: Style) {
+        style.addSource(GeoJsonSource("poi-source"))
+        style.addLayer(
+            CircleLayer("poi-circles", "poi-source").withProperties(
+                PropertyFactory.circleRadius(9f),
+                PropertyFactory.circleColor(
+                    Expression.switchCase(
+                        Expression.eq(Expression.get("amenity"), Expression.literal("cafe")),
+                        Expression.literal("#795548"),
+                        Expression.eq(Expression.get("amenity"), Expression.literal("restaurant")),
+                        Expression.literal("#E53935"),
+                        Expression.eq(Expression.get("amenity"), Expression.literal("fast_food")),
+                        Expression.literal("#FB8C00"),
+                        Expression.eq(Expression.get("amenity"), Expression.literal("bar")),
+                        Expression.literal("#5E35B1"),
+                        Expression.eq(Expression.get("amenity"), Expression.literal("pub")),
+                        Expression.literal("#5E35B1"),
+                        Expression.literal("#43A047")
+                    )
+                ),
+                PropertyFactory.circleStrokeWidth(1.5f),
+                PropertyFactory.circleStrokeColor("#FFFFFF")
+            )
+        )
+    }
+
+    private fun updatePoiLayer(pois: List<Poi>) {
+        map?.getStyle { style ->
+            val features = pois.joinToString(",") { poi ->
+                """{"type":"Feature","geometry":{"type":"Point","coordinates":[${poi.lon},${poi.lat}]},"properties":{"id":${poi.id},"name":"${poi.name.replace("\"","'")}","amenity":"${poi.amenity}"}}"""
+            }
+            style.getSourceAs<GeoJsonSource>("poi-source")
+                ?.setGeoJson("""{"type":"FeatureCollection","features":[$features]}""")
+        }
+    }
 
     private fun addRouteLayer(style: Style) {
         style.addSource(GeoJsonSource("route-source"))

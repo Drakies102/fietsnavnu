@@ -49,6 +49,27 @@ data class RouteResult(
     val instructions: List<RouteInstruction>
 )
 
+data class Poi(
+    val id: Long,
+    val name: String,
+    val amenity: String,
+    val lat: Double,
+    val lon: Double
+)
+
+data class PoiResponse(
+    val features: List<PoiFeature>
+)
+
+data class PoiFeature(
+    val geometry: PoiGeometry,
+    val properties: PoiProperties
+)
+
+data class PoiGeometry(val coordinates: List<Double>)
+
+data class PoiProperties(val id: Long, val name: String, val amenity: String)
+
 data class Knooppunt(
     val id: Long,
     val lat: Double,

@@ -3,7 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
 
     <!-- Full-screen map -->
     <org.maplibre.android.maps.MapView
@@ -106,7 +108,7 @@
 
             </LinearLayout>
 
-            <!-- Knooppunten mode hint (shown when no nodes selected yet) -->
+            <!-- Route Plannen mode: city search -->
             <LinearLayout
                 android:id="@+id/knooppuntenModeContent"
                 android:layout_width="match_parent"
@@ -114,14 +116,16 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
-                <TextView
+                <AutoCompleteTextView
+                    android:id="@+id/actvPlannerCity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/planner_hint"
-                    android:textAlignment="center"
-                    android:padding="8dp"
-                    android:textColor="#FF757575"
-                    android:textSize="13sp" />
+                    android:hint="@string/planner_city_hint"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch"
+                    android:drawableStart="@android:drawable/ic_menu_search"
+                    android:drawablePadding="8dp"
+                    android:singleLine="true" />
 
             </LinearLayout>
 
@@ -252,6 +256,77 @@
         app:layout_constraintTop_toBottomOf="@id/searchCard"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- POI along route FAB — only visible when route is active -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabPois"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="@string/fab_pois_desc"
+        app:srcCompat="@drawable/ic_poi"
+        app:fabSize="mini"
+        app:backgroundTint="@color/white"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/fabLayers"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- POI info card — shown when a POI is tapped -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/poiInfoCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:visibility="gone"
+        app:cardElevation="6dp"
+        app:cardCornerRadius="8dp"
+        app:layout_constraintBottom_toTopOf="@id/instructionsPanel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="12dp"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvPoiName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#FF212121" />
+
+                <TextView
+                    android:id="@+id/tvPoiType"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="#FF757575"
+                    android:layout_marginTop="2dp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvPoiClose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="×"
+                android:textSize="20sp"
+                android:textColor="#FF9E9E9E"
+                android:padding="4dp" />
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
     <!-- ═══════════════════════════════════════════════════════════
          ROUTE SUMMARY PANEL — shown after route calculation (both modes)
          ═══════════════════════════════════════════════════════════ -->
@@ -315,14 +390,14 @@
     </LinearLayout>
 
     <!-- ═══════════════════════════════════════════════════════════
-         KNOOPPUNTEN PLANNER PANEL — shown while building a route
+         ROUTE PLANNEN PANEL — vertical node list, ANWB style
          ═══════════════════════════════════════════════════════════ -->
     <LinearLayout
         android:id="@+id/plannerPanel"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
+        android:orientation="vertical"
+        android:padding="12dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -340,33 +415,49 @@
                 android:orientation="vertical"
                 android:padding="12dp">
 
-                <HorizontalScrollView
+                <!-- Scrollable node list -->
+                <ScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:scrollbars="none">
+                    android:maxHeight="260dp"
+                    android:scrollbars="vertical">
 
                     <LinearLayout
-                        android:id="@+id/llNodeChips"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/llRouteList"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:paddingBottom="4dp" />
+                        android:orientation="vertical" />
 
-                </HorizontalScrollView>
+                </ScrollView>
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:background="@color/divider" />
+
+                <!-- Total distance -->
+                <TextView
+                    android:id="@+id/tvPlannerTotal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:textStyle="bold"
+                    android:textSize="15sp"
+                    android:textColor="@color/route_blue" />
+
+                <!-- Action buttons -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="8dp">
+                    android:orientation="horizontal">
 
                     <Button
                         android:id="@+id/btnClearPlanner"
                         style="@style/Widget.AppCompat.Button.Borderless"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="4dp"
                         android:text="@string/btn_clear_planner" />
 
                     <Button
@@ -374,6 +465,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:enabled="false"
                         android:text="@string/btn_calculate_planner_route" />
 
                 </LinearLayout>

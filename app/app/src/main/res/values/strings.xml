@@ -14,7 +14,12 @@
     <string name="mode_address">Adres</string>
     <string name="mode_knooppunten">Route Plannen</string>
     <string name="planner_hint">Tik op knooppunten om je route te plannen</string>
+    <string name="planner_city_hint">Zoek een stad of gemeente…</string>
+    <string name="planner_startpunt">Startpunt van de route</string>
+    <string name="planner_next_hint">Tik op een knooppunt in de kaart</string>
+    <string name="planner_total">Totaal</string>
     <string name="btn_clear_planner">Wis</string>
     <string name="btn_calculate_planner_route">Bereken route</string>
     <string name="fab_layers_desc">Fietsroutes tonen</string>
+    <string name="fab_pois_desc">Eten en drinken langs route</string>
 </resources>
