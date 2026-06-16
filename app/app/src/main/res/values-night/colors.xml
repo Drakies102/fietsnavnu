@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="text_primary">#FFEEEEEE</color>
+    <color name="text_secondary">#FFAAAAAA</color>
+    <color name="text_tertiary">#FF777777</color>
+    <color name="nav_secondary_text">#FF8888BB</color>
+    <color name="surface_card">#D9252525</color>
+    <color name="surface_card_solid">#FF1E1E2E</color>
+    <color name="surface_nav_instruction">#E0252525</color>
+    <color name="nav_next_surface">#CC2A2350</color>
+    <color name="fab_bg">#D9252525</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>

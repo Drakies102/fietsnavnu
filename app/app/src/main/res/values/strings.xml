@@ -3,6 +3,8 @@
     <string name="app_name">Fiets Routen</string>
     <string name="hint_from">Van (startadres)</string>
     <string name="hint_to">Naar (bestemming)</string>
+    <string name="label_from">Van</string>
+    <string name="label_to">Naar</string>
     <string name="btn_find_route">Vind fietsroute</string>
     <string name="distance_placeholder">Afstand: —</string>
     <string name="duration_placeholder">Tijd: —</string>
@@ -22,4 +24,9 @@
     <string name="btn_calculate_planner_route">Bereken route</string>
     <string name="fab_layers_desc">Fietsroutes tonen</string>
     <string name="fab_pois_desc">Eten en drinken langs route</string>
+    <string name="fab_recenter_desc">Centreer op mijn locatie</string>
+    <string name="swap_locations_desc">Verwissel start en bestemming</string>
+    <string name="profile_bike_label">🚲 Fiets</string>
+    <string name="profile_mtb_label">⛰️ MTB</string>
+    <string name="profile_racingbike_label">🏁 Race</string>
 </resources>

@@ -10,10 +10,13 @@ import com.fietsrouten.data.model.Poi
 import com.fietsrouten.data.repository.PoiServiceRepository
 import com.fietsrouten.data.model.NominatimResult
 import com.fietsrouten.data.model.RouteResult
+import com.fietsrouten.data.model.TripSummary
 import com.fietsrouten.data.repository.OverpassRepository
 import com.fietsrouten.data.repository.RouteRepository
 import com.fietsrouten.navigation.NavigationEngine
 import com.fietsrouten.navigation.NavigationSession
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.debounce
@@ -24,6 +27,10 @@ import kotlinx.coroutines.launch
 class MapViewModel : ViewModel() {
 
     enum class PlannerMode { ADDRESS, KNOOPPUNTEN }
+
+    enum class CyclingProfile(val apiName: String) {
+        BIKE("bike"), MTB("mtb"), RACING("racingbike")
+    }
 
     private val repository = RouteRepository()
     private val overpassRepository = OverpassRepository()
@@ -44,10 +51,30 @@ class MapViewModel : ViewModel() {
     private val fromQuery = MutableStateFlow("")
     private val toQuery = MutableStateFlow("")
 
+    // ── User location (for "use my location" suggestions) ─────────
+
+    private val _userLocation = MutableStateFlow<Pair<Double, Double>?>(null)
+    val userLocation: StateFlow<Pair<Double, Double>?> = _userLocation
+
+    fun updateUserLocation(lat: Double, lon: Double) {
+        _userLocation.value = lat to lon
+    }
+
+    fun currentLocationResult(): NominatimResult? =
+        _userLocation.value?.let { (lat, lon) ->
+            NominatimResult(placeId = -1L, displayName = "Mijn locatie", lat = lat.toString(), lon = lon.toString())
+        }
+
     // ── Route + navigation ────────────────────────────────────────
 
     private val _route = MutableStateFlow<RouteResult?>(null)
     val route: StateFlow<RouteResult?> = _route
+
+    private val _routesByProfile = MutableStateFlow<Map<CyclingProfile, RouteResult>>(emptyMap())
+    val routesByProfile: StateFlow<Map<CyclingProfile, RouteResult>> = _routesByProfile
+
+    private val _selectedProfile = MutableStateFlow(CyclingProfile.BIKE)
+    val selectedProfile: StateFlow<CyclingProfile> = _selectedProfile
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
@@ -60,6 +87,12 @@ class MapViewModel : ViewModel() {
 
     private val _isNavigating = MutableStateFlow(false)
     val isNavigating: StateFlow<Boolean> = _isNavigating
+
+    private val _tripSummary = MutableStateFlow<TripSummary?>(null)
+    val tripSummary: StateFlow<TripSummary?> = _tripSummary
+
+    private var navStartTimeMs = 0L
+    private var navMaxSpeedKmh = 0f
 
     private var recalcCooldownUntil = 0L
 
@@ -122,6 +155,10 @@ class MapViewModel : ViewModel() {
         _plannerCityLocation.value = result.lat.toDouble() to result.lon.toDouble()
     }
 
+    fun clearPlannerCitySelection() {
+        _plannerCityLocation.value = null
+    }
+
     fun getLegDistances(nodes: List<Knooppunt>): List<Double> =
         nodes.zipWithNext { a, b -> haversineMeters(a.lat, a.lon, b.lat, b.lon) }
 
@@ -150,9 +187,39 @@ class MapViewModel : ViewModel() {
         _selectedNodes.value = emptyList()
         _visibleKnoopunten.value = emptyList()
         _route.value = null
+        _routesByProfile.value = emptyMap()
         _error.value = null
         _pois.value = emptyList()
         _poisVisible.value = false
+    }
+
+    // ── Cycling profile selection ──────────────────────────────────
+
+    private suspend fun fetchAllProfiles(
+        request: suspend (profile: String) -> RouteResult
+    ): Map<CyclingProfile, RouteResult> = coroutineScope {
+        CyclingProfile.values()
+            .map { profile -> profile to async { runCatching { request(profile.apiName) } } }
+            .mapNotNull { (profile, deferred) -> deferred.await().getOrNull()?.let { profile to it } }
+            .toMap()
+    }
+
+    private fun applyRouteResults(results: Map<CyclingProfile, RouteResult>): Boolean {
+        if (results.isEmpty()) return false
+        _routesByProfile.value = results
+        val profile = if (_selectedProfile.value in results) _selectedProfile.value else CyclingProfile.BIKE
+        _selectedProfile.value = profile
+        _route.value = results[profile] ?: results.values.first()
+        _pois.value = emptyList()
+        _poisVisible.value = false
+        return true
+    }
+
+    fun selectProfile(profile: CyclingProfile) {
+        val result = _routesByProfile.value[profile] ?: return
+        _selectedProfile.value = profile
+        _route.value = result
+        if (_poisVisible.value) loadPoisAlongRoute(result) else _pois.value = emptyList()
     }
 
     // ── Address-mode routing ──────────────────────────────────────
@@ -163,17 +230,15 @@ class MapViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
-            runCatching {
+            val results = fetchAllProfiles { profile ->
                 repository.getRoute(
                     fromLat = from.lat.toDouble(), fromLon = from.lon.toDouble(),
-                    toLat = to.lat.toDouble(), toLon = to.lon.toDouble()
+                    toLat = to.lat.toDouble(), toLon = to.lon.toDouble(),
+                    profile = profile
                 )
-            }.onSuccess { route ->
-                _route.value = route
-                _pois.value = emptyList()
-                _poisVisible.value = false
-            }.onFailure {
-                _error.value = "Route niet gevonden: ${it.message}"
+            }
+            if (!applyRouteResults(results)) {
+                _error.value = "Route niet gevonden"
             }
             _isLoading.value = false
         }
@@ -191,6 +256,7 @@ class MapViewModel : ViewModel() {
     fun clearPlanner() {
         _selectedNodes.value = emptyList()
         _route.value = null
+        _routesByProfile.value = emptyMap()
         _error.value = null
     }
 
@@ -200,16 +266,14 @@ class MapViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
-            runCatching {
-                repository.getRoute(nodes.map { it.lat to it.lon })
-            }.onSuccess { route ->
-                _route.value = route
+            val results = fetchAllProfiles { profile ->
+                repository.getRoute(nodes.map { it.lat to it.lon }, profile)
+            }
+            if (applyRouteResults(results)) {
                 _visibleKnoopunten.value = _selectedNodes.value
                 _selectedNodes.value = emptyList()
-                _pois.value = emptyList()
-                _poisVisible.value = false
-            }.onFailure {
-                _error.value = "Route niet gevonden: ${it.message}"
+            } else {
+                _error.value = "Route niet gevonden"
             }
             _isLoading.value = false
         }
@@ -300,17 +364,36 @@ class MapViewModel : ViewModel() {
 
     fun startNavigation() {
         if (_route.value == null) return
+        navStartTimeMs = System.currentTimeMillis()
+        navMaxSpeedKmh = 0f
+        _tripSummary.value = null
         _isNavigating.value = true
     }
 
     fun stopNavigation() {
+        val route = _route.value
+        val session = _navigationSession.value
+        if (route != null && navStartTimeMs > 0L) {
+            val durationMs = System.currentTimeMillis() - navStartTimeMs
+            val traveled = route.distanceMeters - (session?.remainingDistanceMeters ?: route.distanceMeters)
+            val avgKmh = if (durationMs > 0) (traveled / (durationMs / 1000.0)) * 3.6 else 0.0
+            _tripSummary.value = TripSummary(
+                distanceMeters = traveled.coerceAtLeast(0.0),
+                durationMs = durationMs,
+                avgSpeedKmh = avgKmh,
+                maxSpeedKmh = navMaxSpeedKmh.toDouble()
+            )
+        }
         _isNavigating.value = false
         _navigationSession.value = null
+        navStartTimeMs = 0L
     }
 
     fun onLocationUpdate(location: Location) {
         if (!_isNavigating.value) return
         val route = _route.value ?: return
+        val speedKmh = location.speed * 3.6f
+        if (speedKmh > navMaxSpeedKmh) navMaxSpeedKmh = speedKmh
         val session = navigationEngine.update(location, route)
         _navigationSession.value = session
 
@@ -326,7 +409,8 @@ class MapViewModel : ViewModel() {
             runCatching {
                 repository.getRoute(
                     fromLat = location.latitude, fromLon = location.longitude,
-                    toLat = to.lat.toDouble(), toLon = to.lon.toDouble()
+                    toLat = to.lat.toDouble(), toLon = to.lon.toDouble(),
+                    profile = _selectedProfile.value.apiName
                 )
             }.onSuccess { _route.value = it }
         }

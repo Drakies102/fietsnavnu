@@ -15,7 +15,8 @@ data class GraphHopperRequest(
     val profile: String = "bike",
     @SerializedName("points_encoded") val pointsEncoded: Boolean = false,
     val locale: String = "nl",
-    val instructions: Boolean = true
+    val instructions: Boolean = true,
+    val elevation: Boolean = true
 )
 
 data class GraphHopperResponse(
@@ -46,7 +47,15 @@ data class RouteResult(
     val coordinates: List<List<Double>>,
     val distanceMeters: Double,
     val durationMs: Long,
-    val instructions: List<RouteInstruction>
+    val instructions: List<RouteInstruction>,
+    val elevationProfile: List<Double> = emptyList()
+)
+
+data class TripSummary(
+    val distanceMeters: Double,
+    val durationMs: Long,
+    val avgSpeedKmh: Double,
+    val maxSpeedKmh: Double
 )
 
 data class Poi(

@@ -6,6 +6,6 @@ object Config {
     const val OVERPASS_BASE_URL = "https://overpass-api.de/"
     const val POI_BASE_URL = "https://fietsnav-pois.learndelingo.nl"
 
-    // Vector tile URL served by Tileserver-GL from netherlands.mbtiles
-    const val MAP_STYLE_URL = "https://fietsnav-tile.learndelingo.nl/styles/basic-preview/style.json?v=2"
+    const val MAP_STYLE_URL      = "https://tiles.openfreemap.org/styles/bright"
+    const val MAP_STYLE_DARK_URL = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
 }

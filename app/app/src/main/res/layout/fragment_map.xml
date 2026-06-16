@@ -20,22 +20,23 @@
     <!-- ═══════════════════════════════════════════════════════════
          ADDRESS SEARCH / PLANNER CARD — hidden during navigation
          ═══════════════════════════════════════════════════════════ -->
-    <androidx.cardview.widget.CardView
+    <LinearLayout
         android:id="@+id/searchCard"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="12dp"
-        app:cardElevation="6dp"
-        app:cardCornerRadius="8dp"
+        android:orientation="vertical"
+        android:background="@drawable/search_card_bg"
+        android:elevation="8dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="12dp">
 
             <!-- Mode toggle -->
             <com.google.android.material.button.MaterialButtonToggleGroup
@@ -53,6 +54,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.FietsRouten.Square"
                     android:text="@string/mode_address" />
 
                 <com.google.android.material.button.MaterialButton
@@ -61,6 +63,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.FietsRouten.Square"
                     android:text="@string/mode_knooppunten" />
 
             </com.google.android.material.button.MaterialButtonToggleGroup>
@@ -72,32 +75,131 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <AutoCompleteTextView
-                    android:id="@+id/actvFrom"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/hint_from"
-                    android:inputType="text"
-                    android:imeOptions="actionNext"
-                    android:drawableStart="@android:drawable/ic_menu_mylocation"
-                    android:drawablePadding="8dp" />
+                    android:layout_height="wrap_content">
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginBottom="4dp"
-                    android:background="@color/divider" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
-                <AutoCompleteTextView
-                    android:id="@+id/actvTo"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/hint_to"
-                    android:inputType="text"
-                    android:imeOptions="actionSearch"
-                    android:drawableStart="@android:drawable/ic_menu_directions"
-                    android:drawablePadding="8dp" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingStart="4dp"
+                            android:paddingEnd="48dp"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_marginEnd="12dp"
+                                android:src="@drawable/ic_marker_origin"
+                                android:contentDescription="@null" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/label_from"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_secondary" />
+
+                                <AutoCompleteTextView
+                                    android:id="@+id/actvFrom"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@android:color/transparent"
+                                    android:padding="0dp"
+                                    android:textSize="15sp"
+                                    android:hint="@string/hint_from"
+                                    android:inputType="text"
+                                    android:imeOptions="actionNext"
+                                    android:maxLines="1"
+                                    android:ellipsize="end" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginStart="34dp"
+                            android:background="@color/divider" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:paddingStart="4dp"
+                            android:paddingEnd="48dp"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_marginEnd="12dp"
+                                android:src="@drawable/ic_marker_destination"
+                                android:contentDescription="@null" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/label_to"
+                                    android:textSize="11sp"
+                                    android:textColor="@color/text_secondary" />
+
+                                <AutoCompleteTextView
+                                    android:id="@+id/actvTo"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:background="@android:color/transparent"
+                                    android:padding="0dp"
+                                    android:textSize="15sp"
+                                    android:hint="@string/hint_to"
+                                    android:inputType="text"
+                                    android:imeOptions="actionSearch"
+                                    android:maxLines="1"
+                                    android:ellipsize="end" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <ImageButton
+                        android:id="@+id/btnSwap"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="end|center_vertical"
+                        android:layout_marginEnd="6dp"
+                        android:padding="8dp"
+                        android:background="@drawable/swap_button_bg"
+                        android:foreground="?android:attr/selectableItemBackgroundBorderless"
+                        android:elevation="4dp"
+                        app:srcCompat="@drawable/ic_swap"
+                        android:contentDescription="@string/swap_locations_desc" />
+
+                </FrameLayout>
 
                 <Button
                     android:id="@+id/btnRoute"
@@ -120,17 +222,22 @@
                     android:id="@+id/actvPlannerCity"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="12dp"
+                    android:paddingTop="12dp"
+                    android:paddingBottom="12dp"
+                    android:textSize="15sp"
                     android:hint="@string/planner_city_hint"
                     android:inputType="text"
                     android:imeOptions="actionSearch"
                     android:drawableStart="@android:drawable/ic_menu_search"
-                    android:drawablePadding="8dp"
+                    android:drawablePadding="12dp"
                     android:singleLine="true" />
 
             </LinearLayout>
 
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </LinearLayout>
 
     <!-- ═══════════════════════════════════════════════════════════
          NAVIGATION INSTRUCTION BAR — TomTom style, full width
@@ -140,9 +247,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@color/white"
+        android:background="@drawable/nav_instruction_bg"
         android:elevation="8dp"
         android:visibility="gone"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -150,7 +260,7 @@
         <LinearLayout
             android:layout_width="90dp"
             android:layout_height="match_parent"
-            android:background="@color/route_blue"
+            android:background="@drawable/nav_instruction_icon_bg"
             android:gravity="center"
             android:minHeight="90dp">
 
@@ -175,7 +285,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
-                android:textColor="#FF212121"
+                android:textColor="@color/text_primary"
                 android:maxLines="2"
                 android:ellipsize="end" />
 
@@ -186,7 +296,7 @@
                 android:layout_marginTop="4dp"
                 android:textSize="30sp"
                 android:textStyle="bold"
-                android:textColor="@color/route_blue" />
+                android:textColor="@color/brand_primary" />
 
         </LinearLayout>
 
@@ -196,14 +306,14 @@
             android:orientation="vertical"
             android:gravity="center"
             android:padding="8dp"
-            android:background="@color/nav_next_bg">
+            android:background="@drawable/nav_instruction_next_bg">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/nav_then"
                 android:textSize="10sp"
-                android:textColor="#FF757575" />
+                android:textColor="@color/text_secondary" />
 
             <ImageView
                 android:id="@+id/ivNextTurnIcon"
@@ -252,7 +362,7 @@
         android:contentDescription="@string/fab_layers_desc"
         app:srcCompat="@drawable/ic_layers"
         app:fabSize="mini"
-        app:backgroundTint="@color/white"
+        app:backgroundTint="@color/fab_bg"
         app:layout_constraintTop_toBottomOf="@id/searchCard"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -266,9 +376,24 @@
         android:contentDescription="@string/fab_pois_desc"
         app:srcCompat="@drawable/ic_poi"
         app:fabSize="mini"
-        app:backgroundTint="@color/white"
+        app:backgroundTint="@color/fab_bg"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@id/fabLayers"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Recenter on my location FAB -->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabRecenter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="@string/fab_recenter_desc"
+        app:srcCompat="@android:drawable/ic_menu_mylocation"
+        app:tint="@color/brand_primary"
+        app:fabSize="mini"
+        app:backgroundTint="@color/fab_bg"
+        app:layout_constraintTop_toBottomOf="@id/fabPois"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- POI info card — shown when a POI is tapped -->
@@ -279,7 +404,8 @@
         android:layout_margin="12dp"
         android:visibility="gone"
         app:cardElevation="6dp"
-        app:cardCornerRadius="8dp"
+        app:cardCornerRadius="20dp"
+        app:cardBackgroundColor="@color/surface_card_solid"
         app:layout_constraintBottom_toTopOf="@id/instructionsPanel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -303,14 +429,14 @@
                     android:layout_height="wrap_content"
                     android:textSize="15sp"
                     android:textStyle="bold"
-                    android:textColor="#FF212121" />
+                    android:textColor="@color/text_primary" />
 
                 <TextView
                     android:id="@+id/tvPoiType"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="12sp"
-                    android:textColor="#FF757575"
+                    android:textColor="@color/text_secondary"
                     android:layout_marginTop="2dp" />
 
             </LinearLayout>
@@ -321,7 +447,7 @@
                 android:layout_height="wrap_content"
                 android:text="×"
                 android:textSize="20sp"
-                android:textColor="#FF9E9E9E"
+                android:textColor="@color/text_tertiary"
                 android:padding="4dp" />
 
         </LinearLayout>
@@ -335,7 +461,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:padding="12dp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -344,14 +470,19 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="6dp"
-            app:cardCornerRadius="8dp">
+            app:cardElevation="8dp"
+            app:cardCornerRadius="20dp"
+            app:cardBackgroundColor="@color/surface_card_solid">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="12dp">
+
+                <include
+                    android:id="@+id/profileSelector"
+                    layout="@layout/partial_profile_selector" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -376,6 +507,13 @@
                         android:text="@string/duration_placeholder" />
 
                 </LinearLayout>
+
+                <com.fietsrouten.ui.ElevationChartView
+                    android:id="@+id/elevationChart"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:layout_marginTop="8dp"
+                    android:visibility="gone" />
 
                 <Button
                     android:id="@+id/btnStartNavigation"
@@ -406,8 +544,9 @@
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardElevation="6dp"
-            app:cardCornerRadius="8dp">
+            app:cardElevation="8dp"
+            app:cardCornerRadius="20dp"
+            app:cardBackgroundColor="@color/surface_card_solid">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -445,7 +584,7 @@
                     android:layout_marginBottom="8dp"
                     android:textStyle="bold"
                     android:textSize="15sp"
-                    android:textColor="@color/route_blue" />
+                    android:textColor="@color/brand_primary" />
 
                 <!-- Action buttons -->
                 <LinearLayout
@@ -483,8 +622,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:background="@color/nav_bg_dark"
-        android:padding="16dp"
+        android:background="@drawable/bottom_bar_bg"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="16dp"
         android:gravity="center_vertical"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -505,8 +647,22 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textColor="#FFAAAACC"
+            android:textColor="@color/nav_secondary_text"
             android:textSize="16sp"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/tvSpeed"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/speed_badge_bg"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:gravity="center" />
 
         <Button

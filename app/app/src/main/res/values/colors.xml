@@ -6,11 +6,24 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="error_red">#FFD32F2F</color>
-    <color name="route_blue">#FF0066CC</color>
     <color name="divider">#FFE0E0E0</color>
-    <color name="nav_bg_dark">#FF1A1A2E</color>
-    <color name="nav_next_bg">#FFE8F0FE</color>
     <color name="cycling_route_ncn">#FFFF6B35</color>
     <color name="cycling_route_rcn">#FF2E7D32</color>
     <color name="cycling_route_lcn">#FF9E9E9E</color>
+    <!-- Semantic colors — dark-mode variants defined in values-night/colors.xml -->
+    <color name="text_primary">#FF212121</color>
+    <color name="text_secondary">#FF757575</color>
+    <color name="text_tertiary">#FF9E9E9E</color>
+    <color name="nav_secondary_text">#FFAAAACC</color>
+    <color name="surface_card">#D9FFFFFF</color>
+    <color name="surface_card_solid">#FFFFFFFF</color>
+    <color name="surface_nav_instruction">#E0FFFFFF</color>
+    <color name="nav_next_surface">#CCEDE9FE</color>
+    <color name="fab_bg">#D9FFFFFF</color>
+
+    <!-- Purple/indigo brand palette -->
+    <color name="brand_primary">#FF6C5DD3</color>
+    <color name="brand_primary_dark">#FF4A3FAD</color>
+    <color name="brand_accent_green">#FF34C77B</color>
+    <color name="nav_bottom_bg">#F51E1840</color>
 </resources>

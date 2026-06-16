@@ -1,6 +1,10 @@
 package com.fietsrouten.ui.map
 
 import android.Manifest
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.RectF
 import android.util.Log
 import android.graphics.drawable.GradientDrawable
@@ -11,9 +15,11 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.Filter
 import android.widget.ImageButton
 import android.widget.LinearLayout
@@ -43,12 +49,14 @@ import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.geometry.LatLngBounds
 import org.maplibre.android.location.LocationComponentActivationOptions
+import org.maplibre.android.location.LocationComponentOptions
 import org.maplibre.android.location.modes.CameraMode
 import org.maplibre.android.location.modes.RenderMode
 import org.maplibre.android.maps.MapLibreMap
 import org.maplibre.android.maps.Style
 import org.maplibre.android.style.expressions.Expression
 import org.maplibre.android.style.layers.CircleLayer
+import org.maplibre.android.style.layers.FillLayer
 import org.maplibre.android.style.layers.LineLayer
 import org.maplibre.android.style.layers.PropertyFactory
 import org.maplibre.android.style.layers.SymbolLayer
@@ -57,7 +65,10 @@ import java.util.Locale
 
 class MapFragment : Fragment() {
 
-    companion object { private const val TAG_K = "Knoopunten" }
+    companion object {
+        private const val TAG_K = "Knoopunten"
+        private const val CURRENT_LOCATION_LABEL = "📍 Mijn locatie"
+    }
 
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
@@ -67,7 +78,14 @@ class MapFragment : Fragment() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val locationCallback = object : LocationCallback() {
         override fun onLocationResult(result: LocationResult) {
-            result.lastLocation?.let { viewModel.onLocationUpdate(it) }
+            result.lastLocation?.let { loc ->
+                viewModel.onLocationUpdate(loc)
+                viewModel.updateUserLocation(loc.latitude, loc.longitude)
+                updateUserRadius(loc.latitude, loc.longitude)
+                if (binding.navBottomBar.visibility == View.VISIBLE) {
+                    binding.tvSpeed.text = "%.0f km/h".format(loc.speed * 3.6f)
+                }
+            }
         }
     }
 
@@ -110,7 +128,9 @@ class MapFragment : Fragment() {
         binding.mapView.getMapAsync { mapLibreMap ->
             map = mapLibreMap
             mapLibreMap.setStyle(Config.MAP_STYLE_URL) { style ->
+                addUserRadiusLayer(style)
                 addRouteLayer(style)
+                addRouteEndpointsLayer(style)
                 addKnoopuntenLayers(style)
                 addCyclingRoutesLayer(style)
                 addPoiLayer(style)
@@ -127,6 +147,7 @@ class MapFragment : Fragment() {
         setupSearch()
         setupNavigation()
         setupPlannerUI()
+        setupProfileSelector()
         observeViewModel()
         loadKnoopuntenFromAssets()
     }
@@ -136,7 +157,24 @@ class MapFragment : Fragment() {
     private fun setupSearch() {
         binding.actvFrom.addTextChangedListener(watcher { viewModel.searchFrom(it) })
         binding.actvTo.addTextChangedListener(watcher { viewModel.searchTo(it) })
+        binding.actvFrom.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) binding.actvFrom.showDropDown() }
+        binding.actvTo.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) binding.actvTo.showDropDown() }
+        setupClearButton(binding.actvFrom) { viewModel.fromLocation = null }
+        setupClearButton(binding.actvTo) { viewModel.toLocation = null }
         binding.btnRoute.setOnClickListener { viewModel.calculateRoute() }
+        binding.btnSwap.setOnClickListener { swapFromTo() }
+    }
+
+    private fun swapFromTo() {
+        val fromText = binding.actvFrom.text.toString()
+        val toText = binding.actvTo.text.toString()
+        val fromLocation = viewModel.fromLocation
+        val toLocation = viewModel.toLocation
+
+        binding.actvFrom.setText(toText, false)
+        binding.actvTo.setText(fromText, false)
+        viewModel.fromLocation = toLocation
+        viewModel.toLocation = fromLocation
     }
 
     // ── Navigation ────────────────────────────────────────────────
@@ -159,11 +197,57 @@ class MapFragment : Fragment() {
         binding.navBottomBar.visibility = View.GONE
         binding.searchCard.visibility = View.VISIBLE
         binding.instructionsPanel.visibility = View.VISIBLE
+        repositionFabsForNavigation(false)
         viewModel.route.value?.let { route ->
             val latLngs = route.coordinates.map { LatLng(it[1], it[0]) }
             if (latLngs.size >= 2) {
                 val bounds = LatLngBounds.Builder().includes(latLngs).build()
                 map?.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 80))
+            }
+        }
+    }
+
+    // ── Cycling profile selector ────────────────────────────────────
+
+    private fun setupProfileSelector() {
+        val toggle = binding.profileSelector.root
+
+        toggle.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (!isChecked) return@addOnButtonCheckedListener
+            val profile = when (checkedId) {
+                R.id.btnProfileMtb -> MapViewModel.CyclingProfile.MTB
+                R.id.btnProfileRacingbike -> MapViewModel.CyclingProfile.RACING
+                else -> MapViewModel.CyclingProfile.BIKE
+            }
+            viewModel.selectProfile(profile)
+        }
+
+        lifecycleScope.launch {
+            viewModel.routesByProfile.collect { routes ->
+                toggle.visibility = if (routes.size > 1) View.VISIBLE else View.GONE
+                routes[MapViewModel.CyclingProfile.BIKE]?.let {
+                    binding.profileSelector.btnProfileBike.text =
+                        "${getString(R.string.profile_bike_label)}\n${formatDuration(it.durationMs)}"
+                }
+                routes[MapViewModel.CyclingProfile.MTB]?.let {
+                    binding.profileSelector.btnProfileMtb.text =
+                        "${getString(R.string.profile_mtb_label)}\n${formatDuration(it.durationMs)}"
+                }
+                routes[MapViewModel.CyclingProfile.RACING]?.let {
+                    binding.profileSelector.btnProfileRacingbike.text =
+                        "${getString(R.string.profile_racingbike_label)}\n${formatDuration(it.durationMs)}"
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            viewModel.selectedProfile.collect { profile ->
+                val id = when (profile) {
+                    MapViewModel.CyclingProfile.MTB -> R.id.btnProfileMtb
+                    MapViewModel.CyclingProfile.RACING -> R.id.btnProfileRacingbike
+                    MapViewModel.CyclingProfile.BIKE -> R.id.btnProfileBike
+                }
+                if (toggle.checkedButtonId != id) toggle.check(id)
             }
         }
     }
@@ -187,10 +271,18 @@ class MapFragment : Fragment() {
         var cityResults = emptyList<com.fietsrouten.data.model.NominatimResult>()
         binding.actvPlannerCity.setAdapter(cityAdapter)
         binding.actvPlannerCity.addTextChangedListener(watcher { viewModel.searchPlannerCity(it) })
+        binding.actvPlannerCity.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) binding.actvPlannerCity.showDropDown() }
+        setupClearButton(binding.actvPlannerCity) { viewModel.clearPlannerCitySelection() }
         binding.actvPlannerCity.setOnItemClickListener { _, _, pos, _ ->
-            val result = cityResults[pos]
-            viewModel.selectPlannerCity(result)
-            binding.actvPlannerCity.setText(result.displayName.substringBefore(","), false)
+            if (pos == 0) {
+                val cur = viewModel.currentLocationResult() ?: return@setOnItemClickListener
+                viewModel.selectPlannerCity(cur)
+                binding.actvPlannerCity.setText(CURRENT_LOCATION_LABEL, false)
+            } else {
+                val result = cityResults[pos - 1]
+                viewModel.selectPlannerCity(result)
+                binding.actvPlannerCity.setText(result.displayName.substringBefore(","), false)
+            }
             binding.actvPlannerCity.clearFocus()
         }
         lifecycleScope.launch {
@@ -198,10 +290,9 @@ class MapFragment : Fragment() {
                 cityResults = suggestions
                 cityAdapter.setNotifyOnChange(false)
                 cityAdapter.clear()
-                cityAdapter.addAll(suggestions.map { it.displayName })
+                cityAdapter.addAll(listOf(CURRENT_LOCATION_LABEL) + suggestions.map { it.displayName })
                 cityAdapter.notifyDataSetChanged()
-                if (suggestions.isNotEmpty() && binding.actvPlannerCity.hasFocus())
-                    binding.actvPlannerCity.showDropDown()
+                if (binding.actvPlannerCity.hasFocus()) binding.actvPlannerCity.showDropDown()
             }
         }
         lifecycleScope.launch {
@@ -234,6 +325,19 @@ class MapFragment : Fragment() {
             viewModel.toggleCyclingRoutes(sw.latitude, sw.longitude, ne.latitude, ne.longitude)
         }
 
+        binding.fabRecenter.setOnClickListener {
+            val (lat, lon) = viewModel.userLocation.value ?: return@setOnClickListener
+            val currentZoom = map?.cameraPosition?.zoom ?: 14.0
+            map?.animateCamera(
+                CameraUpdateFactory.newCameraPosition(
+                    CameraPosition.Builder()
+                        .target(LatLng(lat, lon))
+                        .zoom(currentZoom)
+                        .build()
+                )
+            )
+        }
+
         binding.fabPois.setOnClickListener {
             viewModel.togglePois()
         }
@@ -253,7 +357,7 @@ class MapFragment : Fragment() {
 
     private fun loadKnoopuntenForCurrentViewport() {
         val m = map ?: return
-        if (m.cameraPosition.zoom < 10.0) return
+        if (m.cameraPosition.zoom < 11.0) return
         val bounds = m.projection.visibleRegion.latLngBounds
         val sw = bounds.southWest
         val ne = bounds.northEast
@@ -296,7 +400,7 @@ class MapFragment : Fragment() {
         val rect = RectF(point.x - slop, point.y - slop, point.x + slop, point.y + slop)
 
         // POI tap (checked first — always active when layer is visible)
-        val poiFeatures = m.queryRenderedFeatures(rect, "poi-circles")
+        val poiFeatures = m.queryRenderedFeatures(rect, "poi-symbols")
         if (poiFeatures.isNotEmpty()) {
             val props = poiFeatures.first().properties()
             val name = props?.get("name")?.asString ?: return true
@@ -345,13 +449,21 @@ class MapFragment : Fragment() {
 
         binding.actvFrom.setAdapter(fromAdapter)
         binding.actvFrom.setOnItemClickListener { _, _, pos, _ ->
-            viewModel.fromLocation = fromResults[pos]
-            binding.actvFrom.setText(fromResults[pos].displayName, false)
+            if (pos == 0) {
+                val cur = viewModel.currentLocationResult() ?: return@setOnItemClickListener
+                viewModel.fromLocation = cur
+                binding.actvFrom.setText(CURRENT_LOCATION_LABEL, false)
+            } else {
+                viewModel.fromLocation = fromResults[pos - 1]
+                binding.actvFrom.setText(fromResults[pos - 1].displayName, false)
+            }
+            binding.actvFrom.clearFocus()
         }
         binding.actvTo.setAdapter(toAdapter)
         binding.actvTo.setOnItemClickListener { _, _, pos, _ ->
             viewModel.toLocation = toResults[pos]
             binding.actvTo.setText(toResults[pos].displayName, false)
+            binding.actvTo.clearFocus()
         }
 
         lifecycleScope.launch {
@@ -359,9 +471,9 @@ class MapFragment : Fragment() {
                 fromResults = suggestions
                 fromAdapter.setNotifyOnChange(false)
                 fromAdapter.clear()
-                fromAdapter.addAll(suggestions.map { it.displayName })
+                fromAdapter.addAll(listOf(CURRENT_LOCATION_LABEL) + suggestions.map { it.displayName })
                 fromAdapter.notifyDataSetChanged()
-                if (suggestions.isNotEmpty() && binding.actvFrom.hasFocus()) binding.actvFrom.showDropDown()
+                if (binding.actvFrom.hasFocus()) binding.actvFrom.showDropDown()
             }
         }
         lifecycleScope.launch {
@@ -371,7 +483,7 @@ class MapFragment : Fragment() {
                 toAdapter.clear()
                 toAdapter.addAll(suggestions.map { it.displayName })
                 toAdapter.notifyDataSetChanged()
-                if (suggestions.isNotEmpty() && binding.actvTo.hasFocus()) binding.actvTo.showDropDown()
+                if (binding.actvTo.hasFocus()) binding.actvTo.showDropDown()
             }
         }
         lifecycleScope.launch {
@@ -386,6 +498,9 @@ class MapFragment : Fragment() {
                 drawRoute(route.coordinates)
                 binding.tvDistance.text = "Afstand: ${"%.1f km".format(route.distanceMeters / 1000)}"
                 binding.tvDuration.text = "Tijd: ${route.durationMs / 60000} min"
+                binding.elevationChart.setElevations(route.elevationProfile)
+                binding.elevationChart.visibility =
+                    if (binding.elevationChart.hasSignificantElevation()) View.VISIBLE else View.GONE
                 if (!viewModel.isNavigating.value) {
                     binding.instructionsPanel.visibility = View.VISIBLE
                     binding.plannerPanel.visibility = View.GONE
@@ -407,11 +522,13 @@ class MapFragment : Fragment() {
         lifecycleScope.launch {
             viewModel.isNavigating.collect { navigating ->
                 if (navigating) {
+                    activity?.window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                     binding.searchCard.visibility = View.GONE
                     binding.instructionsPanel.visibility = View.GONE
                     binding.plannerPanel.visibility = View.GONE
                     binding.navInstructionCard.visibility = View.VISIBLE
                     binding.navBottomBar.visibility = View.VISIBLE
+                    repositionFabsForNavigation(true)
                     viewModel.route.value?.let { route ->
                         val first = route.instructions.firstOrNull()
                         if (first != null) {
@@ -419,8 +536,11 @@ class MapFragment : Fragment() {
                             setTurnIcon(binding.ivTurnIcon, first.sign, large = true)
                         }
                         binding.tvNavRemaining.text = formatDistance(route.distanceMeters)
-                        binding.tvNavEta.text = "ETA ${formatEta(route.durationMs)}"
+                        binding.tvNavEta.text = "ETA …"
+                        binding.tvSpeed.text = "0 km/h"
                     }
+                } else {
+                    activity?.window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                 }
             }
         }
@@ -428,6 +548,12 @@ class MapFragment : Fragment() {
             viewModel.navigationSession.collect { session ->
                 session ?: return@collect
                 updateNavigationUI(session)
+            }
+        }
+        lifecycleScope.launch {
+            viewModel.tripSummary.collect { summary ->
+                summary ?: return@collect
+                showTripSummary(summary)
             }
         }
 
@@ -470,7 +596,7 @@ class MapFragment : Fragment() {
         }
         lifecycleScope.launch {
             viewModel.poisVisible.collect { visible ->
-                val tint = if (visible) R.color.route_blue else android.R.color.darker_gray
+                val tint = if (visible) R.color.brand_primary else android.R.color.darker_gray
                 binding.fabPois.imageTintList = android.content.res.ColorStateList.valueOf(
                     ContextCompat.getColor(requireContext(), tint)
                 )
@@ -485,7 +611,7 @@ class MapFragment : Fragment() {
         }
         lifecycleScope.launch {
             viewModel.showCyclingRoutes.collect { showing ->
-                val tintColor = if (showing) R.color.route_blue else android.R.color.darker_gray
+                val tintColor = if (showing) R.color.brand_primary else android.R.color.darker_gray
                 binding.fabLayers.imageTintList =
                     android.content.res.ColorStateList.valueOf(
                         ContextCompat.getColor(requireContext(), tintColor)
@@ -530,7 +656,7 @@ class MapFragment : Fragment() {
                     .also { it.setMargins(0, 0, (12 * dp).toInt(), 0) }
                 background = GradientDrawable().apply {
                     shape = GradientDrawable.OVAL
-                    setColor(ContextCompat.getColor(requireContext(), R.color.route_blue))
+                    setColor(ContextCompat.getColor(requireContext(), R.color.brand_primary))
                 }
             }
             row.addView(circle)
@@ -567,7 +693,7 @@ class MapFragment : Fragment() {
                     layoutParams = LinearLayout.LayoutParams(
                         (2 * dp).toInt(), (20 * dp).toInt()
                     ).also { it.setMargins((17 * dp).toInt(), 0, 0, 0) }
-                    setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.route_blue))
+                    setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.brand_primary))
                 }
                 binding.llRouteList.addView(line)
             }
@@ -627,37 +753,39 @@ class MapFragment : Fragment() {
 
     private fun addKnoopuntenLayers(style: Style) {
         style.addSource(GeoJsonSource("knooppunt-source"))
-        style.addLayer(
-            CircleLayer("knooppunt-circles", "knooppunt-source").withProperties(
-                PropertyFactory.circleRadius(12f),
-                PropertyFactory.circleColor(
-                    Expression.switchCase(
-                        Expression.eq(Expression.get("selected"), Expression.literal("true")),
-                        Expression.literal("#0066CC"),
-                        Expression.literal("#FFFFFF")
-                    )
-                ),
-                PropertyFactory.circleStrokeWidth(2f),
-                PropertyFactory.circleStrokeColor("#0066CC")
-            )
+        val circles = CircleLayer("knooppunt-circles", "knooppunt-source").withProperties(
+            PropertyFactory.circleRadius(12f),
+            PropertyFactory.circleColor(
+                Expression.switchCase(
+                    Expression.eq(Expression.get("selected"), Expression.literal("true")),
+                    Expression.literal("#6C5DD3"),
+                    Expression.literal("#FFFFFF")
+                )
+            ),
+            PropertyFactory.circleStrokeWidth(2f),
+            PropertyFactory.circleStrokeColor("#6C5DD3")
         )
-        style.addLayer(
-            SymbolLayer("knooppunt-labels", "knooppunt-source").withProperties(
-                PropertyFactory.textField(Expression.get("ref")),
-                PropertyFactory.textSize(10f),
-                PropertyFactory.textColor(
-                    Expression.switchCase(
-                        Expression.eq(Expression.get("selected"), Expression.literal("true")),
-                        Expression.literal("#FFFFFF"),
-                        Expression.literal("#0066CC")
-                    )
-                ),
-                PropertyFactory.textFont(arrayOf("Noto Sans Regular")),
-                PropertyFactory.textAnchor("center"),
-                PropertyFactory.textAllowOverlap(true),
-                PropertyFactory.iconAllowOverlap(true)
-            )
+        circles.minZoom = 11f
+        style.addLayer(circles)
+
+        val labels = SymbolLayer("knooppunt-labels", "knooppunt-source").withProperties(
+            PropertyFactory.textField(Expression.get("ref")),
+            PropertyFactory.textSize(10f),
+            PropertyFactory.textColor(
+                Expression.switchCase(
+                    Expression.eq(Expression.get("selected"), Expression.literal("true")),
+                    Expression.literal("#FFFFFF"),
+                    Expression.literal("#6C5DD3")
+                )
+            ),
+            PropertyFactory.textFont(arrayOf("Noto Sans Regular")),
+            PropertyFactory.textAnchor("center"),
+            PropertyFactory.textAllowOverlap(false),
+            PropertyFactory.textIgnorePlacement(false),
+            PropertyFactory.iconAllowOverlap(false)
         )
+        labels.minZoom = 11f
+        style.addLayer(labels)
     }
 
     private fun addCyclingRoutesLayer(style: Style) {
@@ -758,11 +886,27 @@ class MapFragment : Fragment() {
         }
         if (!large) {
             imageView.imageTintList = android.content.res.ColorStateList.valueOf(
-                ContextCompat.getColor(requireContext(), R.color.route_blue)
+                ContextCompat.getColor(requireContext(), R.color.brand_primary)
             )
         } else {
             imageView.imageTintList = null
         }
+    }
+
+    // ── Trip summary ──────────────────────────────────────────────
+
+    private fun showTripSummary(summary: com.fietsrouten.data.model.TripSummary) {
+        val distKm = "%.1f km".format(summary.distanceMeters / 1000)
+        val mins = summary.durationMs / 60000
+        val secs = (summary.durationMs % 60000) / 1000
+        val time = if (mins > 0) "${mins} min ${secs} sec" else "${secs} sec"
+        val avg = "%.1f km/u".format(summary.avgSpeedKmh)
+        val max = "%.1f km/u".format(summary.maxSpeedKmh)
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Rit voltooid")
+            .setMessage("Afstand: $distKm\nTijd: $time\nGem. snelheid: $avg\nMax. snelheid: $max")
+            .setPositiveButton("Sluiten", null)
+            .show()
     }
 
     // ── Voice guidance ────────────────────────────────────────────
@@ -835,17 +979,30 @@ class MapFragment : Fragment() {
     }
 
     private fun enableLocation(style: Style) {
+        if (ContextCompat.checkSelfPermission(
+                requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED) return
+        val puckOptions = LocationComponentOptions.builder(requireContext())
+            .foregroundDrawable(R.drawable.ic_puck_bicycle)
+            .gpsDrawable(R.drawable.ic_puck_bicycle)
+            .accuracyAlpha(0f)
+            .pulseEnabled(false)
+            .build()
         map?.locationComponent?.apply {
             activateLocationComponent(
-                LocationComponentActivationOptions.builder(requireContext(), style).build()
+                LocationComponentActivationOptions.builder(requireContext(), style)
+                    .locationComponentOptions(puckOptions)
+                    .build()
             )
             isLocationComponentEnabled = true
             cameraMode = CameraMode.NONE
-            renderMode = RenderMode.NORMAL
+            renderMode = RenderMode.GPS
         }
-        // Zoom to user's location on first load
+        // Zoom to user's location on first load and draw proximity ring
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
             location ?: return@addOnSuccessListener
+            viewModel.updateUserLocation(location.latitude, location.longitude)
+            updateUserRadius(location.latitude, location.longitude)
             map?.animateCamera(
                 CameraUpdateFactory.newCameraPosition(
                     CameraPosition.Builder()
@@ -857,12 +1014,52 @@ class MapFragment : Fragment() {
         }
     }
 
+    /** Anchors the layers/POI/recenter FAB column below the visible top card so it's never hidden behind the nav instruction banner. */
+    private fun repositionFabsForNavigation(navigating: Boolean) {
+        val anchor = if (navigating) R.id.navInstructionCard else R.id.searchCard
+        val params = binding.fabLayers.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
+        params.topToBottom = anchor
+        binding.fabLayers.layoutParams = params
+    }
+
+    private fun isDarkMode(): Boolean {
+        val nightMask = android.content.res.Configuration.UI_MODE_NIGHT_MASK
+        val nightMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
+        return (resources.configuration.uiMode and nightMask) == nightMode
+    }
+
     // ── Helpers ───────────────────────────────────────────────────
 
     private fun watcher(onChanged: (String) -> Unit) = object : TextWatcher {
         override fun afterTextChanged(s: Editable?) { onChanged(s.toString()) }
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+    }
+
+    private fun setupClearButton(actv: AutoCompleteTextView, onClear: () -> Unit) {
+        val clearIcon = androidx.appcompat.content.res.AppCompatResources
+            .getDrawable(requireContext(), R.drawable.ic_clear)?.apply {
+                setBounds(0, 0, intrinsicWidth, intrinsicHeight)
+            }
+        fun refresh() {
+            val end = if (actv.text.isNullOrEmpty()) null else clearIcon
+            val d = actv.compoundDrawablesRelative
+            actv.setCompoundDrawablesRelativeWithIntrinsicBounds(d[0], d[1], end, d[3])
+        }
+        actv.addTextChangedListener(watcher { refresh() })
+        actv.setOnTouchListener { _, event ->
+            val end = actv.compoundDrawablesRelative[2]
+            if (end != null && event.action == MotionEvent.ACTION_UP) {
+                val touchStart = actv.width - actv.paddingEnd - end.bounds.width()
+                if (event.x >= touchStart) {
+                    actv.text?.clear()
+                    onClear()
+                    return@setOnTouchListener true
+                }
+            }
+            false
+        }
+        refresh()
     }
 
     private fun makePassthroughAdapter() = object : ArrayAdapter<String>(
@@ -896,6 +1093,13 @@ class MapFragment : Fragment() {
         else -> "%.1f km".format(meters / 1000)
     }
 
+    private fun formatDuration(durationMs: Long): String {
+        val totalMinutes = (durationMs / 60000).toInt()
+        val hours = totalMinutes / 60
+        val minutes = totalMinutes % 60
+        return if (hours > 0) "${hours}u ${minutes}min" else "$minutes min"
+    }
+
     private fun formatEta(remainingMs: Long): String {
         val cal = java.util.Calendar.getInstance()
         cal.add(java.util.Calendar.MILLISECOND, remainingMs.coerceAtMost(Int.MAX_VALUE.toLong()).toInt())
@@ -905,29 +1109,61 @@ class MapFragment : Fragment() {
     // ── Map layer helpers ─────────────────────────────────────────
 
     private fun addPoiLayer(style: Style) {
+        val ctx = requireContext()
+        listOf(
+            Triple("poi-cafe",      Color.parseColor("#795548"), "☕"),
+            Triple("poi-restaurant",Color.parseColor("#E53935"), "🍴"),
+            Triple("poi-fast_food", Color.parseColor("#FB8C00"), "🍔"),
+            Triple("poi-bar",       Color.parseColor("#5E35B1"), "🍺"),
+            Triple("poi-pub",       Color.parseColor("#5E35B1"), "🍺"),
+            Triple("poi-default",   Color.parseColor("#43A047"), "★"),
+        ).forEach { (id, color, emoji) ->
+            style.addImage(id, makePoiMarker(color, emoji, ctx))
+        }
         style.addSource(GeoJsonSource("poi-source"))
         style.addLayer(
-            CircleLayer("poi-circles", "poi-source").withProperties(
-                PropertyFactory.circleRadius(9f),
-                PropertyFactory.circleColor(
+            SymbolLayer("poi-symbols", "poi-source").withProperties(
+                PropertyFactory.iconImage(
                     Expression.switchCase(
                         Expression.eq(Expression.get("amenity"), Expression.literal("cafe")),
-                        Expression.literal("#795548"),
+                        Expression.literal("poi-cafe"),
                         Expression.eq(Expression.get("amenity"), Expression.literal("restaurant")),
-                        Expression.literal("#E53935"),
+                        Expression.literal("poi-restaurant"),
                         Expression.eq(Expression.get("amenity"), Expression.literal("fast_food")),
-                        Expression.literal("#FB8C00"),
+                        Expression.literal("poi-fast_food"),
                         Expression.eq(Expression.get("amenity"), Expression.literal("bar")),
-                        Expression.literal("#5E35B1"),
+                        Expression.literal("poi-bar"),
                         Expression.eq(Expression.get("amenity"), Expression.literal("pub")),
-                        Expression.literal("#5E35B1"),
-                        Expression.literal("#43A047")
+                        Expression.literal("poi-pub"),
+                        Expression.literal("poi-default")
                     )
                 ),
-                PropertyFactory.circleStrokeWidth(1.5f),
-                PropertyFactory.circleStrokeColor("#FFFFFF")
+                PropertyFactory.iconAllowOverlap(true),
+                PropertyFactory.iconIgnorePlacement(true),
+                PropertyFactory.iconSize(1.0f)
             )
         )
+    }
+
+    private fun makePoiMarker(bgColor: Int, emoji: String, ctx: android.content.Context): Bitmap {
+        val dp = ctx.resources.displayMetrics.density
+        val size = (28 * dp).toInt()
+        val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bmp)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+        paint.color = Color.WHITE
+        canvas.drawCircle(size / 2f, size / 2f, size / 2f, paint)
+
+        paint.color = bgColor
+        canvas.drawCircle(size / 2f, size / 2f, size / 2f - (2 * dp), paint)
+
+        paint.textSize = size * 0.48f
+        paint.textAlign = Paint.Align.CENTER
+        val textY = size / 2f - (paint.descent() + paint.ascent()) / 2f
+        canvas.drawText(emoji, size / 2f, textY, paint)
+
+        return bmp
     }
 
     private fun updatePoiLayer(pois: List<Poi>) {
@@ -944,8 +1180,8 @@ class MapFragment : Fragment() {
         style.addSource(GeoJsonSource("route-source"))
         style.addLayer(
             LineLayer("route-layer", "route-source").withProperties(
-                PropertyFactory.lineColor("#0066CC"),
-                PropertyFactory.lineWidth(5f),
+                PropertyFactory.lineColor("#6C5DD3"),
+                PropertyFactory.lineWidth(6f),
                 PropertyFactory.lineCap("round"),
                 PropertyFactory.lineJoin("round")
             )
@@ -955,14 +1191,23 @@ class MapFragment : Fragment() {
     private fun drawRoute(coordinates: List<List<Double>>) {
         map?.getStyle { style ->
             val source = style.getSourceAs<GeoJsonSource>("route-source") ?: return@getStyle
+            val startSource = style.getSourceAs<GeoJsonSource>("start-source")
+            val endSource   = style.getSourceAs<GeoJsonSource>("end-source")
+            val empty = """{"type":"FeatureCollection","features":[]}"""
             if (coordinates.isEmpty()) {
-                source.setGeoJson("""{"type":"FeatureCollection","features":[]}""")
+                source.setGeoJson(empty)
+                startSource?.setGeoJson(empty)
+                endSource?.setGeoJson(empty)
                 return@getStyle
             }
             val coordJson = coordinates.joinToString(",") { "[${it[0]},${it[1]}]" }
             source.setGeoJson(
                 """{"type":"Feature","geometry":{"type":"LineString","coordinates":[$coordJson]}}"""
             )
+            val s = coordinates.first()
+            val e = coordinates.last()
+            startSource?.setGeoJson("""{"type":"Feature","geometry":{"type":"Point","coordinates":[${s[0]},${s[1]}]},"properties":{}}""")
+            endSource?.setGeoJson("""{"type":"Feature","geometry":{"type":"Point","coordinates":[${e[0]},${e[1]}]},"properties":{}}""")
             if (!viewModel.isNavigating.value) {
                 val latLngs = coordinates.map { LatLng(it[1], it[0]) }
                 if (latLngs.size >= 2) {
@@ -971,6 +1216,118 @@ class MapFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun addRouteEndpointsLayer(style: Style) {
+        val ctx = requireContext()
+        style.addImage("marker-start", makeNavArrowIcon())
+        style.addImage("marker-end", makeDestinationPin(ctx))
+
+        // Start bicycle icon — anchor at center so it sits exactly on the point
+        style.addSource(GeoJsonSource("start-source"))
+        style.addLayer(
+            SymbolLayer("start-symbol", "start-source").withProperties(
+                PropertyFactory.iconImage("marker-start"),
+                PropertyFactory.iconAllowOverlap(true),
+                PropertyFactory.iconIgnorePlacement(true),
+                PropertyFactory.iconAnchor("center")
+            )
+        )
+
+        // Destination pin — anchor at bottom so the tip touches the point
+        style.addSource(GeoJsonSource("end-source"))
+        style.addLayer(
+            SymbolLayer("end-symbol", "end-source").withProperties(
+                PropertyFactory.iconImage("marker-end"),
+                PropertyFactory.iconAllowOverlap(true),
+                PropertyFactory.iconIgnorePlacement(true),
+                PropertyFactory.iconAnchor("bottom")
+            )
+        )
+    }
+
+    /** Classic navigation arrow pointer — marks the route start / "you are here" position. */
+    private fun makeNavArrowIcon(): Bitmap {
+        val dp = resources.displayMetrics.density
+        val size = (36 * dp).toInt()
+        val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bmp)
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+        val cx = size / 2f
+        val tip = size * 0.05f
+        val baseY = size * 0.95f
+        val baseHalfW = size * 0.42f
+        val notchY = size * 0.68f
+        val notchHalfW = size * 0.14f
+
+        val path = android.graphics.Path()
+        path.moveTo(cx, tip)
+        path.lineTo(cx + baseHalfW, baseY)
+        path.lineTo(cx + notchHalfW, notchY)
+        path.lineTo(cx - notchHalfW, notchY)
+        path.lineTo(cx - baseHalfW, baseY)
+        path.close()
+
+        // White outline
+        paint.color = Color.WHITE
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = size * 0.10f
+        canvas.drawPath(path, paint)
+
+        // Brand fill
+        paint.color = Color.parseColor("#6C5DD3")
+        paint.style = Paint.Style.FILL
+        canvas.drawPath(path, paint)
+
+        return bmp
+    }
+
+    /** Classic Google-Maps-style teardrop pin for the destination. */
+    private fun makeDestinationPin(ctx: android.content.Context): Bitmap {
+        val dp = ctx.resources.displayMetrics.density
+        val size = (44 * dp).toInt()
+        val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bmp)
+
+        val drawable = androidx.appcompat.content.res.AppCompatResources
+            .getDrawable(ctx, R.drawable.ic_poi)!!.mutate()
+        androidx.core.graphics.drawable.DrawableCompat
+            .setTint(drawable, Color.parseColor("#EA4335"))
+        drawable.setBounds(0, 0, size, size)
+        drawable.draw(canvas)
+
+        return bmp
+    }
+
+    private fun addUserRadiusLayer(style: Style) {
+        val fill    = if (isDarkMode()) "rgba(108, 93, 211, 0.16)" else "rgba(108, 93, 211, 0.08)"
+        val outline = if (isDarkMode()) "rgba(108, 93, 211, 0.70)" else "rgba(108, 93, 211, 0.50)"
+        style.addSource(GeoJsonSource("user-radius-source"))
+        style.addLayer(
+            FillLayer("user-radius-fill", "user-radius-source")
+                .withProperties(
+                    PropertyFactory.fillColor(fill),
+                    PropertyFactory.fillOutlineColor(outline)
+                )
+        )
+    }
+
+    private fun updateUserRadius(lat: Double, lon: Double) {
+        map?.getStyle { style ->
+            style.getSourceAs<GeoJsonSource>("user-radius-source")
+                ?.setGeoJson(circleGeoJson(lat, lon, 500.0))
+        }
+    }
+
+    private fun circleGeoJson(lat: Double, lon: Double, radiusM: Double): String {
+        val pts = (0..63).joinToString(",") { i ->
+            val angle = Math.toRadians(i * 360.0 / 63)
+            val dLat = (radiusM / 111320.0) * kotlin.math.cos(angle)
+            val dLon = (radiusM / (111320.0 * kotlin.math.cos(Math.toRadians(lat)))) * kotlin.math.sin(angle)
+            "[${lon + dLon},${lat + dLat}]"
+        }
+        return """{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[$pts]]},"properties":{}}"""
     }
 
     // ── Lifecycle ─────────────────────────────────────────────────

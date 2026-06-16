@@ -6,18 +6,8 @@
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorSecondary">@color/brand_primary</item>
         <item name="colorOnSecondary">@color/white</item>
-        <item name="android:statusBarColor">@color/brand_primary_dark</item>
+        <item name="android:statusBarColor">#FF121212</item>
+        <item name="android:windowBackground">#FF121212</item>
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.FietsRouten.SmallComponent</item>
-    </style>
-
-    <!-- TomTom-style pill shape for buttons / toggle groups -->
-    <style name="ShapeAppearance.FietsRouten.SmallComponent" parent="ShapeAppearance.MaterialComponents.SmallComponent">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerSize">24dp</item>
-    </style>
-
-    <!-- Square corners for buttons inside a MaterialButtonToggleGroup -->
-    <style name="ShapeAppearanceOverlay.FietsRouten.Square" parent="">
-        <item name="cornerSize">0dp</item>
     </style>
 </resources>

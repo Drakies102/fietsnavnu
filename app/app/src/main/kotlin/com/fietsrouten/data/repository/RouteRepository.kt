@@ -37,11 +37,13 @@ class RouteRepository {
         )
         val response = graphHopperApi.getRoute(request)
         val path = response.paths.first()
+        val elevations = path.points.coordinates.map { if (it.size >= 3) it[2] else 0.0 }
         return RouteResult(
             coordinates = path.points.coordinates,
             distanceMeters = path.distance,
             durationMs = path.time,
-            instructions = path.instructions
+            instructions = path.instructions,
+            elevationProfile = elevations
         )
     }
 

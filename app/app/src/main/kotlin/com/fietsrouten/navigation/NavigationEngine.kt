@@ -31,7 +31,12 @@ class NavigationEngine {
         val remainingDistance = distanceAlongRoute(nearestIndex, routeLatLngs.lastIndex, routeLatLngs, snappedPoint)
 
         val routeFraction = if (route.distanceMeters > 0) remainingDistance / route.distanceMeters else 0.0
-        val remainingDuration = (route.durationMs * routeFraction).toLong()
+        // When moving, derive ETA from actual GPS speed (m/s); fall back to proportional estimate when stopped
+        val remainingDuration = if (location.speed > 0.5f && remainingDistance > 0) {
+            (remainingDistance / location.speed * 1000).toLong()
+        } else {
+            (route.durationMs * routeFraction).toLong()
+        }
 
         // Only use GPS bearing when moving; otherwise hold last known bearing
         if (location.hasBearing() && location.speed > 0.5f) {
