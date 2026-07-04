@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Public+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Space+Mono:wght@400;700&family=Familjen+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #202327; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+</style>
+</helmet>
+
+<div style="min-width:2600px;padding:64px 72px 120px;background:radial-gradient(1200px 600px at 30% -5%, #2b2f34, #1c1e21 60%);font-family:'Public Sans',sans-serif;color:#e9ebe6;">
+
+  <!-- ===== PAGE HEADER ===== -->
+  <div style="max-width:1100px;margin-bottom:56px;">
+    <div style="display:inline-flex;align-items:center;gap:10px;padding:6px 14px;border:1px solid #3a3f45;border-radius:100px;font:600 12px 'Space Mono',monospace;letter-spacing:.08em;color:#a7b0ab;text-transform:uppercase;margin-bottom:22px;">
+      <span style="width:8px;height:8px;border-radius:50%;background:#1B9E57;"></span> React Native redesign · concept
+    </div>
+    <h1 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:52px;line-height:1.02;margin:0 0 16px;color:#f4f5f2;letter-spacing:-.02em;">FietsRouten, reborn</h1>
+    <p style="max-width:720px;margin:0;font-size:17px;line-height:1.6;color:#a9b0ac;">Two visual directions for the same cross-platform app — a React Native UI over a thin Kotlin native layer (GPS, speed, background location) and React Native Navigation. Both cover the full flow: search, route summary, knooppunten planner, turn-by-turn, layers &amp; POIs, saved routes and settings. Compare the home screens first (<a href="#1a" style="color:#7fd3a4;">1a</a> vs <a href="#1b" style="color:#8fb2ff;">1b</a>), then scroll for the build plan.</p>
+  </div>
+
+  <!-- ===== TURN 1: two direction boards side by side ===== -->
+  <div style="display:flex;gap:56px;align-items:flex-start;flex-wrap:nowrap;">
+
+    <!-- ============ DIRECTION A — GROEN ============ -->
+    <section id="1a" style="scroll-margin:40px;">
+      <div style="display:flex;align-items:flex-start;gap:20px;margin-bottom:28px;">
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;color:#0c1a12;background:#7fd3a4;border-radius:10px;padding:6px 11px;letter-spacing:.02em;">1a</div>
+        <div>
+          <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:30px;margin:0 0 6px;color:#f4f5f2;">Groen</h2>
+          <p style="margin:0;max-width:560px;font-size:15px;line-height:1.55;color:#a9b0ac;">Warm, friendly, daylight. Cream canvas, fresh cycle-green, Dutch amber for knooppunten. Big rounded surfaces, generous type. Feels like a sunny ride on the LF-routes.</p>
+          <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;align-items:center;">
+            <span style="width:26px;height:26px;border-radius:7px;background:#F4F2EC;border:1px solid #00000018;" title="#F4F2EC"></span>
+            <span style="width:26px;height:26px;border-radius:7px;background:#1B9E57;" title="#1B9E57"></span>
+            <span style="width:26px;height:26px;border-radius:7px;background:#0E7A44;" title="#0E7A44"></span>
+            <span style="width:26px;height:26px;border-radius:7px;background:#EF7C1A;" title="#EF7C1A"></span>
+            <span style="width:26px;height:26px;border-radius:7px;background:#15241B;" title="#15241B"></span>
+            <span style="margin-left:8px;font:500 12px 'Space Mono',monospace;color:#8b938e;">Space&nbsp;Grotesk · Public&nbsp;Sans</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,250px);gap:28px 24px;">
+<!-- ============ A1 HOME ============ -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
+          <div style="width:250px;height:512px;background:#0b0d0c;border-radius:34px;padding:6px;box-shadow:0 30px 55px -20px rgba(0,0,0,.6);">
+            <div style="width:100%;height:100%;border-radius:28px;overflow:hidden;position:relative;background:#F4F2EC;font-family:'Public Sans',sans-serif;">
+              <div style="position:absolute;inset:0;background:linear-gradient(150deg,#ECE9E0,#E4E7DC);"></div>
+              <div style="position:absolute;left:-24px;top:120px;width:150px;height:120px;background:#C7DCEA;border-radius:44px;transform:rotate(-10deg);"></div>
+              <div style="position:absolute;right:-30px;bottom:70px;width:170px;height:150px;background:#D2E4C4;border-radius:52px;"></div>
+              <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(58deg,transparent 0 36px,#ffffff 36px 39px),repeating-linear-gradient(150deg,transparent 0 46px,#ffffff 46px 48px);opacity:.55;"></div>
+              <div style="position:absolute;left:118px;top:300px;width:16px;height:16px;border-radius:50%;background:#1B9E57;border:3px solid #fff;box-shadow:0 3px 8px #0004;"></div>
+              <!-- status bar -->
+              <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:9px 16px 4px;font:700 11px 'Space Mono',monospace;color:#15241B;">
+                <span>9:41</span>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:flex;gap:2px;align-items:flex-end;"><i style="width:3px;height:5px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:7px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:9px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:11px;background:#15241B;border-radius:1px;"></i></span><span style="font-size:9px;">5G</span><span style="width:20px;height:11px;border:1.5px solid #15241B;border-radius:3px;position:relative;display:inline-block;"><i style="position:absolute;top:1.5px;bottom:1.5px;left:1.5px;width:11px;background:#15241B;border-radius:1px;"></i></span></div>
+              </div>
+              <!-- search -->
+              <div style="position:absolute;top:44px;left:12px;right:12px;">
+                <div style="background:#fff;border-radius:19px;padding:13px 15px;box-shadow:0 10px 26px -12px #15241b55;display:flex;align-items:center;gap:11px;">
+                  <svg width="17" height="17" viewBox="0 0 17 17" fill="none"><circle cx="7" cy="7" r="5.2" stroke="#1B9E57" stroke-width="2"/><line x1="11" y1="11" x2="15.5" y2="15.5" stroke="#1B9E57" stroke-width="2" stroke-linecap="round"/></svg>
+                  <span style="font-size:14px;color:#6B7A70;font-weight:500;">Waar wil je heen?</span>
+                </div>
+                <div style="display:flex;gap:7px;margin-top:9px;">
+                  <span style="background:#fff;border-radius:100px;padding:6px 12px;font:600 11.5px 'Public Sans';color:#15241B;box-shadow:0 4px 12px -6px #15241b40;">🏠 Thuis</span>
+                  <span style="background:#fff;border-radius:100px;padding:6px 12px;font:600 11.5px 'Public Sans';color:#15241B;box-shadow:0 4px 12px -6px #15241b40;">💼 Werk</span>
+                  <span style="background:#15241B;border-radius:100px;padding:6px 12px;font:600 11.5px 'Public Sans';color:#fff;">Knooppunten</span>
+                </div>
+              </div>
+              <!-- fabs -->
+              <div style="position:absolute;right:12px;top:210px;display:flex;flex-direction:column;gap:9px;">
+                <div style="width:42px;height:42px;border-radius:14px;background:#fff;box-shadow:0 6px 16px -8px #15241b66;display:flex;align-items:center;justify-content:center;"><div style="width:15px;height:15px;transform:rotate(45deg);border:2px solid #15241B;border-radius:2px;"></div></div>
+                <div style="width:42px;height:42px;border-radius:14px;background:#1B9E57;box-shadow:0 8px 18px -6px #1B9E5799;display:flex;align-items:center;justify-content:center;"><div style="width:11px;height:11px;border-radius:50%;border:2.5px solid #fff;"></div></div>
+              </div>
+              <!-- bottom sheet -->
+              <div style="position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:24px 24px 0 0;padding:12px 16px 20px;box-shadow:0 -8px 30px -14px #15241b40;">
+                <div style="width:36px;height:4px;border-radius:100px;background:#E1DDD0;margin:0 auto 12px;"></div>
+                <div style="font:600 11px 'Space Mono',monospace;color:#8b938e;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;">Recente ritten</div>
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div style="width:40px;height:40px;border-radius:12px;background:#EEF4EA;display:flex;align-items:center;justify-content:center;flex:0 0 auto;"><div style="width:12px;height:12px;transform:rotate(45deg);border:2px solid #1B9E57;border-radius:2px;"></div></div>
+                  <div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:14px;color:#15241B;">Utrecht Centraal</div><div style="font-size:11.5px;color:#6B7A70;">18,4 km · via LF-routes</div></div>
+                  <span style="font:700 13px 'Space Mono',monospace;color:#1B9E57;">1u 12m</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span style="font:600 10px 'Space Mono',monospace;color:#8b938e;letter-spacing:.1em;">01 · HOME</span>
+        </div>
+
+        <!-- ============ A2 SEARCH ============ -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
+          <div style="width:250px;height:512px;background:#0b0d0c;border-radius:34px;padding:6px;box-shadow:0 30px 55px -20px rgba(0,0,0,.6);">
+            <div style="width:100%;height:100%;border-radius:28px;overflow:hidden;position:relative;background:#F4F2EC;font-family:'Public Sans',sans-serif;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 16px 4px;font:700 11px 'Space Mono',monospace;color:#15241B;">
+                <span>9:41</span>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:flex;gap:2px;align-items:flex-end;"><i style="width:3px;height:5px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:7px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:9px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:11px;background:#15241B;border-radius:1px;"></i></span><span style="font-size:9px;">5G</span><span style="width:20px;height:11px;border:1.5px solid #15241B;border-radius:3px;position:relative;display:inline-block;"><i style="position:absolute;top:1.5px;bottom:1.5px;left:1.5px;width:11px;background:#15241B;border-radius:1px;"></i></span></div>
+              </div>
+              <!-- from/to fields -->
+              <div style="padding:8px 12px 0;">
+                <div style="background:#fff;border-radius:18px;padding:4px 14px;box-shadow:0 8px 22px -12px #15241b40;">
+                  <div style="display:flex;align-items:center;gap:12px;padding:12px 0;"><span style="width:11px;height:11px;border-radius:50%;border:3px solid #1B9E57;"></span><span style="font-size:14px;color:#15241B;font-weight:600;flex:1;">Mijn locatie</span><span style="width:16px;height:16px;transform:rotate(45deg);border:2px solid #C9C3B4;border-radius:2px;"></span></div>
+                  <div style="height:1px;background:#EDE9DD;margin-left:23px;"></div>
+                  <div style="display:flex;align-items:center;gap:12px;padding:12px 0;"><span style="width:11px;height:11px;background:#EF7C1A;border-radius:3px;"></span><span style="font-size:14px;color:#15241B;font-weight:600;flex:1;">Utr<span style="border-right:2px solid #1B9E57;">|</span></span></div>
+                </div>
+              </div>
+              <div style="font:600 10px 'Space Mono',monospace;color:#8b938e;letter-spacing:.08em;text-transform:uppercase;padding:16px 18px 8px;">Voorstellen</div>
+              <div style="padding:0 8px;">
+                <div style="display:flex;align-items:center;gap:13px;padding:11px 10px;"><span style="width:34px;height:34px;border-radius:10px;background:#EEF4EA;display:flex;align-items:center;justify-content:center;flex:0 0 auto;"><span style="width:9px;height:9px;border-radius:50%;background:#1B9E57;"></span></span><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13.5px;color:#15241B;">Utrecht Centraal</div><div style="font-size:11px;color:#6B7A70;">Stationsplein, Utrecht</div></div><span style="font:600 11px 'Space Mono';color:#8b938e;">36 km</span></div>
+                <div style="display:flex;align-items:center;gap:13px;padding:11px 10px;"><span style="width:34px;height:34px;border-radius:10px;background:#EEF4EA;display:flex;align-items:center;justify-content:center;flex:0 0 auto;"><span style="width:9px;height:9px;border-radius:50%;background:#1B9E57;"></span></span><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13.5px;color:#15241B;">Utrechtseweg 92</div><div style="font-size:11px;color:#6B7A70;">Amersfoort</div></div><span style="font:600 11px 'Space Mono';color:#8b938e;">14 km</span></div>
+                <div style="display:flex;align-items:center;gap:13px;padding:11px 10px;"><span style="width:34px;height:34px;border-radius:10px;background:#EEF4EA;display:flex;align-items:center;justify-content:center;flex:0 0 auto;"><span style="width:9px;height:9px;border-radius:50%;background:#1B9E57;"></span></span><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13.5px;color:#15241B;">Utrechtse Heuvelrug</div><div style="font-size:11px;color:#6B7A70;">Nationaal Park</div></div><span style="font:600 11px 'Space Mono';color:#8b938e;">22 km</span></div>
+              </div>
+              <!-- keyboard -->
+              <div style="position:absolute;left:0;right:0;bottom:0;background:#DDD9CE;padding:8px 5px 16px;display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;gap:5px;justify-content:center;">
+                  <span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;box-shadow:0 1px 0 #0002;">q</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;box-shadow:0 1px 0 #0002;">w</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;box-shadow:0 1px 0 #0002;">e</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;box-shadow:0 1px 0 #0002;">r</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;box-shadow:0 1px 0 #0002;">t</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;box-shadow:0 1px 0 #0002;">y</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;box-shadow:0 1px 0 #0002;">u</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;box-shadow:0 1px 0 #0002;">i</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;box-shadow:0 1px 0 #0002;">o</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;box-shadow:0 1px 0 #0002;">p</span>
+                </div>
+                <div style="display:flex;gap:5px;justify-content:center;padding:0 12px;">
+                  <span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;">a</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;">s</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;">d</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;">f</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;">g</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;">h</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;">j</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;">k</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;">l</span>
+                </div>
+                <div style="display:flex;gap:5px;justify-content:center;align-items:center;padding:0 4px;">
+                  <span style="width:34px;text-align:center;background:#C6C1B4;border-radius:6px;padding:9px 0;font-size:11px;font-weight:700;color:#15241B;">⇧</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;">z</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;">x</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;">c</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;">v</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;">b</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;">n</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#15241B;">m</span><span style="width:34px;text-align:center;background:#C6C1B4;border-radius:6px;padding:9px 0;font-size:11px;font-weight:700;color:#15241B;">⌫</span>
+                </div>
+                <div style="display:flex;gap:5px;justify-content:center;align-items:center;">
+                  <span style="width:56px;text-align:center;background:#C6C1B4;border-radius:6px;padding:9px 0;font-size:11px;font-weight:700;color:#15241B;">123</span><span style="flex:1;text-align:center;background:#fff;border-radius:6px;padding:9px 0;font-size:12px;font-weight:600;color:#15241B;">spatie</span><span style="width:70px;text-align:center;background:#1B9E57;border-radius:6px;padding:9px 0;font-size:11px;font-weight:700;color:#fff;">Zoek</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span style="font:600 10px 'Space Mono',monospace;color:#8b938e;letter-spacing:.1em;">02 · ZOEKEN</span>
+        </div>
+
+        <!-- ============ A3 ROUTE SUMMARY ============ -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
+          <div style="width:250px;height:512px;background:#0b0d0c;border-radius:34px;padding:6px;box-shadow:0 30px 55px -20px rgba(0,0,0,.6);">
+            <div style="width:100%;height:100%;border-radius:28px;overflow:hidden;position:relative;background:#F4F2EC;font-family:'Public Sans',sans-serif;">
+              <div style="position:absolute;inset:0;background:linear-gradient(150deg,#ECE9E0,#E4E7DC);"></div>
+              <div style="position:absolute;left:-24px;top:60px;width:150px;height:120px;background:#C7DCEA;border-radius:44px;transform:rotate(-10deg);"></div>
+              <div style="position:absolute;right:-30px;top:150px;width:150px;height:130px;background:#D2E4C4;border-radius:52px;"></div>
+              <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(58deg,transparent 0 36px,#fff 36px 39px),repeating-linear-gradient(150deg,transparent 0 46px,#fff 46px 48px);opacity:.5;"></div>
+              <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 250 512" preserveAspectRatio="none"><path d="M55 60 C 110 110, 70 170, 140 210 S 90 270, 130 300" fill="none" stroke="#1B9E57" stroke-width="7" stroke-linecap="round"/></svg>
+              <div style="position:absolute;left:49px;top:54px;width:14px;height:14px;border-radius:50%;background:#EF7C1A;border:3px solid #fff;box-shadow:0 2px 6px #0004;"></div>
+              <div style="position:absolute;left:124px;top:294px;width:14px;height:14px;border-radius:50%;background:#1B9E57;border:3px solid #fff;box-shadow:0 2px 6px #0004;"></div>
+              <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:9px 16px 4px;font:700 11px 'Space Mono',monospace;color:#15241B;">
+                <span>9:41</span>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:flex;gap:2px;align-items:flex-end;"><i style="width:3px;height:5px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:7px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:9px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:11px;background:#15241B;border-radius:1px;"></i></span><span style="font-size:9px;">5G</span><span style="width:20px;height:11px;border:1.5px solid #15241B;border-radius:3px;position:relative;display:inline-block;"><i style="position:absolute;top:1.5px;bottom:1.5px;left:1.5px;width:11px;background:#15241B;border-radius:1px;"></i></span></div>
+              </div>
+              <div style="position:absolute;top:44px;left:12px;background:#fff;border-radius:100px;padding:8px 14px;box-shadow:0 6px 16px -8px #15241b55;display:flex;align-items:center;gap:8px;"><span style="font-size:15px;color:#15241B;">‹</span><span style="font-size:12.5px;font-weight:600;color:#15241B;">Utrecht Centraal</span></div>
+              <!-- bottom sheet -->
+              <div style="position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:24px 24px 0 0;padding:12px 16px 18px;box-shadow:0 -8px 30px -14px #15241b40;">
+                <div style="width:36px;height:4px;border-radius:100px;background:#E1DDD0;margin:0 auto 12px;"></div>
+                <div style="display:flex;gap:6px;background:#F1EEE4;padding:4px;border-radius:100px;margin-bottom:14px;">
+                  <span style="flex:1;text-align:center;background:#1B9E57;color:#fff;border-radius:100px;padding:7px 0;font-size:12px;font-weight:700;">🚲 Fiets</span>
+                  <span style="flex:1;text-align:center;color:#6B7A70;padding:7px 0;font-size:12px;font-weight:600;">⛰️ MTB</span>
+                  <span style="flex:1;text-align:center;color:#6B7A70;padding:7px 0;font-size:12px;font-weight:600;">🏁 Race</span>
+                </div>
+                <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:12px;">
+                  <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:26px;color:#15241B;line-height:1;">18,4<span style="font-size:14px;color:#6B7A70;font-weight:600;"> km</span></div></div>
+                  <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:26px;color:#15241B;line-height:1;">1:12<span style="font-size:14px;color:#6B7A70;font-weight:600;"> u</span></div></div>
+                  <div style="margin-left:auto;text-align:right;"><div style="font:700 11px 'Space Mono';color:#EF7C1A;">↗ 46 m</div><div style="font-size:10px;color:#8b938e;">hoogte</div></div>
+                </div>
+                <!-- elevation chart -->
+                <div style="display:flex;align-items:flex-end;gap:2px;height:44px;margin-bottom:14px;padding:0 1px;">
+                  <div style="flex:1;height:30%;background:#DDEBD3;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:45%;background:#DDEBD3;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:38%;background:#DDEBD3;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:60%;background:#C7E1B7;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:72%;background:#C7E1B7;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:55%;background:#C7E1B7;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:40%;background:#DDEBD3;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:48%;background:#DDEBD3;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:35%;background:#DDEBD3;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:52%;background:#C7E1B7;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:66%;background:#C7E1B7;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:44%;background:#DDEBD3;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:30%;background:#DDEBD3;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:38%;background:#DDEBD3;border-radius:2px 2px 0 0;"></div>
+                </div>
+                <div style="background:#1B9E57;border-radius:100px;padding:14px 0;text-align:center;font-weight:700;font-size:15px;color:#fff;box-shadow:0 12px 24px -10px #1B9E5799;">Start navigatie</div>
+              </div>
+            </div>
+          </div>
+          <span style="font:600 10px 'Space Mono',monospace;color:#8b938e;letter-spacing:.1em;">03 · ROUTE</span>
+        </div>
+
+        <!-- ============ A4 KNOOPPUNTEN ============ -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
+          <div style="width:250px;height:512px;background:#0b0d0c;border-radius:34px;padding:6px;box-shadow:0 30px 55px -20px rgba(0,0,0,.6);">
+            <div style="width:100%;height:100%;border-radius:28px;overflow:hidden;position:relative;background:#F4F2EC;font-family:'Public Sans',sans-serif;">
+              <div style="position:absolute;inset:0;background:linear-gradient(150deg,#ECE9E0,#E4E7DC);"></div>
+              <div style="position:absolute;right:-30px;top:120px;width:170px;height:150px;background:#D2E4C4;border-radius:52px;"></div>
+              <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(58deg,transparent 0 36px,#fff 36px 39px),repeating-linear-gradient(150deg,transparent 0 46px,#fff 46px 48px);opacity:.5;"></div>
+              <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 250 512" preserveAspectRatio="none"><path d="M60 90 L150 150 L110 240 L190 250" fill="none" stroke="#EF7C1A" stroke-width="4" stroke-dasharray="2 7" stroke-linecap="round"/></svg>
+              <div style="position:absolute;left:52px;top:82px;width:22px;height:22px;border-radius:50%;background:#EF7C1A;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font:700 10px 'Space Mono';color:#fff;box-shadow:0 2px 6px #0004;">72</div>
+              <div style="position:absolute;left:142px;top:142px;width:22px;height:22px;border-radius:50%;background:#EF7C1A;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font:700 10px 'Space Mono';color:#fff;box-shadow:0 2px 6px #0004;">81</div>
+              <div style="position:absolute;left:102px;top:232px;width:22px;height:22px;border-radius:50%;background:#15241B;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font:700 10px 'Space Mono';color:#fff;box-shadow:0 2px 6px #0004;">6</div>
+              <div style="position:absolute;left:180px;top:242px;width:22px;height:22px;border-radius:50%;background:#fff;border:2px solid #EF7C1A;display:flex;align-items:center;justify-content:center;font:700 10px 'Space Mono';color:#EF7C1A;box-shadow:0 2px 6px #0004;">4</div>
+              <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:9px 16px 4px;font:700 11px 'Space Mono',monospace;color:#15241B;">
+                <span>9:41</span>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:flex;gap:2px;align-items:flex-end;"><i style="width:3px;height:5px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:7px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:9px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:11px;background:#15241B;border-radius:1px;"></i></span><span style="font-size:9px;">5G</span><span style="width:20px;height:11px;border:1.5px solid #15241B;border-radius:3px;position:relative;display:inline-block;"><i style="position:absolute;top:1.5px;bottom:1.5px;left:1.5px;width:11px;background:#15241B;border-radius:1px;"></i></span></div>
+              </div>
+              <div style="position:absolute;top:44px;left:12px;right:12px;background:#15241B;border-radius:14px;padding:10px 14px;text-align:center;font-size:12px;font-weight:600;color:#fff;">Tik knooppunten aan om je route te plannen</div>
+              <!-- bottom sheet -->
+              <div style="position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:24px 24px 0 0;padding:12px 16px 16px;box-shadow:0 -8px 30px -14px #15241b40;">
+                <div style="width:36px;height:4px;border-radius:100px;background:#E1DDD0;margin:0 auto 12px;"></div>
+                <div style="display:flex;align-items:center;gap:8px;font:700 12px 'Space Mono';margin-bottom:12px;flex-wrap:wrap;">
+                  <span style="width:24px;height:24px;border-radius:50%;background:#EF7C1A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;">72</span><span style="color:#C9C3B4;">— 2,1 km —</span><span style="width:24px;height:24px;border-radius:50%;background:#EF7C1A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;">81</span><span style="color:#C9C3B4;">— 3,4 —</span><span style="width:24px;height:24px;border-radius:50%;background:#15241B;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;">6</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0 12px;border-top:1px solid #EDE9DD;">
+                  <span style="font-size:12px;color:#6B7A70;font-weight:600;">Totaal</span>
+                  <span style="font-family:'Space Grotesk';font-weight:700;font-size:19px;color:#1B9E57;">5,5 km</span>
+                </div>
+                <div style="display:flex;gap:10px;">
+                  <span style="padding:13px 18px;border-radius:100px;border:1.5px solid #E1DDD0;font-weight:700;font-size:14px;color:#6B7A70;">Wis</span>
+                  <span style="flex:1;text-align:center;background:#1B9E57;border-radius:100px;padding:13px 0;font-weight:700;font-size:14px;color:#fff;box-shadow:0 10px 22px -10px #1B9E5799;">Bereken route</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span style="font:600 10px 'Space Mono',monospace;color:#8b938e;letter-spacing:.1em;">04 · KNOOPPUNTEN</span>
+        </div>
+
+        <!-- ============ A5 NAVIGATION ============ -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
+          <div style="width:250px;height:512px;background:#0b0d0c;border-radius:34px;padding:6px;box-shadow:0 30px 55px -20px rgba(0,0,0,.6);">
+            <div style="width:100%;height:100%;border-radius:28px;overflow:hidden;position:relative;background:#DDE7D6;font-family:'Public Sans',sans-serif;">
+              <div style="position:absolute;inset:0;background:linear-gradient(160deg,#DFE8D7,#D2E0CB);"></div>
+              <div style="position:absolute;left:-20px;bottom:120px;width:150px;height:130px;background:#C7DCEA;border-radius:44px;transform:rotate(8deg);"></div>
+              <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(58deg,transparent 0 40px,#fff 40px 43px),repeating-linear-gradient(150deg,transparent 0 50px,#fff 50px 52px);opacity:.4;"></div>
+              <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 250 512" preserveAspectRatio="none"><path d="M125 470 L125 320 Q125 250 190 220" fill="none" stroke="#1B9E57" stroke-width="10" stroke-linecap="round"/></svg>
+              <div style="position:absolute;left:113px;top:452px;width:24px;height:24px;border-radius:50%;background:#1B9E57;border:4px solid #fff;box-shadow:0 3px 10px #0005;"></div>
+              <!-- top instruction -->
+              <div style="position:absolute;top:8px;left:8px;right:8px;background:#0E7A44;border-radius:20px;padding:14px;display:flex;align-items:center;gap:12px;box-shadow:0 12px 28px -12px #0E7A4499;">
+                <svg width="42" height="42" viewBox="0 0 42 42" fill="none"><path d="M13 34 L13 20 Q13 13 20 13 L27 13" stroke="#fff" stroke-width="4.5" stroke-linecap="round" fill="none"/><path d="M23 6 L33 13 L23 20 Z" fill="#fff"/></svg>
+                <div style="flex:1;"><div style="font-family:'Space Grotesk';font-weight:700;font-size:30px;color:#fff;line-height:1;">200<span style="font-size:15px;font-weight:600;"> m</span></div><div style="font-size:13px;color:#BFE8CF;font-weight:600;margin-top:3px;">Ga rechtsaf — Maliebaan</div></div>
+                <div style="text-align:center;opacity:.85;"><div style="font-size:8px;color:#BFE8CF;">dan</div><div style="font-size:16px;color:#fff;">↰</div></div>
+              </div>
+              <!-- bottom bar -->
+              <div style="position:absolute;left:0;right:0;bottom:0;background:#0c1c14;padding:16px 16px 20px;display:flex;align-items:center;gap:10px;">
+                <div style="flex:1;"><div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;color:#fff;line-height:1;">1:04</div><div style="font-size:10px;color:#7fb79a;">aankomst 10:45 · 15 km</div></div>
+                <div style="text-align:center;background:#12291d;border-radius:12px;padding:5px 10px;"><div style="font-family:'Space Grotesk';font-weight:700;font-size:19px;color:#7fd3a4;line-height:1;">18</div><div style="font-size:8px;color:#7fb79a;">km/u</div></div>
+                <div style="width:44px;height:44px;border-radius:50%;background:#D32F2F;display:flex;align-items:center;justify-content:center;"><span style="width:13px;height:13px;background:#fff;border-radius:3px;"></span></div>
+              </div>
+            </div>
+          </div>
+          <span style="font:600 10px 'Space Mono',monospace;color:#8b938e;letter-spacing:.1em;">05 · NAVIGATIE</span>
+        </div>
+
+        <!-- ============ A6 LAYERS / POI ============ -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
+          <div style="width:250px;height:512px;background:#0b0d0c;border-radius:34px;padding:6px;box-shadow:0 30px 55px -20px rgba(0,0,0,.6);">
+            <div style="width:100%;height:100%;border-radius:28px;overflow:hidden;position:relative;background:#F4F2EC;font-family:'Public Sans',sans-serif;">
+              <div style="position:absolute;inset:0;background:linear-gradient(150deg,#ECE9E0,#E4E7DC);"></div>
+              <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(58deg,transparent 0 36px,#fff 36px 39px),repeating-linear-gradient(150deg,transparent 0 46px,#fff 46px 48px);opacity:.5;"></div>
+              <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 250 512" preserveAspectRatio="none"><path d="M40 80 C 90 120, 60 170, 120 200" fill="none" stroke="#1B9E57" stroke-width="6" stroke-linecap="round"/></svg>
+              <div style="position:absolute;left:70px;top:100px;width:20px;height:20px;border-radius:50%;background:#EF7C1A;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:9px;box-shadow:0 2px 6px #0004;">☕</div>
+              <div style="position:absolute;left:135px;top:150px;width:20px;height:20px;border-radius:50%;background:#EF7C1A;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:9px;box-shadow:0 2px 6px #0004;">🍽</div>
+              <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:9px 16px 4px;font:700 11px 'Space Mono',monospace;color:#15241B;">
+                <span>9:41</span>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:flex;gap:2px;align-items:flex-end;"><i style="width:3px;height:5px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:7px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:9px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:11px;background:#15241B;border-radius:1px;"></i></span><span style="font-size:9px;">5G</span><span style="width:20px;height:11px;border:1.5px solid #15241B;border-radius:3px;position:relative;display:inline-block;"><i style="position:absolute;top:1.5px;bottom:1.5px;left:1.5px;width:11px;background:#15241B;border-radius:1px;"></i></span></div>
+              </div>
+              <!-- layers sheet -->
+              <div style="position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:24px 24px 0 0;padding:12px 16px 20px;box-shadow:0 -8px 30px -14px #15241b40;">
+                <div style="width:36px;height:4px;border-radius:100px;background:#E1DDD0;margin:0 auto 14px;"></div>
+                <div style="font-family:'Space Grotesk';font-weight:700;font-size:17px;color:#15241B;margin-bottom:14px;">Kaartlagen</div>
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;"><span style="width:34px;height:34px;border-radius:10px;background:#FDF0E4;display:flex;align-items:center;justify-content:center;">🔴</span><div style="flex:1;"><div style="font-weight:600;font-size:13.5px;color:#15241B;">Knooppunten</div><div style="font-size:11px;color:#6B7A70;">Fietsknooppunten-net</div></div><span style="width:42px;height:24px;border-radius:100px;background:#1B9E57;position:relative;"><i style="position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;background:#fff;"></i></span></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;"><span style="width:34px;height:34px;border-radius:10px;background:#EEF4EA;display:flex;align-items:center;justify-content:center;">🟢</span><div style="flex:1;"><div style="font-weight:600;font-size:13.5px;color:#15241B;">LF-routes</div><div style="font-size:11px;color:#6B7A70;">Lange-afstand fietsroutes</div></div><span style="width:42px;height:24px;border-radius:100px;background:#1B9E57;position:relative;"><i style="position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;background:#fff;"></i></span></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;"><span style="width:34px;height:34px;border-radius:10px;background:#FDF0E4;display:flex;align-items:center;justify-content:center;">🍽</span><div style="flex:1;"><div style="font-weight:600;font-size:13.5px;color:#15241B;">Eten &amp; drinken</div><div style="font-size:11px;color:#6B7A70;">Langs je route</div></div><span style="width:42px;height:24px;border-radius:100px;background:#E1DDD0;position:relative;"><i style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;"></i></span></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;"><span style="width:34px;height:34px;border-radius:10px;background:#EEF4EA;display:flex;align-items:center;justify-content:center;">🌙</span><div style="flex:1;"><div style="font-weight:600;font-size:13.5px;color:#15241B;">Donkere kaart</div><div style="font-size:11px;color:#6B7A70;">Automatisch 's avonds</div></div><span style="width:42px;height:24px;border-radius:100px;background:#E1DDD0;position:relative;"><i style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;"></i></span></div>
+              </div>
+            </div>
+          </div>
+          <span style="font:600 10px 'Space Mono',monospace;color:#8b938e;letter-spacing:.1em;">06 · LAGEN &amp; POI</span>
+        </div>
+
+        <!-- ============ A7 SAVED ROUTES ============ -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
+          <div style="width:250px;height:512px;background:#0b0d0c;border-radius:34px;padding:6px;box-shadow:0 30px 55px -20px rgba(0,0,0,.6);">
+            <div style="width:100%;height:100%;border-radius:28px;overflow:hidden;position:relative;background:#F4F2EC;font-family:'Public Sans',sans-serif;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 16px 4px;font:700 11px 'Space Mono',monospace;color:#15241B;">
+                <span>9:41</span>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:flex;gap:2px;align-items:flex-end;"><i style="width:3px;height:5px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:7px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:9px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:11px;background:#15241B;border-radius:1px;"></i></span><span style="font-size:9px;">5G</span><span style="width:20px;height:11px;border:1.5px solid #15241B;border-radius:3px;position:relative;display:inline-block;"><i style="position:absolute;top:1.5px;bottom:1.5px;left:1.5px;width:11px;background:#15241B;border-radius:1px;"></i></span></div>
+              </div>
+              <div style="padding:10px 18px 6px;"><h3 style="font-family:'Space Grotesk';font-weight:700;font-size:24px;color:#15241B;margin:0;">Mijn ritten</h3></div>
+              <div style="display:flex;gap:6px;padding:6px 16px 4px;">
+                <span style="background:#15241B;color:#fff;border-radius:100px;padding:6px 14px;font-size:12px;font-weight:700;">Opgeslagen</span>
+                <span style="color:#6B7A70;border-radius:100px;padding:6px 14px;font-size:12px;font-weight:600;">Recent</span>
+              </div>
+              <div style="padding:8px 12px;display:flex;flex-direction:column;gap:12px;">
+                <div style="background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 8px 20px -12px #15241b33;">
+                  <div style="height:74px;position:relative;background:linear-gradient(150deg,#E4E7DC,#D2E4C4);"><svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 220 74" preserveAspectRatio="none"><path d="M20 60 C 60 20, 120 55, 200 18" fill="none" stroke="#1B9E57" stroke-width="4" stroke-linecap="round"/></svg></div>
+                  <div style="padding:11px 14px;"><div style="font-weight:700;font-size:14px;color:#15241B;">Rondje Utrechtse Heuvelrug</div><div style="display:flex;gap:12px;margin-top:5px;font:600 11px 'Space Mono';color:#6B7A70;"><span>42,3 km</span><span>↗ 180 m</span><span style="color:#EF7C1A;">★ 4,8</span></div></div>
+                </div>
+                <div style="background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 8px 20px -12px #15241b33;">
+                  <div style="height:74px;position:relative;background:linear-gradient(150deg,#E4E7DC,#C7DCEA);"><svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 220 74" preserveAspectRatio="none"><path d="M15 20 C 80 60, 130 25, 205 55" fill="none" stroke="#1B9E57" stroke-width="4" stroke-linecap="round"/></svg></div>
+                  <div style="padding:11px 14px;"><div style="font-weight:700;font-size:14px;color:#15241B;">Woon-werk · Amersfoort</div><div style="display:flex;gap:12px;margin-top:5px;font:600 11px 'Space Mono';color:#6B7A70;"><span>18,4 km</span><span>↗ 46 m</span><span>3× p/w</span></div></div>
+                </div>
+              </div>
+              <!-- tab bar -->
+              <div style="position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #EDE9DD;display:flex;padding:9px 0 16px;">
+                <div style="flex:1;text-align:center;"><div style="width:16px;height:16px;transform:rotate(45deg);border:2px solid #C9C3B4;border-radius:2px;margin:0 auto 4px;"></div><div style="font-size:9px;color:#8b938e;">Kaart</div></div>
+                <div style="flex:1;text-align:center;"><div style="width:16px;height:16px;border-radius:50%;border:2.5px solid #1B9E57;margin:0 auto 4px;"></div><div style="font-size:9px;color:#1B9E57;font-weight:700;">Ritten</div></div>
+                <div style="flex:1;text-align:center;"><div style="width:16px;height:16px;border-radius:50%;background:#C9C3B4;margin:0 auto 4px;"></div><div style="font-size:9px;color:#8b938e;">Profiel</div></div>
+              </div>
+            </div>
+          </div>
+          <span style="font:600 10px 'Space Mono',monospace;color:#8b938e;letter-spacing:.1em;">07 · MIJN RITTEN</span>
+        </div>
+
+        <!-- ============ A8 SETTINGS / PROFILE ============ -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
+          <div style="width:250px;height:512px;background:#0b0d0c;border-radius:34px;padding:6px;box-shadow:0 30px 55px -20px rgba(0,0,0,.6);">
+            <div style="width:100%;height:100%;border-radius:28px;overflow:hidden;position:relative;background:#F4F2EC;font-family:'Public Sans',sans-serif;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 16px 4px;font:700 11px 'Space Mono',monospace;color:#15241B;">
+                <span>9:41</span>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:flex;gap:2px;align-items:flex-end;"><i style="width:3px;height:5px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:7px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:9px;background:#15241B;border-radius:1px;"></i><i style="width:3px;height:11px;background:#15241B;border-radius:1px;"></i></span><span style="font-size:9px;">5G</span><span style="width:20px;height:11px;border:1.5px solid #15241B;border-radius:3px;position:relative;display:inline-block;"><i style="position:absolute;top:1.5px;bottom:1.5px;left:1.5px;width:11px;background:#15241B;border-radius:1px;"></i></span></div>
+              </div>
+              <!-- profile header -->
+              <div style="padding:14px 18px 16px;display:flex;align-items:center;gap:14px;">
+                <div style="width:56px;height:56px;border-radius:20px;background:linear-gradient(135deg,#1B9E57,#0E7A44);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:22px;color:#fff;">SV</div>
+                <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:18px;color:#15241B;">Sanne Visser</div><div style="font-size:12px;color:#6B7A70;">Sinds 2024 · Utrecht</div></div>
+              </div>
+              <div style="margin:0 16px 16px;background:#fff;border-radius:18px;padding:14px;display:flex;box-shadow:0 8px 20px -12px #15241b26;">
+                <div style="flex:1;text-align:center;"><div style="font-family:'Space Grotesk';font-weight:700;font-size:20px;color:#1B9E57;">1.284</div><div style="font-size:10px;color:#6B7A70;">km gereden</div></div>
+                <div style="width:1px;background:#EDE9DD;"></div>
+                <div style="flex:1;text-align:center;"><div style="font-family:'Space Grotesk';font-weight:700;font-size:20px;color:#1B9E57;">87</div><div style="font-size:10px;color:#6B7A70;">ritten</div></div>
+                <div style="width:1px;background:#EDE9DD;"></div>
+                <div style="flex:1;text-align:center;"><div style="font-family:'Space Grotesk';font-weight:700;font-size:20px;color:#EF7C1A;">312</div><div style="font-size:10px;color:#6B7A70;">knooppunten</div></div>
+              </div>
+              <div style="margin:0 16px;background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 8px 20px -12px #15241b26;">
+                <div style="display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid #F1EEE4;"><span style="width:28px;height:28px;border-radius:9px;background:#EEF4EA;display:flex;align-items:center;justify-content:center;">🚲</span><span style="flex:1;font-size:13.5px;font-weight:600;color:#15241B;">Standaard fietsprofiel</span><span style="font-size:12px;color:#6B7A70;">Fiets ›</span></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid #F1EEE4;"><span style="width:28px;height:28px;border-radius:9px;background:#EEF4EA;display:flex;align-items:center;justify-content:center;">🗺</span><span style="flex:1;font-size:13.5px;font-weight:600;color:#15241B;">Offline kaarten</span><span style="font-size:12px;color:#6B7A70;">NL ›</span></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid #F1EEE4;"><span style="width:28px;height:28px;border-radius:9px;background:#EEF4EA;display:flex;align-items:center;justify-content:center;">🔊</span><span style="flex:1;font-size:13.5px;font-weight:600;color:#15241B;">Spraakbegeleiding</span><span style="width:42px;height:24px;border-radius:100px;background:#1B9E57;position:relative;"><i style="position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;background:#fff;"></i></span></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:13px 15px;"><span style="width:28px;height:28px;border-radius:9px;background:#EEF4EA;display:flex;align-items:center;justify-content:center;">📏</span><span style="flex:1;font-size:13.5px;font-weight:600;color:#15241B;">Eenheden</span><span style="font-size:12px;color:#6B7A70;">km ›</span></div>
+              </div>
+            </div>
+          </div>
+          <span style="font:600 10px 'Space Mono',monospace;color:#8b938e;letter-spacing:.1em;">08 · PROFIEL</span>
+        </div>
+      </div>
+    </section>
+    <section id="1b" style="scroll-margin:40px;">
+      <div style="display:flex;align-items:flex-start;gap:20px;margin-bottom:28px;">
+        <div style="font-family:'Familjen Grotesk',sans-serif;font-weight:700;font-size:15px;color:#0a0f1a;background:#8fb2ff;border-radius:6px;padding:6px 11px;letter-spacing:.02em;">1b</div>
+        <div>
+          <h2 style="font-family:'Familjen Grotesk',sans-serif;font-weight:700;font-size:30px;margin:0 0 6px;color:#f4f5f2;">Ink</h2>
+          <p style="margin:0;max-width:560px;font-size:15px;line-height:1.55;color:#a9b0ac;">Dark, technical, performance-forward. Map-first black canvas, electric cobalt, signal-lime for the route line and live data. Tighter corners, denser layout, mono numerics. A Komoot-grade instrument for serious riders.</p>
+          <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;align-items:center;">
+            <span style="width:26px;height:26px;border-radius:6px;background:#10141C;border:1px solid #ffffff1a;" title="#10141C"></span>
+            <span style="width:26px;height:26px;border-radius:6px;background:#1B212D;border:1px solid #ffffff1a;" title="#1B212D"></span>
+            <span style="width:26px;height:26px;border-radius:6px;background:#3D6BFF;" title="#3D6BFF"></span>
+            <span style="width:26px;height:26px;border-radius:6px;background:#C4F542;" title="#C4F542"></span>
+            <span style="width:26px;height:26px;border-radius:6px;background:#EDF1F7;" title="#EDF1F7"></span>
+            <span style="margin-left:8px;font:500 12px 'JetBrains Mono',monospace;color:#8b938e;">Familjen&nbsp;Grotesk · Manrope</span>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,250px);gap:28px 24px;">
+
+        <!-- ============ B1 HOME ============ -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
+          <div style="width:250px;height:512px;background:#000;border-radius:34px;padding:6px;box-shadow:0 30px 55px -20px rgba(0,0,0,.7);">
+            <div style="width:100%;height:100%;border-radius:28px;overflow:hidden;position:relative;background:#10141C;font-family:'Manrope',sans-serif;">
+              <div style="position:absolute;inset:0;background:linear-gradient(160deg,#111722,#0c1017);"></div>
+              <div style="position:absolute;left:-24px;top:130px;width:150px;height:120px;background:#132433;border-radius:44px;transform:rotate(-10deg);"></div>
+              <div style="position:absolute;right:-30px;bottom:70px;width:170px;height:150px;background:#13241c;border-radius:52px;"></div>
+              <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(58deg,transparent 0 36px,#ffffff10 36px 38px),repeating-linear-gradient(150deg,transparent 0 46px,#ffffff10 46px 48px);"></div>
+              <div style="position:absolute;left:118px;top:300px;width:16px;height:16px;border-radius:50%;background:#3D6BFF;border:3px solid #0c1017;box-shadow:0 0 0 3px #3D6BFF44;"></div>
+              <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:9px 16px 4px;font:600 11px 'JetBrains Mono',monospace;color:#EDF1F7;">
+                <span>9:41</span>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:flex;gap:2px;align-items:flex-end;"><i style="width:3px;height:5px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:7px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:9px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:11px;background:#EDF1F7;border-radius:1px;"></i></span><span style="font-size:9px;">5G</span><span style="width:20px;height:11px;border:1.5px solid #EDF1F7;border-radius:3px;position:relative;display:inline-block;"><i style="position:absolute;top:1.5px;bottom:1.5px;left:1.5px;width:11px;background:#EDF1F7;border-radius:1px;"></i></span></div>
+              </div>
+              <div style="position:absolute;top:44px;left:12px;right:12px;">
+                <div style="background:#1B212D;border:1px solid #2a3342;border-radius:14px;padding:13px 15px;display:flex;align-items:center;gap:11px;">
+                  <svg width="17" height="17" viewBox="0 0 17 17" fill="none"><circle cx="7" cy="7" r="5.2" stroke="#3D6BFF" stroke-width="2"/><line x1="11" y1="11" x2="15.5" y2="15.5" stroke="#3D6BFF" stroke-width="2" stroke-linecap="round"/></svg>
+                  <span style="font-size:14px;color:#8A94A6;font-weight:500;">Zoek bestemming</span>
+                </div>
+                <div style="display:flex;gap:7px;margin-top:9px;">
+                  <span style="background:#1B212D;border:1px solid #2a3342;border-radius:8px;padding:6px 12px;font:600 11.5px 'Manrope';color:#EDF1F7;">🏠 Thuis</span>
+                  <span style="background:#1B212D;border:1px solid #2a3342;border-radius:8px;padding:6px 12px;font:600 11.5px 'Manrope';color:#EDF1F7;">💼 Werk</span>
+                  <span style="background:#3D6BFF;border-radius:8px;padding:6px 12px;font:600 11.5px 'Manrope';color:#fff;">Knooppunten</span>
+                </div>
+              </div>
+              <div style="position:absolute;right:12px;top:210px;display:flex;flex-direction:column;gap:9px;">
+                <div style="width:42px;height:42px;border-radius:12px;background:#1B212D;border:1px solid #2a3342;display:flex;align-items:center;justify-content:center;"><div style="width:15px;height:15px;transform:rotate(45deg);border:2px solid #EDF1F7;border-radius:2px;"></div></div>
+                <div style="width:42px;height:42px;border-radius:12px;background:#3D6BFF;display:flex;align-items:center;justify-content:center;box-shadow:0 0 20px -4px #3D6BFF88;"><div style="width:11px;height:11px;border-radius:50%;border:2.5px solid #fff;"></div></div>
+              </div>
+              <div style="position:absolute;left:0;right:0;bottom:0;background:#161B24;border-top:1px solid #262D3A;border-radius:20px 20px 0 0;padding:12px 16px 20px;">
+                <div style="width:36px;height:4px;border-radius:100px;background:#2a3342;margin:0 auto 12px;"></div>
+                <div style="font:600 10px 'JetBrains Mono',monospace;color:#6d7789;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px;">Recente ritten</div>
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <div style="width:40px;height:40px;border-radius:10px;background:#1E2A22;display:flex;align-items:center;justify-content:center;flex:0 0 auto;"><div style="width:12px;height:12px;transform:rotate(45deg);border:2px solid #C4F542;border-radius:2px;"></div></div>
+                  <div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:14px;color:#EDF1F7;">Utrecht Centraal</div><div style="font-size:11.5px;color:#8A94A6;">18,4 km · via LF-routes</div></div>
+                  <span style="font:600 13px 'JetBrains Mono',monospace;color:#C4F542;">1u12</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span style="font:600 10px 'JetBrains Mono',monospace;color:#8b938e;letter-spacing:.1em;">01 · HOME</span>
+        </div>
+
+        <!-- ============ B2 SEARCH ============ -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
+          <div style="width:250px;height:512px;background:#000;border-radius:34px;padding:6px;box-shadow:0 30px 55px -20px rgba(0,0,0,.7);">
+            <div style="width:100%;height:100%;border-radius:28px;overflow:hidden;position:relative;background:#10141C;font-family:'Manrope',sans-serif;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 16px 4px;font:600 11px 'JetBrains Mono',monospace;color:#EDF1F7;">
+                <span>9:41</span>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:flex;gap:2px;align-items:flex-end;"><i style="width:3px;height:5px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:7px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:9px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:11px;background:#EDF1F7;border-radius:1px;"></i></span><span style="font-size:9px;">5G</span><span style="width:20px;height:11px;border:1.5px solid #EDF1F7;border-radius:3px;position:relative;display:inline-block;"><i style="position:absolute;top:1.5px;bottom:1.5px;left:1.5px;width:11px;background:#EDF1F7;border-radius:1px;"></i></span></div>
+              </div>
+              <div style="padding:8px 12px 0;">
+                <div style="background:#1B212D;border:1px solid #2a3342;border-radius:14px;padding:4px 14px;">
+                  <div style="display:flex;align-items:center;gap:12px;padding:12px 0;"><span style="width:11px;height:11px;border-radius:50%;border:3px solid #C4F542;"></span><span style="font-size:14px;color:#EDF1F7;font-weight:600;flex:1;">Mijn locatie</span><span style="width:16px;height:16px;transform:rotate(45deg);border:2px solid #3b4453;border-radius:2px;"></span></div>
+                  <div style="height:1px;background:#262D3A;margin-left:23px;"></div>
+                  <div style="display:flex;align-items:center;gap:12px;padding:12px 0;"><span style="width:11px;height:11px;background:#3D6BFF;border-radius:3px;"></span><span style="font-size:14px;color:#EDF1F7;font-weight:600;flex:1;">Utr<span style="border-right:2px solid #C4F542;">|</span></span></div>
+                </div>
+              </div>
+              <div style="font:600 10px 'JetBrains Mono',monospace;color:#6d7789;letter-spacing:.08em;text-transform:uppercase;padding:16px 18px 8px;">Voorstellen</div>
+              <div style="padding:0 8px;">
+                <div style="display:flex;align-items:center;gap:13px;padding:11px 10px;"><span style="width:34px;height:34px;border-radius:9px;background:#1B212D;display:flex;align-items:center;justify-content:center;flex:0 0 auto;"><span style="width:9px;height:9px;border-radius:50%;background:#3D6BFF;"></span></span><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13.5px;color:#EDF1F7;">Utrecht Centraal</div><div style="font-size:11px;color:#8A94A6;">Stationsplein, Utrecht</div></div><span style="font:600 11px 'JetBrains Mono';color:#6d7789;">36 km</span></div>
+                <div style="display:flex;align-items:center;gap:13px;padding:11px 10px;"><span style="width:34px;height:34px;border-radius:9px;background:#1B212D;display:flex;align-items:center;justify-content:center;flex:0 0 auto;"><span style="width:9px;height:9px;border-radius:50%;background:#3D6BFF;"></span></span><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13.5px;color:#EDF1F7;">Utrechtseweg 92</div><div style="font-size:11px;color:#8A94A6;">Amersfoort</div></div><span style="font:600 11px 'JetBrains Mono';color:#6d7789;">14 km</span></div>
+                <div style="display:flex;align-items:center;gap:13px;padding:11px 10px;"><span style="width:34px;height:34px;border-radius:9px;background:#1B212D;display:flex;align-items:center;justify-content:center;flex:0 0 auto;"><span style="width:9px;height:9px;border-radius:50%;background:#3D6BFF;"></span></span><div style="flex:1;min-width:0;"><div style="font-weight:600;font-size:13.5px;color:#EDF1F7;">Utrechtse Heuvelrug</div><div style="font-size:11px;color:#8A94A6;">Nationaal Park</div></div><span style="font:600 11px 'JetBrains Mono';color:#6d7789;">22 km</span></div>
+              </div>
+              <div style="position:absolute;left:0;right:0;bottom:0;background:#0b0e14;padding:8px 5px 16px;display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;gap:5px;justify-content:center;">
+                  <span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">q</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">w</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">e</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">r</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">t</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">y</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">u</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">i</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">o</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">p</span>
+                </div>
+                <div style="display:flex;gap:5px;justify-content:center;padding:0 12px;">
+                  <span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">a</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">s</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">d</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">f</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">g</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">h</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">j</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">k</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">l</span>
+                </div>
+                <div style="display:flex;gap:5px;justify-content:center;align-items:center;padding:0 4px;">
+                  <span style="width:34px;text-align:center;background:#161b24;border-radius:6px;padding:9px 0;font-size:11px;font-weight:700;color:#EDF1F7;">⇧</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">z</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">x</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">c</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">v</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">b</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">n</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:13px;font-weight:600;color:#EDF1F7;">m</span><span style="width:34px;text-align:center;background:#161b24;border-radius:6px;padding:9px 0;font-size:11px;font-weight:700;color:#EDF1F7;">⌫</span>
+                </div>
+                <div style="display:flex;gap:5px;justify-content:center;align-items:center;">
+                  <span style="width:56px;text-align:center;background:#161b24;border-radius:6px;padding:9px 0;font-size:11px;font-weight:700;color:#EDF1F7;">123</span><span style="flex:1;text-align:center;background:#242b37;border-radius:6px;padding:9px 0;font-size:12px;font-weight:600;color:#EDF1F7;">spatie</span><span style="width:70px;text-align:center;background:#3D6BFF;border-radius:6px;padding:9px 0;font-size:11px;font-weight:700;color:#fff;">Zoek</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span style="font:600 10px 'JetBrains Mono',monospace;color:#8b938e;letter-spacing:.1em;">02 · ZOEKEN</span>
+        </div>
+
+        <!-- ============ B3 ROUTE SUMMARY ============ -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
+          <div style="width:250px;height:512px;background:#000;border-radius:34px;padding:6px;box-shadow:0 30px 55px -20px rgba(0,0,0,.7);">
+            <div style="width:100%;height:100%;border-radius:28px;overflow:hidden;position:relative;background:#10141C;font-family:'Manrope',sans-serif;">
+              <div style="position:absolute;inset:0;background:linear-gradient(160deg,#111722,#0c1017);"></div>
+              <div style="position:absolute;left:-24px;top:60px;width:150px;height:120px;background:#132433;border-radius:44px;transform:rotate(-10deg);"></div>
+              <div style="position:absolute;right:-30px;top:150px;width:150px;height:130px;background:#13241c;border-radius:52px;"></div>
+              <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(58deg,transparent 0 36px,#ffffff0d 36px 38px),repeating-linear-gradient(150deg,transparent 0 46px,#ffffff0d 46px 48px);"></div>
+              <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 250 512" preserveAspectRatio="none"><path d="M55 60 C 110 110, 70 170, 140 210 S 90 270, 130 300" fill="none" stroke="#C4F542" stroke-width="6" stroke-linecap="round"/></svg>
+              <div style="position:absolute;left:49px;top:54px;width:14px;height:14px;border-radius:50%;background:#3D6BFF;border:3px solid #10141C;box-shadow:0 0 0 2px #3D6BFF;"></div>
+              <div style="position:absolute;left:124px;top:294px;width:14px;height:14px;border-radius:50%;background:#C4F542;border:3px solid #10141C;box-shadow:0 0 0 2px #C4F542;"></div>
+              <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:9px 16px 4px;font:600 11px 'JetBrains Mono',monospace;color:#EDF1F7;">
+                <span>9:41</span>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:flex;gap:2px;align-items:flex-end;"><i style="width:3px;height:5px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:7px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:9px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:11px;background:#EDF1F7;border-radius:1px;"></i></span><span style="font-size:9px;">5G</span><span style="width:20px;height:11px;border:1.5px solid #EDF1F7;border-radius:3px;position:relative;display:inline-block;"><i style="position:absolute;top:1.5px;bottom:1.5px;left:1.5px;width:11px;background:#EDF1F7;border-radius:1px;"></i></span></div>
+              </div>
+              <div style="position:absolute;top:44px;left:12px;background:#1B212D;border:1px solid #2a3342;border-radius:10px;padding:8px 14px;display:flex;align-items:center;gap:8px;"><span style="font-size:15px;color:#EDF1F7;">‹</span><span style="font-size:12.5px;font-weight:600;color:#EDF1F7;">Utrecht Centraal</span></div>
+              <div style="position:absolute;left:0;right:0;bottom:0;background:#161B24;border-top:1px solid #262D3A;border-radius:20px 20px 0 0;padding:12px 16px 18px;">
+                <div style="width:36px;height:4px;border-radius:100px;background:#2a3342;margin:0 auto 12px;"></div>
+                <div style="display:flex;gap:6px;background:#10141C;padding:4px;border-radius:10px;margin-bottom:14px;">
+                  <span style="flex:1;text-align:center;background:#3D6BFF;color:#fff;border-radius:8px;padding:7px 0;font-size:12px;font-weight:700;">🚲 Fiets</span>
+                  <span style="flex:1;text-align:center;color:#8A94A6;padding:7px 0;font-size:12px;font-weight:600;">⛰️ MTB</span>
+                  <span style="flex:1;text-align:center;color:#8A94A6;padding:7px 0;font-size:12px;font-weight:600;">🏁 Race</span>
+                </div>
+                <div style="display:flex;align-items:flex-end;gap:16px;margin-bottom:12px;">
+                  <div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:26px;color:#EDF1F7;line-height:1;">18,4<span style="font-size:13px;color:#8A94A6;"> km</span></div></div>
+                  <div><div style="font-family:'JetBrains Mono';font-weight:600;font-size:26px;color:#EDF1F7;line-height:1;">1:12<span style="font-size:13px;color:#8A94A6;"> u</span></div></div>
+                  <div style="margin-left:auto;text-align:right;"><div style="font:600 11px 'JetBrains Mono';color:#C4F542;">↗ 46 m</div><div style="font-size:10px;color:#6d7789;">hoogte</div></div>
+                </div>
+                <div style="display:flex;align-items:flex-end;gap:2px;height:44px;margin-bottom:14px;padding:0 1px;">
+                  <div style="flex:1;height:30%;background:#22303f;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:45%;background:#22303f;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:38%;background:#22303f;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:60%;background:#3D6BFF;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:72%;background:#3D6BFF;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:55%;background:#3D6BFF;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:40%;background:#22303f;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:48%;background:#22303f;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:35%;background:#22303f;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:52%;background:#3D6BFF;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:66%;background:#3D6BFF;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:44%;background:#22303f;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:30%;background:#22303f;border-radius:2px 2px 0 0;"></div><div style="flex:1;height:38%;background:#22303f;border-radius:2px 2px 0 0;"></div>
+                </div>
+                <div style="background:#3D6BFF;border-radius:12px;padding:14px 0;text-align:center;font-weight:700;font-size:15px;color:#fff;box-shadow:0 0 24px -6px #3D6BFF99;">Start navigatie</div>
+              </div>
+            </div>
+          </div>
+          <span style="font:600 10px 'JetBrains Mono',monospace;color:#8b938e;letter-spacing:.1em;">03 · ROUTE</span>
+        </div>
+
+        <!-- ============ B4 KNOOPPUNTEN ============ -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
+          <div style="width:250px;height:512px;background:#000;border-radius:34px;padding:6px;box-shadow:0 30px 55px -20px rgba(0,0,0,.7);">
+            <div style="width:100%;height:100%;border-radius:28px;overflow:hidden;position:relative;background:#10141C;font-family:'Manrope',sans-serif;">
+              <div style="position:absolute;inset:0;background:linear-gradient(160deg,#111722,#0c1017);"></div>
+              <div style="position:absolute;right:-30px;top:120px;width:170px;height:150px;background:#13241c;border-radius:52px;"></div>
+              <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(58deg,transparent 0 36px,#ffffff0d 36px 38px),repeating-linear-gradient(150deg,transparent 0 46px,#ffffff0d 46px 48px);"></div>
+              <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 250 512" preserveAspectRatio="none"><path d="M60 90 L150 150 L110 240 L190 250" fill="none" stroke="#3D6BFF" stroke-width="4" stroke-dasharray="2 7" stroke-linecap="round"/></svg>
+              <div style="position:absolute;left:52px;top:82px;width:22px;height:22px;border-radius:50%;background:#3D6BFF;border:2px solid #10141C;display:flex;align-items:center;justify-content:center;font:600 10px 'JetBrains Mono';color:#fff;box-shadow:0 0 0 2px #3D6BFF66;">72</div>
+              <div style="position:absolute;left:142px;top:142px;width:22px;height:22px;border-radius:50%;background:#3D6BFF;border:2px solid #10141C;display:flex;align-items:center;justify-content:center;font:600 10px 'JetBrains Mono';color:#fff;box-shadow:0 0 0 2px #3D6BFF66;">81</div>
+              <div style="position:absolute;left:102px;top:232px;width:22px;height:22px;border-radius:50%;background:#C4F542;border:2px solid #10141C;display:flex;align-items:center;justify-content:center;font:600 10px 'JetBrains Mono';color:#0c1017;">6</div>
+              <div style="position:absolute;left:180px;top:242px;width:22px;height:22px;border-radius:50%;background:#161B24;border:2px solid #3D6BFF;display:flex;align-items:center;justify-content:center;font:600 10px 'JetBrains Mono';color:#8fb2ff;">4</div>
+              <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:9px 16px 4px;font:600 11px 'JetBrains Mono',monospace;color:#EDF1F7;">
+                <span>9:41</span>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:flex;gap:2px;align-items:flex-end;"><i style="width:3px;height:5px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:7px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:9px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:11px;background:#EDF1F7;border-radius:1px;"></i></span><span style="font-size:9px;">5G</span><span style="width:20px;height:11px;border:1.5px solid #EDF1F7;border-radius:3px;position:relative;display:inline-block;"><i style="position:absolute;top:1.5px;bottom:1.5px;left:1.5px;width:11px;background:#EDF1F7;border-radius:1px;"></i></span></div>
+              </div>
+              <div style="position:absolute;top:44px;left:12px;right:12px;background:#1B212D;border:1px solid #2a3342;border-radius:12px;padding:10px 14px;text-align:center;font-size:12px;font-weight:600;color:#EDF1F7;">Tik knooppunten aan om je route te plannen</div>
+              <div style="position:absolute;left:0;right:0;bottom:0;background:#161B24;border-top:1px solid #262D3A;border-radius:20px 20px 0 0;padding:12px 16px 16px;">
+                <div style="width:36px;height:4px;border-radius:100px;background:#2a3342;margin:0 auto 12px;"></div>
+                <div style="display:flex;align-items:center;gap:8px;font:600 12px 'JetBrains Mono';margin-bottom:12px;flex-wrap:wrap;">
+                  <span style="width:24px;height:24px;border-radius:50%;background:#3D6BFF;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;">72</span><span style="color:#6d7789;">— 2,1 —</span><span style="width:24px;height:24px;border-radius:50%;background:#3D6BFF;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;">81</span><span style="color:#6d7789;">— 3,4 —</span><span style="width:24px;height:24px;border-radius:50%;background:#C4F542;color:#0c1017;display:flex;align-items:center;justify-content:center;font-size:11px;">6</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0 12px;border-top:1px solid #262D3A;">
+                  <span style="font-size:12px;color:#8A94A6;font-weight:600;">Totaal</span>
+                  <span style="font-family:'JetBrains Mono';font-weight:600;font-size:19px;color:#C4F542;">5,5 km</span>
+                </div>
+                <div style="display:flex;gap:10px;">
+                  <span style="padding:13px 18px;border-radius:12px;border:1.5px solid #2a3342;font-weight:700;font-size:14px;color:#8A94A6;">Wis</span>
+                  <span style="flex:1;text-align:center;background:#3D6BFF;border-radius:12px;padding:13px 0;font-weight:700;font-size:14px;color:#fff;box-shadow:0 0 24px -6px #3D6BFF99;">Bereken route</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span style="font:600 10px 'JetBrains Mono',monospace;color:#8b938e;letter-spacing:.1em;">04 · KNOOPPUNTEN</span>
+        </div>
+
+        <!-- ============ B5 NAVIGATION ============ -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
+          <div style="width:250px;height:512px;background:#000;border-radius:34px;padding:6px;box-shadow:0 30px 55px -20px rgba(0,0,0,.7);">
+            <div style="width:100%;height:100%;border-radius:28px;overflow:hidden;position:relative;background:#0c1017;font-family:'Manrope',sans-serif;">
+              <div style="position:absolute;inset:0;background:linear-gradient(160deg,#0f1520,#090c12);"></div>
+              <div style="position:absolute;left:-20px;bottom:120px;width:150px;height:130px;background:#132433;border-radius:44px;transform:rotate(8deg);"></div>
+              <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(58deg,transparent 0 40px,#ffffff0d 40px 42px),repeating-linear-gradient(150deg,transparent 0 50px,#ffffff0d 50px 52px);"></div>
+              <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 250 512" preserveAspectRatio="none"><path d="M125 470 L125 320 Q125 250 190 220" fill="none" stroke="#C4F542" stroke-width="10" stroke-linecap="round"/></svg>
+              <div style="position:absolute;left:113px;top:452px;width:24px;height:24px;border-radius:50%;background:#3D6BFF;border:4px solid #0c1017;box-shadow:0 0 0 3px #3D6BFF66;"></div>
+              <div style="position:absolute;top:8px;left:8px;right:8px;background:#1B212D;border:1px solid #2a3342;border-radius:16px;padding:14px;display:flex;align-items:center;gap:12px;">
+                <svg width="42" height="42" viewBox="0 0 42 42" fill="none"><path d="M13 34 L13 20 Q13 13 20 13 L27 13" stroke="#C4F542" stroke-width="4.5" stroke-linecap="round" fill="none"/><path d="M23 6 L33 13 L23 20 Z" fill="#C4F542"/></svg>
+                <div style="flex:1;"><div style="font-family:'Familjen Grotesk';font-weight:700;font-size:30px;color:#fff;line-height:1;">200<span style="font-size:15px;font-weight:600;color:#8A94A6;"> m</span></div><div style="font-size:13px;color:#C4F542;font-weight:600;margin-top:3px;">Ga rechtsaf — Maliebaan</div></div>
+                <div style="text-align:center;opacity:.85;"><div style="font-size:8px;color:#8A94A6;">dan</div><div style="font-size:16px;color:#EDF1F7;">↰</div></div>
+              </div>
+              <div style="position:absolute;left:0;right:0;bottom:0;background:#000;padding:16px 16px 20px;display:flex;align-items:center;gap:10px;">
+                <div style="flex:1;"><div style="font-family:'JetBrains Mono';font-weight:600;font-size:19px;color:#fff;line-height:1;">1:04</div><div style="font-size:10px;color:#8A94A6;">aankomst 10:45 · 15 km</div></div>
+                <div style="text-align:center;background:#C4F542;border-radius:10px;padding:5px 11px;"><div style="font-family:'JetBrains Mono';font-weight:600;font-size:19px;color:#0c1017;line-height:1;">18</div><div style="font-size:8px;color:#0c1017;font-weight:700;">km/u</div></div>
+                <div style="width:44px;height:44px;border-radius:50%;background:#D32F2F;display:flex;align-items:center;justify-content:center;"><span style="width:13px;height:13px;background:#fff;border-radius:3px;"></span></div>
+              </div>
+            </div>
+          </div>
+          <span style="font:600 10px 'JetBrains Mono',monospace;color:#8b938e;letter-spacing:.1em;">05 · NAVIGATIE</span>
+        </div>
+
+        <!-- ============ B6 LAYERS / POI ============ -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
+          <div style="width:250px;height:512px;background:#000;border-radius:34px;padding:6px;box-shadow:0 30px 55px -20px rgba(0,0,0,.7);">
+            <div style="width:100%;height:100%;border-radius:28px;overflow:hidden;position:relative;background:#10141C;font-family:'Manrope',sans-serif;">
+              <div style="position:absolute;inset:0;background:linear-gradient(160deg,#111722,#0c1017);"></div>
+              <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(58deg,transparent 0 36px,#ffffff0d 36px 38px),repeating-linear-gradient(150deg,transparent 0 46px,#ffffff0d 46px 48px);"></div>
+              <svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 250 512" preserveAspectRatio="none"><path d="M40 80 C 90 120, 60 170, 120 200" fill="none" stroke="#C4F542" stroke-width="6" stroke-linecap="round"/></svg>
+              <div style="position:absolute;left:70px;top:100px;width:20px;height:20px;border-radius:50%;background:#3D6BFF;border:2px solid #10141C;display:flex;align-items:center;justify-content:center;font-size:9px;">☕</div>
+              <div style="position:absolute;left:135px;top:150px;width:20px;height:20px;border-radius:50%;background:#3D6BFF;border:2px solid #10141C;display:flex;align-items:center;justify-content:center;font-size:9px;">🍽</div>
+              <div style="position:relative;display:flex;align-items:center;justify-content:space-between;padding:9px 16px 4px;font:600 11px 'JetBrains Mono',monospace;color:#EDF1F7;">
+                <span>9:41</span>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:flex;gap:2px;align-items:flex-end;"><i style="width:3px;height:5px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:7px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:9px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:11px;background:#EDF1F7;border-radius:1px;"></i></span><span style="font-size:9px;">5G</span><span style="width:20px;height:11px;border:1.5px solid #EDF1F7;border-radius:3px;position:relative;display:inline-block;"><i style="position:absolute;top:1.5px;bottom:1.5px;left:1.5px;width:11px;background:#EDF1F7;border-radius:1px;"></i></span></div>
+              </div>
+              <div style="position:absolute;left:0;right:0;bottom:0;background:#161B24;border-top:1px solid #262D3A;border-radius:20px 20px 0 0;padding:12px 16px 20px;">
+                <div style="width:36px;height:4px;border-radius:100px;background:#2a3342;margin:0 auto 14px;"></div>
+                <div style="font-family:'Familjen Grotesk';font-weight:700;font-size:17px;color:#EDF1F7;margin-bottom:14px;">Kaartlagen</div>
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;"><span style="width:34px;height:34px;border-radius:9px;background:#1B212D;display:flex;align-items:center;justify-content:center;">🔵</span><div style="flex:1;"><div style="font-weight:600;font-size:13.5px;color:#EDF1F7;">Knooppunten</div><div style="font-size:11px;color:#8A94A6;">Fietsknooppunten-net</div></div><span style="width:42px;height:24px;border-radius:100px;background:#3D6BFF;position:relative;"><i style="position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;background:#fff;"></i></span></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;"><span style="width:34px;height:34px;border-radius:9px;background:#1B212D;display:flex;align-items:center;justify-content:center;">🟢</span><div style="flex:1;"><div style="font-weight:600;font-size:13.5px;color:#EDF1F7;">LF-routes</div><div style="font-size:11px;color:#8A94A6;">Lange-afstand fietsroutes</div></div><span style="width:42px;height:24px;border-radius:100px;background:#3D6BFF;position:relative;"><i style="position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;background:#fff;"></i></span></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;"><span style="width:34px;height:34px;border-radius:9px;background:#1B212D;display:flex;align-items:center;justify-content:center;">🍽</span><div style="flex:1;"><div style="font-weight:600;font-size:13.5px;color:#EDF1F7;">Eten &amp; drinken</div><div style="font-size:11px;color:#8A94A6;">Langs je route</div></div><span style="width:42px;height:24px;border-radius:100px;background:#2a3342;position:relative;"><i style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#8A94A6;"></i></span></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 0;"><span style="width:34px;height:34px;border-radius:9px;background:#1B212D;display:flex;align-items:center;justify-content:center;">🛰</span><div style="flex:1;"><div style="font-weight:600;font-size:13.5px;color:#EDF1F7;">Satelliet</div><div style="font-size:11px;color:#8A94A6;">Luchtfoto-kaart</div></div><span style="width:42px;height:24px;border-radius:100px;background:#2a3342;position:relative;"><i style="position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#8A94A6;"></i></span></div>
+              </div>
+            </div>
+          </div>
+          <span style="font:600 10px 'JetBrains Mono',monospace;color:#8b938e;letter-spacing:.1em;">06 · LAGEN &amp; POI</span>
+        </div>
+
+        <!-- ============ B7 SAVED ROUTES ============ -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
+          <div style="width:250px;height:512px;background:#000;border-radius:34px;padding:6px;box-shadow:0 30px 55px -20px rgba(0,0,0,.7);">
+            <div style="width:100%;height:100%;border-radius:28px;overflow:hidden;position:relative;background:#10141C;font-family:'Manrope',sans-serif;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 16px 4px;font:600 11px 'JetBrains Mono',monospace;color:#EDF1F7;">
+                <span>9:41</span>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:flex;gap:2px;align-items:flex-end;"><i style="width:3px;height:5px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:7px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:9px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:11px;background:#EDF1F7;border-radius:1px;"></i></span><span style="font-size:9px;">5G</span><span style="width:20px;height:11px;border:1.5px solid #EDF1F7;border-radius:3px;position:relative;display:inline-block;"><i style="position:absolute;top:1.5px;bottom:1.5px;left:1.5px;width:11px;background:#EDF1F7;border-radius:1px;"></i></span></div>
+              </div>
+              <div style="padding:10px 18px 6px;"><h3 style="font-family:'Familjen Grotesk';font-weight:700;font-size:24px;color:#EDF1F7;margin:0;">Mijn ritten</h3></div>
+              <div style="display:flex;gap:6px;padding:6px 16px 4px;">
+                <span style="background:#3D6BFF;color:#fff;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;">Opgeslagen</span>
+                <span style="color:#8A94A6;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;">Recent</span>
+              </div>
+              <div style="padding:8px 12px;display:flex;flex-direction:column;gap:12px;">
+                <div style="background:#161B24;border:1px solid #232b38;border-radius:14px;overflow:hidden;">
+                  <div style="height:74px;position:relative;background:linear-gradient(150deg,#132433,#13241c);"><svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 220 74" preserveAspectRatio="none"><path d="M20 60 C 60 20, 120 55, 200 18" fill="none" stroke="#C4F542" stroke-width="4" stroke-linecap="round"/></svg></div>
+                  <div style="padding:11px 14px;"><div style="font-weight:700;font-size:14px;color:#EDF1F7;">Rondje Utrechtse Heuvelrug</div><div style="display:flex;gap:12px;margin-top:5px;font:600 11px 'JetBrains Mono';color:#8A94A6;"><span>42,3 km</span><span>↗ 180 m</span><span style="color:#C4F542;">★ 4,8</span></div></div>
+                </div>
+                <div style="background:#161B24;border:1px solid #232b38;border-radius:14px;overflow:hidden;">
+                  <div style="height:74px;position:relative;background:linear-gradient(150deg,#132433,#101a26);"><svg style="position:absolute;inset:0;width:100%;height:100%;" viewBox="0 0 220 74" preserveAspectRatio="none"><path d="M15 20 C 80 60, 130 25, 205 55" fill="none" stroke="#C4F542" stroke-width="4" stroke-linecap="round"/></svg></div>
+                  <div style="padding:11px 14px;"><div style="font-weight:700;font-size:14px;color:#EDF1F7;">Woon-werk · Amersfoort</div><div style="display:flex;gap:12px;margin-top:5px;font:600 11px 'JetBrains Mono';color:#8A94A6;"><span>18,4 km</span><span>↗ 46 m</span><span>3× p/w</span></div></div>
+                </div>
+              </div>
+              <div style="position:absolute;left:0;right:0;bottom:0;background:#0c1017;border-top:1px solid #232b38;display:flex;padding:9px 0 16px;">
+                <div style="flex:1;text-align:center;"><div style="width:16px;height:16px;transform:rotate(45deg);border:2px solid #3b4453;border-radius:2px;margin:0 auto 4px;"></div><div style="font-size:9px;color:#6d7789;">Kaart</div></div>
+                <div style="flex:1;text-align:center;"><div style="width:16px;height:16px;border-radius:50%;border:2.5px solid #3D6BFF;margin:0 auto 4px;"></div><div style="font-size:9px;color:#8fb2ff;font-weight:700;">Ritten</div></div>
+                <div style="flex:1;text-align:center;"><div style="width:16px;height:16px;border-radius:50%;background:#3b4453;margin:0 auto 4px;"></div><div style="font-size:9px;color:#6d7789;">Profiel</div></div>
+              </div>
+            </div>
+          </div>
+          <span style="font:600 10px 'JetBrains Mono',monospace;color:#8b938e;letter-spacing:.1em;">07 · MIJN RITTEN</span>
+        </div>
+
+        <!-- ============ B8 SETTINGS / PROFILE ============ -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
+          <div style="width:250px;height:512px;background:#000;border-radius:34px;padding:6px;box-shadow:0 30px 55px -20px rgba(0,0,0,.7);">
+            <div style="width:100%;height:100%;border-radius:28px;overflow:hidden;position:relative;background:#10141C;font-family:'Manrope',sans-serif;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 16px 4px;font:600 11px 'JetBrains Mono',monospace;color:#EDF1F7;">
+                <span>9:41</span>
+                <div style="display:flex;align-items:center;gap:5px;"><span style="display:flex;gap:2px;align-items:flex-end;"><i style="width:3px;height:5px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:7px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:9px;background:#EDF1F7;border-radius:1px;"></i><i style="width:3px;height:11px;background:#EDF1F7;border-radius:1px;"></i></span><span style="font-size:9px;">5G</span><span style="width:20px;height:11px;border:1.5px solid #EDF1F7;border-radius:3px;position:relative;display:inline-block;"><i style="position:absolute;top:1.5px;bottom:1.5px;left:1.5px;width:11px;background:#EDF1F7;border-radius:1px;"></i></span></div>
+              </div>
+              <div style="padding:14px 18px 16px;display:flex;align-items:center;gap:14px;">
+                <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#3D6BFF,#2a4dcc);display:flex;align-items:center;justify-content:center;font-family:'Familjen Grotesk';font-weight:700;font-size:22px;color:#fff;">SV</div>
+                <div><div style="font-family:'Familjen Grotesk';font-weight:700;font-size:18px;color:#EDF1F7;">Sanne Visser</div><div style="font-size:12px;color:#8A94A6;">Sinds 2024 · Utrecht</div></div>
+              </div>
+              <div style="margin:0 16px 16px;background:#161B24;border:1px solid #232b38;border-radius:14px;padding:14px;display:flex;">
+                <div style="flex:1;text-align:center;"><div style="font-family:'JetBrains Mono';font-weight:600;font-size:20px;color:#C4F542;">1.284</div><div style="font-size:10px;color:#8A94A6;">km gereden</div></div>
+                <div style="width:1px;background:#232b38;"></div>
+                <div style="flex:1;text-align:center;"><div style="font-family:'JetBrains Mono';font-weight:600;font-size:20px;color:#C4F542;">87</div><div style="font-size:10px;color:#8A94A6;">ritten</div></div>
+                <div style="width:1px;background:#232b38;"></div>
+                <div style="flex:1;text-align:center;"><div style="font-family:'JetBrains Mono';font-weight:600;font-size:20px;color:#8fb2ff;">312</div><div style="font-size:10px;color:#8A94A6;">knooppunten</div></div>
+              </div>
+              <div style="margin:0 16px;background:#161B24;border:1px solid #232b38;border-radius:14px;overflow:hidden;">
+                <div style="display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid #232b38;"><span style="width:28px;height:28px;border-radius:8px;background:#1B212D;display:flex;align-items:center;justify-content:center;">🚲</span><span style="flex:1;font-size:13.5px;font-weight:600;color:#EDF1F7;">Standaard fietsprofiel</span><span style="font-size:12px;color:#8A94A6;">Fiets ›</span></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid #232b38;"><span style="width:28px;height:28px;border-radius:8px;background:#1B212D;display:flex;align-items:center;justify-content:center;">🗺</span><span style="flex:1;font-size:13.5px;font-weight:600;color:#EDF1F7;">Offline kaarten</span><span style="font-size:12px;color:#8A94A6;">NL ›</span></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:13px 15px;border-bottom:1px solid #232b38;"><span style="width:28px;height:28px;border-radius:8px;background:#1B212D;display:flex;align-items:center;justify-content:center;">🔊</span><span style="flex:1;font-size:13.5px;font-weight:600;color:#EDF1F7;">Spraakbegeleiding</span><span style="width:42px;height:24px;border-radius:100px;background:#3D6BFF;position:relative;"><i style="position:absolute;top:2px;right:2px;width:20px;height:20px;border-radius:50%;background:#fff;"></i></span></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:13px 15px;"><span style="width:28px;height:28px;border-radius:8px;background:#1B212D;display:flex;align-items:center;justify-content:center;">📏</span><span style="flex:1;font-size:13.5px;font-weight:600;color:#EDF1F7;">Eenheden</span><span style="font-size:12px;color:#8A94A6;">km ›</span></div>
+              </div>
+            </div>
+          </div>
+          <span style="font:600 10px 'JetBrains Mono',monospace;color:#8b938e;letter-spacing:.1em;">08 · PROFIEL</span>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+<!-- ===== BUILD PLAN ===== -->
+  <div style="margin-top:96px;max-width:2260px;">
+    <div style="display:flex;align-items:flex-start;gap:20px;margin-bottom:32px;">
+      <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;color:#0c1a12;background:#c9d3cd;border-radius:8px;padding:6px 11px;">PLAN</div>
+      <div>
+        <h2 style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:32px;margin:0 0 6px;color:#f4f5f2;">The build plan</h2>
+        <p style="margin:0;max-width:760px;font-size:15px;line-height:1.55;color:#a9b0ac;">React Native owns the whole UI and app logic. Kotlin shrinks to a thin set of native modules for what JS can't do accurately — fused GPS, speed, heading, and background location during navigation. The self-hosted backend (GraphHopper, Nominatim, POI service) and OpenFreeMap / Overpass are reused unchanged.</p>
+      </div>
+    </div>
+
+    <!-- architecture stack -->
+    <div style="background:#171b1f;border:1px solid #2a2f34;border-radius:22px;padding:28px 30px;margin-bottom:24px;">
+      <div style="font:600 12px 'Space Mono',monospace;color:#8b938e;letter-spacing:.1em;text-transform:uppercase;margin-bottom:20px;">Architecture — four layers</div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;gap:14px;align-items:stretch;">
+          <div style="width:150px;flex:0 0 auto;display:flex;align-items:center;font-family:'Space Grotesk';font-weight:700;font-size:15px;color:#7fd3a4;">React Native UI</div>
+          <div style="flex:1;display:flex;gap:10px;flex-wrap:wrap;">
+            <span style="background:#1e2a22;border:1px solid #2f4438;border-radius:10px;padding:10px 14px;font-size:13px;color:#d7e5dd;">8 screens · React Native Navigation (native stack &amp; tabs)</span>
+            <span style="background:#1e2a22;border:1px solid #2f4438;border-radius:10px;padding:10px 14px;font-size:13px;color:#d7e5dd;">@gorhom/bottom-sheet · Reanimated</span>
+            <span style="background:#1e2a22;border:1px solid #2f4438;border-radius:10px;padding:10px 14px;font-size:13px;color:#d7e5dd;">Zustand store (ex-MapViewModel)</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:stretch;">
+          <div style="width:150px;flex:0 0 auto;display:flex;align-items:center;font-family:'Space Grotesk';font-weight:700;font-size:15px;color:#8fb2ff;">Cross-platform JS</div>
+          <div style="flex:1;display:flex;gap:10px;flex-wrap:wrap;">
+            <span style="background:#182130;border:1px solid #2b3a52;border-radius:10px;padding:10px 14px;font-size:13px;color:#d3ddf0;">@maplibre/maplibre-react-native (map render)</span>
+            <span style="background:#182130;border:1px solid #2b3a52;border-radius:10px;padding:10px 14px;font-size:13px;color:#d3ddf0;">NavigationEngine.ts (ported from Kotlin)</span>
+            <span style="background:#182130;border:1px solid #2b3a52;border-radius:10px;padding:10px 14px;font-size:13px;color:#d3ddf0;">axios + React Query · TanStack</span>
+            <span style="background:#182130;border:1px solid #2b3a52;border-radius:10px;padding:10px 14px;font-size:13px;color:#d3ddf0;">react-native-mmkv (saved routes)</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:stretch;">
+          <div style="width:150px;flex:0 0 auto;display:flex;align-items:center;font-family:'Space Grotesk';font-weight:700;font-size:15px;color:#efb27f;">Kotlin native (thin)</div>
+          <div style="flex:1;display:flex;gap:10px;flex-wrap:wrap;">
+            <span style="background:#2a2016;border:1px solid #4a3a24;border-radius:10px;padding:10px 14px;font-size:13px;color:#f0e0cf;">LocationModule · FusedLocationProvider (GPS, speed, bearing)</span>
+            <span style="background:#2a2016;border:1px solid #4a3a24;border-radius:10px;padding:10px 14px;font-size:13px;color:#f0e0cf;">NavForegroundService (background location + notification)</span>
+            <span style="background:#2a2016;border:1px solid #4a3a24;border-radius:10px;padding:10px 14px;font-size:13px;color:#f0e0cf;">TTS / keep-awake / permissions bridges</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:stretch;">
+          <div style="width:150px;flex:0 0 auto;display:flex;align-items:center;font-family:'Space Grotesk';font-weight:700;font-size:15px;color:#a9b0ac;">Backend (reused)</div>
+          <div style="flex:1;display:flex;gap:10px;flex-wrap:wrap;">
+            <span style="background:#20242a;border:1px solid #333941;border-radius:10px;padding:10px 14px;font-size:13px;color:#c2c9d1;">GraphHopper · routing</span>
+            <span style="background:#20242a;border:1px solid #333941;border-radius:10px;padding:10px 14px;font-size:13px;color:#c2c9d1;">Nominatim · geocoding</span>
+            <span style="background:#20242a;border:1px solid #333941;border-radius:10px;padding:10px 14px;font-size:13px;color:#c2c9d1;">POI service</span>
+            <span style="background:#20242a;border:1px solid #333941;border-radius:10px;padding:10px 14px;font-size:13px;color:#c2c9d1;">OpenFreeMap · tiles</span>
+            <span style="background:#20242a;border:1px solid #333941;border-radius:10px;padding:10px 14px;font-size:13px;color:#c2c9d1;">Overpass · overlays</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
+      <!-- native bridges + libs -->
+      <div style="flex:1;min-width:520px;background:#171b1f;border:1px solid #2a2f34;border-radius:22px;padding:28px 30px;">
+        <div style="font:600 12px 'Space Mono',monospace;color:#8b938e;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;">Kotlin → React Native migration map</div>
+        <p style="margin:0 0 20px;font-size:13.5px;line-height:1.5;color:#8b938e;">What each current Kotlin piece becomes.</p>
+        <div style="display:flex;flex-direction:column;gap:0;">
+          <div style="display:flex;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid #23282d;"><span style="flex:1;font-family:'Space Mono';font-size:12.5px;color:#efb27f;">MapFragment / activity_main</span><span style="color:#5a6169;">→</span><span style="flex:1.3;font-size:13px;color:#d7dde2;">React Native Navigation screens + native tab bar</span></div>
+          <div style="display:flex;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid #23282d;"><span style="flex:1;font-family:'Space Mono';font-size:12.5px;color:#efb27f;">MapViewModel (StateFlow)</span><span style="color:#5a6169;">→</span><span style="flex:1.3;font-size:13px;color:#d7dde2;">Zustand store + React Query for async</span></div>
+          <div style="display:flex;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid #23282d;"><span style="flex:1;font-family:'Space Mono';font-size:12.5px;color:#efb27f;">MapLibre (Android SDK)</span><span style="color:#5a6169;">→</span><span style="flex:1.3;font-size:13px;color:#d7dde2;">@maplibre/maplibre-react-native (same style URLs)</span></div>
+          <div style="display:flex;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid #23282d;"><span style="flex:1;font-family:'Space Mono';font-size:12.5px;color:#efb27f;">Retrofit APIs (GraphHopper…)</span><span style="color:#5a6169;">→</span><span style="flex:1.3;font-size:13px;color:#d7dde2;">axios clients, identical endpoints &amp; models</span></div>
+          <div style="display:flex;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid #23282d;"><span style="flex:1;font-family:'Space Mono';font-size:12.5px;color:#efb27f;">NavigationEngine.kt (snap/off-route)</span><span style="color:#5a6169;">→</span><span style="flex:1.3;font-size:13px;color:#d7dde2;">NavigationEngine.ts — pure JS port, unit-tested</span></div>
+          <div style="display:flex;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid #23282d;"><span style="flex:1;font-family:'Space Mono';font-size:12.5px;color:#7fd3a4;">FusedLocation + speed + bearing</span><span style="color:#5a6169;">→</span><span style="flex:1.3;font-size:13px;color:#d7dde2;"><b style="color:#efb27f;">stays native</b> — Kotlin LocationModule (TurboModule)</span></div>
+          <div style="display:flex;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid #23282d;"><span style="flex:1;font-family:'Space Mono';font-size:12.5px;color:#7fd3a4;">Background location during nav</span><span style="color:#5a6169;">→</span><span style="flex:1.3;font-size:13px;color:#d7dde2;"><b style="color:#efb27f;">stays native</b> — Kotlin foreground service</span></div>
+          <div style="display:flex;gap:16px;align-items:center;padding:12px 0;"><span style="flex:1;font-family:'Space Mono';font-size:12.5px;color:#efb27f;">TextToSpeech (voice guidance)</span><span style="color:#5a6169;">→</span><span style="flex:1.3;font-size:13px;color:#d7dde2;">react-native-tts (thin native fallback if needed)</span></div>
+        </div>
+      </div>
+
+      <!-- milestones -->
+      <div style="flex:1;min-width:520px;background:#171b1f;border:1px solid #2a2f34;border-radius:22px;padding:28px 30px;">
+        <div style="font:600 12px 'Space Mono',monospace;color:#8b938e;letter-spacing:.1em;text-transform:uppercase;margin-bottom:20px;">Milestones</div>
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <div style="display:flex;gap:16px;padding-bottom:16px;"><div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;"><span style="width:30px;height:30px;border-radius:9px;background:#1e2a22;color:#7fd3a4;display:flex;align-items:center;justify-content:center;font:700 12px 'Space Mono';">M0</span><span style="flex:1;width:2px;background:#2a2f34;margin-top:4px;"></span></div><div style="padding-top:3px;"><div style="font-family:'Space Grotesk';font-weight:700;font-size:14.5px;color:#f4f5f2;">Foundation <span style="font-weight:400;color:#7a8189;font-size:12px;">· ~1 wk</span></div><div style="font-size:12.5px;color:#9aa0a7;line-height:1.5;margin-top:2px;">RN project, React Native Navigation shell, CI, design tokens, TurboModule scaffolding.</div></div></div>
+          <div style="display:flex;gap:16px;padding-bottom:16px;"><div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;"><span style="width:30px;height:30px;border-radius:9px;background:#1e2a22;color:#7fd3a4;display:flex;align-items:center;justify-content:center;font:700 12px 'Space Mono';">M1</span><span style="flex:1;width:2px;background:#2a2f34;margin-top:4px;"></span></div><div style="padding-top:3px;"><div style="font-family:'Space Grotesk';font-weight:700;font-size:14.5px;color:#f4f5f2;">Map &amp; location <span style="font-weight:400;color:#7a8189;font-size:12px;">· ~1–2 wk</span></div><div style="font-size:12.5px;color:#9aa0a7;line-height:1.5;margin-top:2px;">MapLibre map, OpenFreeMap style, Kotlin LocationModule (GPS/speed/bearing), live puck &amp; recenter.</div></div></div>
+          <div style="display:flex;gap:16px;padding-bottom:16px;"><div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;"><span style="width:30px;height:30px;border-radius:9px;background:#182130;color:#8fb2ff;display:flex;align-items:center;justify-content:center;font:700 12px 'Space Mono';">M2</span><span style="flex:1;width:2px;background:#2a2f34;margin-top:4px;"></span></div><div style="padding-top:3px;"><div style="font-family:'Space Grotesk';font-weight:700;font-size:14.5px;color:#f4f5f2;">Search &amp; routing <span style="font-weight:400;color:#7a8189;font-size:12px;">· ~1–2 wk</span></div><div style="font-size:12.5px;color:#9aa0a7;line-height:1.5;margin-top:2px;">Nominatim autocomplete, from/to, GraphHopper routing, route drawn on map.</div></div></div>
+          <div style="display:flex;gap:16px;padding-bottom:16px;"><div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;"><span style="width:30px;height:30px;border-radius:9px;background:#182130;color:#8fb2ff;display:flex;align-items:center;justify-content:center;font:700 12px 'Space Mono';">M3</span><span style="flex:1;width:2px;background:#2a2f34;margin-top:4px;"></span></div><div style="padding-top:3px;"><div style="font-family:'Space Grotesk';font-weight:700;font-size:14.5px;color:#f4f5f2;">Route summary <span style="font-weight:400;color:#7a8189;font-size:12px;">· ~1 wk</span></div><div style="font-size:12.5px;color:#9aa0a7;line-height:1.5;margin-top:2px;">Profiles (Fiets/MTB/Race), distance/time, elevation chart, bottom sheet.</div></div></div>
+          <div style="display:flex;gap:16px;padding-bottom:16px;"><div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;"><span style="width:30px;height:30px;border-radius:9px;background:#2a2016;color:#efb27f;display:flex;align-items:center;justify-content:center;font:700 12px 'Space Mono';">M4</span><span style="flex:1;width:2px;background:#2a2f34;margin-top:4px;"></span></div><div style="padding-top:3px;"><div style="font-family:'Space Grotesk';font-weight:700;font-size:14.5px;color:#f4f5f2;">Turn-by-turn nav <span style="font-weight:400;color:#7a8189;font-size:12px;">· ~2 wk · the hard one</span></div><div style="font-size:12.5px;color:#9aa0a7;line-height:1.5;margin-top:2px;">NavigationEngine.ts, foreground service + background location, off-route recalc, TTS voice.</div></div></div>
+          <div style="display:flex;gap:16px;padding-bottom:16px;"><div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;"><span style="width:30px;height:30px;border-radius:9px;background:#20242a;color:#c2c9d1;display:flex;align-items:center;justify-content:center;font:700 12px 'Space Mono';">M5</span><span style="flex:1;width:2px;background:#2a2f34;margin-top:4px;"></span></div><div style="padding-top:3px;"><div style="font-family:'Space Grotesk';font-weight:700;font-size:14.5px;color:#f4f5f2;">Knooppunten planner <span style="font-weight:400;color:#7a8189;font-size:12px;">· ~1–2 wk</span></div><div style="font-size:12.5px;color:#9aa0a7;line-height:1.5;margin-top:2px;">Bundled knoopunten.geojson, tap-to-add nodes, leg distances, multi-waypoint route.</div></div></div>
+          <div style="display:flex;gap:16px;padding-bottom:16px;"><div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;"><span style="width:30px;height:30px;border-radius:9px;background:#20242a;color:#c2c9d1;display:flex;align-items:center;justify-content:center;font:700 12px 'Space Mono';">M6</span><span style="flex:1;width:2px;background:#2a2f34;margin-top:4px;"></span></div><div style="padding-top:3px;"><div style="font-family:'Space Grotesk';font-weight:700;font-size:14.5px;color:#f4f5f2;">Layers &amp; POIs <span style="font-weight:400;color:#7a8189;font-size:12px;">· ~1 wk</span></div><div style="font-size:12.5px;color:#9aa0a7;line-height:1.5;margin-top:2px;">Overpass overlays, POI service along route, layer toggles, dark map.</div></div></div>
+          <div style="display:flex;gap:16px;padding-bottom:16px;"><div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;"><span style="width:30px;height:30px;border-radius:9px;background:#20242a;color:#c2c9d1;display:flex;align-items:center;justify-content:center;font:700 12px 'Space Mono';">M7</span><span style="flex:1;width:2px;background:#2a2f34;margin-top:4px;"></span></div><div style="padding-top:3px;"><div style="font-family:'Space Grotesk';font-weight:700;font-size:14.5px;color:#f4f5f2;">Saved routes &amp; profile <span style="font-weight:400;color:#7a8189;font-size:12px;">· ~1 wk · new</span></div><div style="font-size:12.5px;color:#9aa0a7;line-height:1.5;margin-top:2px;">MMKV persistence, ride history, stats, settings screen.</div></div></div>
+          <div style="display:flex;gap:16px;"><div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;"><span style="width:30px;height:30px;border-radius:9px;background:#2a2016;color:#efb27f;display:flex;align-items:center;justify-content:center;font:700 12px 'Space Mono';">M8</span></div><div style="padding-top:3px;"><div style="font-family:'Space Grotesk';font-weight:700;font-size:14.5px;color:#f4f5f2;">Polish, offline &amp; store <span style="font-weight:400;color:#7a8189;font-size:12px;">· ~1–2 wk</span></div><div style="font-size:12.5px;color:#9aa0a7;line-height:1.5;margin-top:2px;">Offline tiles, battery/perf tuning, iOS parity pass, Play Store + TestFlight.</div></div></div>
+        </div>
+        <div style="margin-top:22px;padding-top:18px;border-top:1px solid #23282d;display:flex;gap:24px;flex-wrap:wrap;">
+          <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:20px;color:#7fd3a4;">~11–14 wk</div><div style="font-size:11.5px;color:#8b938e;">to feature parity + iOS</div></div>
+          <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:20px;color:#8fb2ff;">2 platforms</div><div style="font-size:11.5px;color:#8b938e;">one codebase, iOS for free</div></div>
+          <div><div style="font-family:'Space Grotesk';font-weight:700;font-size:20px;color:#efb27f;">~3 native modules</div><div style="font-size:11.5px;color:#8b938e;">the only Kotlin you maintain</div></div>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin:40px 0 0;font-size:13px;color:#6b7278;font-family:'Space Mono',monospace;">Concept mock · schematic maps are placeholders for live MapLibre tiles · Dutch copy matches the current app.</p>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>
