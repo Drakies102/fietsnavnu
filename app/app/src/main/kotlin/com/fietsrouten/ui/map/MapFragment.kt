@@ -29,6 +29,8 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.transition.TransitionManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.fietsrouten.Config
 import com.fietsrouten.R
 import com.fietsrouten.data.model.CyclingRoute
@@ -142,6 +144,7 @@ class MapFragment : Fragment() {
                 .build()
             mapLibreMap.addOnCameraIdleListener { onCameraIdle() }
             mapLibreMap.addOnMapClickListener { latLng -> onMapClick(latLng) }
+            mapLibreMap.addOnMapLongClickListener { latLng -> onMapLongClick(latLng) }
         }
 
         setupSearch()
@@ -157,8 +160,12 @@ class MapFragment : Fragment() {
     private fun setupSearch() {
         binding.actvFrom.addTextChangedListener(watcher { viewModel.searchFrom(it) })
         binding.actvTo.addTextChangedListener(watcher { viewModel.searchTo(it) })
-        binding.actvFrom.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) binding.actvFrom.showDropDown() }
-        binding.actvTo.setOnFocusChangeListener { _, hasFocus -> if (hasFocus) binding.actvTo.showDropDown() }
+        binding.actvFrom.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && binding.actvFrom.text.isNotEmpty()) binding.actvFrom.post { binding.actvFrom.showDropDown() }
+        }
+        binding.actvTo.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && binding.actvTo.text.isNotEmpty()) binding.actvTo.post { binding.actvTo.showDropDown() }
+        }
         setupClearButton(binding.actvFrom) { viewModel.fromLocation = null }
         setupClearButton(binding.actvTo) { viewModel.toLocation = null }
         binding.btnRoute.setOnClickListener { viewModel.calculateRoute() }
@@ -267,7 +274,7 @@ class MapFragment : Fragment() {
         }
 
         // City search autocomplete
-        val cityAdapter = makePassthroughAdapter()
+        val cityAdapter = SuggestionAdapter()
         var cityResults = emptyList<com.fietsrouten.data.model.NominatimResult>()
         binding.actvPlannerCity.setAdapter(cityAdapter)
         binding.actvPlannerCity.addTextChangedListener(watcher { viewModel.searchPlannerCity(it) })
@@ -288,11 +295,8 @@ class MapFragment : Fragment() {
         lifecycleScope.launch {
             viewModel.plannerCitySuggestions.collect { suggestions ->
                 cityResults = suggestions
-                cityAdapter.setNotifyOnChange(false)
-                cityAdapter.clear()
-                cityAdapter.addAll(listOf(CURRENT_LOCATION_LABEL) + suggestions.map { it.displayName })
-                cityAdapter.notifyDataSetChanged()
-                if (binding.actvPlannerCity.hasFocus()) binding.actvPlannerCity.showDropDown()
+                cityAdapter.update(listOf(CURRENT_LOCATION_LABEL) + suggestions.map { it.displayName })
+                if (binding.actvPlannerCity.hasFocus() && suggestions.isNotEmpty()) binding.actvPlannerCity.showDropDown()
             }
         }
         lifecycleScope.launch {
@@ -427,6 +431,30 @@ class MapFragment : Fragment() {
         return false
     }
 
+    private fun onMapLongClick(latLng: LatLng): Boolean {
+        if (binding.searchCard.visibility != View.VISIBLE) return false
+        if (viewModel.plannerMode.value != MapViewModel.PlannerMode.ADDRESS) return false
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("Locatie instellen")
+            .setItems(arrayOf("Stel in als startpunt", "Stel in als eindpunt")) { _, which ->
+                lifecycleScope.launch {
+                    val result = viewModel.reverseGeocode(latLng.latitude, latLng.longitude)
+                    if (result != null) {
+                        if (which == 0) {
+                            viewModel.fromLocation = result
+                            binding.actvFrom.setText(result.displayName, false)
+                        } else {
+                            viewModel.toLocation = result
+                            binding.actvTo.setText(result.displayName, false)
+                        }
+                    }
+                }
+            }
+            .show()
+        return true
+    }
+
     private fun amenityLabel(amenity: String): String = when (amenity) {
         "cafe"       -> "Café / Koffieshop"
         "restaurant" -> "Restaurant"
@@ -444,8 +472,8 @@ class MapFragment : Fragment() {
         var fromResults = emptyList<com.fietsrouten.data.model.NominatimResult>()
         var toResults = emptyList<com.fietsrouten.data.model.NominatimResult>()
 
-        val fromAdapter = makePassthroughAdapter()
-        val toAdapter = makePassthroughAdapter()
+        val fromAdapter = SuggestionAdapter()
+        val toAdapter = SuggestionAdapter()
 
         binding.actvFrom.setAdapter(fromAdapter)
         binding.actvFrom.setOnItemClickListener { _, _, pos, _ ->
@@ -469,23 +497,20 @@ class MapFragment : Fragment() {
         lifecycleScope.launch {
             viewModel.fromSuggestions.collect { suggestions ->
                 fromResults = suggestions
-                fromAdapter.setNotifyOnChange(false)
-                fromAdapter.clear()
-                fromAdapter.addAll(listOf(CURRENT_LOCATION_LABEL) + suggestions.map { it.displayName })
-                fromAdapter.notifyDataSetChanged()
-                if (binding.actvFrom.hasFocus()) binding.actvFrom.showDropDown()
+                fromAdapter.update(listOf(CURRENT_LOCATION_LABEL) + suggestions.map { it.displayName })
+                if (binding.actvFrom.hasFocus() && suggestions.isNotEmpty()) binding.actvFrom.showDropDown()
             }
         }
         lifecycleScope.launch {
             viewModel.toSuggestions.collect { suggestions ->
                 toResults = suggestions
-                toAdapter.setNotifyOnChange(false)
-                toAdapter.clear()
-                toAdapter.addAll(suggestions.map { it.displayName })
-                toAdapter.notifyDataSetChanged()
-                if (binding.actvTo.hasFocus()) binding.actvTo.showDropDown()
+                toAdapter.update(suggestions.map { it.displayName })
+                if (binding.actvTo.hasFocus() && suggestions.isNotEmpty()) binding.actvTo.showDropDown()
             }
         }
+        binding.btnCollapseSearch.setOnClickListener { collapseSearchCard() }
+        binding.searchExpandBar.setOnClickListener { expandSearchCard() }
+
         lifecycleScope.launch {
             viewModel.route.collect { route ->
                 if (route == null) {
@@ -493,6 +518,8 @@ class MapFragment : Fragment() {
                     binding.instructionsPanel.visibility = View.GONE
                     binding.fabPois.visibility = View.GONE
                     binding.poiInfoCard.visibility = View.GONE
+                    binding.btnCollapseSearch.visibility = View.GONE
+                    expandSearchCard()
                     return@collect
                 }
                 drawRoute(route.coordinates)
@@ -506,6 +533,10 @@ class MapFragment : Fragment() {
                     binding.plannerPanel.visibility = View.GONE
                 }
                 binding.fabPois.visibility = View.VISIBLE
+                binding.btnCollapseSearch.visibility = View.VISIBLE
+                val from = binding.actvFrom.text.toString().ifEmpty { "Van" }
+                val to = binding.actvTo.text.toString().ifEmpty { "Naar" }
+                binding.tvSearchSummary.text = "$from  →  $to"
             }
         }
         lifecycleScope.launch {
@@ -521,9 +552,11 @@ class MapFragment : Fragment() {
         }
         lifecycleScope.launch {
             viewModel.isNavigating.collect { navigating ->
+                setPuckForNavigation(navigating)
                 if (navigating) {
                     activity?.window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
                     binding.searchCard.visibility = View.GONE
+                    binding.searchExpandBar.visibility = View.GONE
                     binding.instructionsPanel.visibility = View.GONE
                     binding.plannerPanel.visibility = View.GONE
                     binding.navInstructionCard.visibility = View.VISIBLE
@@ -560,13 +593,20 @@ class MapFragment : Fragment() {
         // Planner mode UI switching
         lifecycleScope.launch {
             viewModel.plannerMode.collect { mode ->
+                TransitionManager.beginDelayedTransition(binding.searchCard as ViewGroup)
                 when (mode) {
                     MapViewModel.PlannerMode.ADDRESS -> {
+                        binding.actvPlannerCity.setText("", false)
+                        binding.actvPlannerCity.clearFocus()
                         binding.addressModeContent.visibility = View.VISIBLE
                         binding.knooppuntenModeContent.visibility = View.GONE
                         binding.plannerPanel.visibility = View.GONE
                     }
                     MapViewModel.PlannerMode.KNOOPPUNTEN -> {
+                        binding.actvFrom.setText("", false)
+                        binding.actvFrom.clearFocus()
+                        binding.actvTo.setText("", false)
+                        binding.actvTo.clearFocus()
                         binding.addressModeContent.visibility = View.GONE
                         binding.knooppuntenModeContent.visibility = View.VISIBLE
                         loadKnoopuntenForCurrentViewport()
@@ -758,12 +798,12 @@ class MapFragment : Fragment() {
             PropertyFactory.circleColor(
                 Expression.switchCase(
                     Expression.eq(Expression.get("selected"), Expression.literal("true")),
-                    Expression.literal("#6C5DD3"),
+                    Expression.literal("#00897B"),
                     Expression.literal("#FFFFFF")
                 )
             ),
             PropertyFactory.circleStrokeWidth(2f),
-            PropertyFactory.circleStrokeColor("#6C5DD3")
+            PropertyFactory.circleStrokeColor("#00897B")
         )
         circles.minZoom = 11f
         style.addLayer(circles)
@@ -775,7 +815,7 @@ class MapFragment : Fragment() {
                 Expression.switchCase(
                     Expression.eq(Expression.get("selected"), Expression.literal("true")),
                     Expression.literal("#FFFFFF"),
-                    Expression.literal("#6C5DD3")
+                    Expression.literal("#00897B")
                 )
             ),
             PropertyFactory.textFont(arrayOf("Noto Sans Regular")),
@@ -978,25 +1018,38 @@ class MapFragment : Fragment() {
         }
     }
 
+    private fun setPuckForNavigation(navigating: Boolean) {
+        val ctx = context ?: return
+        val drawableRes = if (navigating) R.drawable.ic_nav_puck else R.drawable.ic_location_dot
+        val options = LocationComponentOptions.builder(ctx)
+            .foregroundDrawable(drawableRes)
+            .gpsDrawable(drawableRes)
+            .accuracyAlpha(0f)
+            .pulseEnabled(false)
+            .build()
+        map?.locationComponent?.applyStyle(options)
+        map?.locationComponent?.renderMode = if (navigating) RenderMode.GPS else RenderMode.NORMAL
+    }
+
     private fun enableLocation(style: Style) {
         if (ContextCompat.checkSelfPermission(
                 requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED) return
-        val puckOptions = LocationComponentOptions.builder(requireContext())
-            .foregroundDrawable(R.drawable.ic_puck_bicycle)
-            .gpsDrawable(R.drawable.ic_puck_bicycle)
+        val dotOptions = LocationComponentOptions.builder(requireContext())
+            .foregroundDrawable(R.drawable.ic_location_dot)
+            .gpsDrawable(R.drawable.ic_location_dot)
             .accuracyAlpha(0f)
             .pulseEnabled(false)
             .build()
         map?.locationComponent?.apply {
             activateLocationComponent(
                 LocationComponentActivationOptions.builder(requireContext(), style)
-                    .locationComponentOptions(puckOptions)
+                    .locationComponentOptions(dotOptions)
                     .build()
             )
             isLocationComponentEnabled = true
             cameraMode = CameraMode.NONE
-            renderMode = RenderMode.GPS
+            renderMode = RenderMode.NORMAL
         }
         // Zoom to user's location on first load and draw proximity ring
         fusedLocationClient.lastLocation.addOnSuccessListener { location ->
@@ -1015,8 +1068,20 @@ class MapFragment : Fragment() {
     }
 
     /** Anchors the layers/POI/recenter FAB column below the visible top card so it's never hidden behind the nav instruction banner. */
+    private fun collapseSearchCard() {
+        TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
+        binding.searchCard.visibility = View.GONE
+        binding.searchExpandBar.visibility = View.VISIBLE
+    }
+
+    private fun expandSearchCard() {
+        TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
+        binding.searchCard.visibility = View.VISIBLE
+        binding.searchExpandBar.visibility = View.GONE
+    }
+
     private fun repositionFabsForNavigation(navigating: Boolean) {
-        val anchor = if (navigating) R.id.navInstructionCard else R.id.searchCard
+        val anchor = if (navigating) R.id.navInstructionCard else R.id.searchTopBarrier
         val params = binding.fabLayers.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
         params.topToBottom = anchor
         binding.fabLayers.layoutParams = params
@@ -1062,13 +1127,25 @@ class MapFragment : Fragment() {
         refresh()
     }
 
-    private fun makePassthroughAdapter() = object : ArrayAdapter<String>(
+    private inner class SuggestionAdapter : ArrayAdapter<String>(
         requireContext(), android.R.layout.simple_dropdown_item_1line
     ) {
+        private val data = mutableListOf<String>()
+
+        fun update(items: List<String>) {
+            data.clear()
+            data.addAll(items)
+            notifyDataSetChanged()
+        }
+
+        override fun getCount() = data.size
+        override fun getItem(pos: Int): String = data[pos]
+
         override fun getFilter() = object : Filter() {
             override fun performFiltering(c: CharSequence?) = FilterResults().apply {
-                val items = (0 until count).mapNotNull { getItem(it) }
-                values = items; count = items.size
+                val snapshot = data.toList()
+                values = snapshot
+                count = snapshot.size
             }
             override fun publishResults(c: CharSequence?, r: FilterResults?) = notifyDataSetChanged()
         }
@@ -1180,7 +1257,7 @@ class MapFragment : Fragment() {
         style.addSource(GeoJsonSource("route-source"))
         style.addLayer(
             LineLayer("route-layer", "route-source").withProperties(
-                PropertyFactory.lineColor("#6C5DD3"),
+                PropertyFactory.lineColor("#00897B"),
                 PropertyFactory.lineWidth(6f),
                 PropertyFactory.lineCap("round"),
                 PropertyFactory.lineJoin("round")
@@ -1276,7 +1353,7 @@ class MapFragment : Fragment() {
         canvas.drawPath(path, paint)
 
         // Brand fill
-        paint.color = Color.parseColor("#6C5DD3")
+        paint.color = Color.parseColor("#00897B")
         paint.style = Paint.Style.FILL
         canvas.drawPath(path, paint)
 
@@ -1301,8 +1378,8 @@ class MapFragment : Fragment() {
     }
 
     private fun addUserRadiusLayer(style: Style) {
-        val fill    = if (isDarkMode()) "rgba(108, 93, 211, 0.16)" else "rgba(108, 93, 211, 0.08)"
-        val outline = if (isDarkMode()) "rgba(108, 93, 211, 0.70)" else "rgba(108, 93, 211, 0.50)"
+        val fill    = if (isDarkMode()) "rgba(0, 137, 123, 0.16)" else "rgba(0, 137, 123, 0.08)"
+        val outline = if (isDarkMode()) "rgba(0, 137, 123, 0.70)" else "rgba(0, 137, 123, 0.50)"
         style.addSource(GeoJsonSource("user-radius-source"))
         style.addLayer(
             FillLayer("user-radius-fill", "user-radius-source")

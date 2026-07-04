@@ -27,13 +27,10 @@
         android:orientation="vertical"
         android:background="@drawable/search_card_bg"
         android:elevation="8dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="20dp"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:layout_marginTop="12dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -54,7 +51,6 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.FietsRouten.Square"
                     android:text="@string/mode_address" />
 
                 <com.google.android.material.button.MaterialButton
@@ -63,10 +59,14 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.FietsRouten.Square"
                     android:text="@string/mode_knooppunten" />
 
             </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <!-- Mode content container — fixed height regardless of active mode -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
             <!-- Address mode content -->
             <LinearLayout
@@ -77,7 +77,9 @@
 
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/input_fields_bg"
+                    android:clipToOutline="true">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -125,7 +127,8 @@
                                     android:inputType="text"
                                     android:imeOptions="actionNext"
                                     android:maxLines="1"
-                                    android:ellipsize="end" />
+                                    android:ellipsize="end"
+                                    android:completionThreshold="1" />
 
                             </LinearLayout>
 
@@ -178,7 +181,8 @@
                                     android:inputType="text"
                                     android:imeOptions="actionSearch"
                                     android:maxLines="1"
-                                    android:ellipsize="end" />
+                                    android:ellipsize="end"
+                                    android:completionThreshold="1" />
 
                             </LinearLayout>
 
@@ -216,7 +220,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:visibility="gone">
+                android:visibility="invisible">
 
                 <AutoCompleteTextView
                     android:id="@+id/actvPlannerCity"
@@ -237,7 +241,69 @@
 
             </LinearLayout>
 
+            </FrameLayout>
+
+            <!-- Shown only when a route is ready — lets user collapse the card -->
+            <ImageButton
+                android:id="@+id/btnCollapseSearch"
+                android:layout_width="match_parent"
+                android:layout_height="28dp"
+                android:layout_marginTop="4dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_chevron_up"
+                android:contentDescription="@string/collapse_search_desc"
+                android:visibility="gone" />
+
     </LinearLayout>
+
+    <!-- Compact bar shown when search card is collapsed -->
+    <LinearLayout
+        android:id="@+id/searchExpandBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/search_card_bg"
+        android:elevation="8dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="14dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/tvSearchSummary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textSize="14sp"
+            android:textColor="@color/text_primary"
+            android:singleLine="true"
+            android:ellipsize="end" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_chevron_down"
+            android:alpha="0.5"
+            android:contentDescription="@string/expand_search_desc" />
+
+    </LinearLayout>
+
+    <!-- Tracks the bottom of whichever search header is visible -->
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/searchTopBarrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="bottom"
+        app:constraint_referenced_ids="searchCard,searchExpandBar" />
 
     <!-- ═══════════════════════════════════════════════════════════
          NAVIGATION INSTRUCTION BAR — TomTom style, full width
@@ -333,7 +399,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/searchCard"
+        app:layout_constraintTop_toBottomOf="@id/searchTopBarrier"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="8dp" />
@@ -348,7 +414,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginTop="4dp"
-        app:layout_constraintTop_toBottomOf="@id/searchCard"
+        app:layout_constraintTop_toBottomOf="@id/searchTopBarrier"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -363,7 +429,7 @@
         app:srcCompat="@drawable/ic_layers"
         app:fabSize="mini"
         app:backgroundTint="@color/fab_bg"
-        app:layout_constraintTop_toBottomOf="@id/searchCard"
+        app:layout_constraintTop_toBottomOf="@id/searchTopBarrier"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- POI along route FAB — only visible when route is active -->

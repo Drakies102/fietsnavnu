@@ -150,6 +150,11 @@ class MapViewModel : ViewModel() {
 
     fun searchFrom(query: String) { fromQuery.value = query }
     fun searchTo(query: String) { toQuery.value = query }
+
+    suspend fun reverseGeocode(lat: Double, lon: Double): NominatimResult? =
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            repository.reverseGeocode(lat, lon)
+        }
     fun searchPlannerCity(query: String) { plannerCityQuery.value = query }
     fun selectPlannerCity(result: NominatimResult) {
         _plannerCityLocation.value = result.lat.toDouble() to result.lon.toDouble()
@@ -184,8 +189,20 @@ class MapViewModel : ViewModel() {
 
     fun setMode(mode: PlannerMode) {
         _plannerMode.value = mode
+        // Clear address mode state
+        fromLocation = null
+        toLocation = null
+        fromQuery.value = ""
+        toQuery.value = ""
+        _fromSuggestions.value = emptyList()
+        _toSuggestions.value = emptyList()
+        // Clear knooppunten mode state
+        _plannerCityLocation.value = null
+        plannerCityQuery.value = ""
+        _plannerCitySuggestions.value = emptyList()
         _selectedNodes.value = emptyList()
         _visibleKnoopunten.value = emptyList()
+        // Clear shared state
         _route.value = null
         _routesByProfile.value = emptyMap()
         _error.value = null

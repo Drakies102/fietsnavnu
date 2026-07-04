@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- White border for visibility on any map background -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M24,3 L44,43 Q44,46 41,44 L24,35 L7,44 Q4,46 4,43 Z" />
+    <!-- Teal fill -->
+    <path
+        android:fillColor="#00897B"
+        android:pathData="M24,8 L41,42 Q41,44 39,43 L24,35 L9,43 Q7,44 7,42 Z" />
+</vector>

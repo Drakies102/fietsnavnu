@@ -12,4 +12,11 @@ interface NominatimApi {
         @Query("limit") limit: Int = 5,
         @Query("countrycodes") countryCodes: String = "nl"
     ): List<NominatimResult>
+
+    @GET("reverse")
+    suspend fun reverse(
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
+        @Query("format") format: String = "json"
+    ): NominatimResult
 }

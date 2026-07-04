@@ -19,7 +19,6 @@
         android:textSize="11sp"
         android:textAllCaps="false"
         android:gravity="center"
-        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.FietsRouten.Square"
         android:text="@string/profile_bike_label" />
 
     <com.google.android.material.button.MaterialButton
@@ -31,7 +30,6 @@
         android:textSize="11sp"
         android:textAllCaps="false"
         android:gravity="center"
-        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.FietsRouten.Square"
         android:text="@string/profile_mtb_label" />
 
     <com.google.android.material.button.MaterialButton
@@ -43,7 +41,6 @@
         android:textSize="11sp"
         android:textAllCaps="false"
         android:gravity="center"
-        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.FietsRouten.Square"
         android:text="@string/profile_racingbike_label" />
 
 </com.google.android.material.button.MaterialButtonToggleGroup>

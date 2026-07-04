@@ -26,6 +26,14 @@ class RouteRepository {
     suspend fun searchAddress(query: String): List<NominatimResult> =
         nominatimApi.search(query)
 
+    suspend fun reverseGeocode(lat: Double, lon: Double): NominatimResult? = try {
+        val result = nominatimApi.reverse(lat, lon)
+        val shortName = result.displayName.split(", ").take(2).joinToString(", ")
+        NominatimResult(placeId = result.placeId, displayName = shortName, lat = lat.toString(), lon = lon.toString())
+    } catch (e: Exception) {
+        null
+    }
+
     suspend fun getRoute(
         waypoints: List<Pair<Double, Double>>,
         profile: String = "bike"

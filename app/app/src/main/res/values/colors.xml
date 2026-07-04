@@ -18,12 +18,14 @@
     <color name="surface_card">#D9FFFFFF</color>
     <color name="surface_card_solid">#FFFFFFFF</color>
     <color name="surface_nav_instruction">#E0FFFFFF</color>
-    <color name="nav_next_surface">#CCEDE9FE</color>
+    <color name="nav_next_surface">#CCE0F2F1</color>
     <color name="fab_bg">#D9FFFFFF</color>
 
-    <!-- Purple/indigo brand palette -->
-    <color name="brand_primary">#FF6C5DD3</color>
-    <color name="brand_primary_dark">#FF4A3FAD</color>
+    <color name="input_field_bg">#0A000000</color>
+
+    <!-- Teal/green brand palette -->
+    <color name="brand_primary">#FF00897B</color>
+    <color name="brand_primary_dark">#FF00695C</color>
     <color name="brand_accent_green">#FF34C77B</color>
-    <color name="nav_bottom_bg">#F51E1840</color>
+    <color name="nav_bottom_bg">#F5002A22</color>
 </resources>
