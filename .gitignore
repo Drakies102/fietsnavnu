@@ -8,3 +8,6 @@ app/local.properties
 data/*.pbf
 data/*.mbtiles
 data/default-gh/
+
+# Redesign source zip (extracted copy lives in design_handoff_fietsrouten_rn/)
+Fietsnavigation App Redesign.zip
