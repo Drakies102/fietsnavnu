@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="error_red">#FFD32F2F</color>
+    <color name="error_red">#FFE5484D</color>
     <color name="divider">#FFE0E0E0</color>
     <color name="cycling_route_ncn">#FFFF6B35</color>
     <color name="cycling_route_rcn">#FF2E7D32</color>
@@ -23,9 +20,16 @@
 
     <color name="input_field_bg">#0A000000</color>
 
-    <!-- Teal/green brand palette -->
-    <color name="brand_primary">#FF00897B</color>
-    <color name="brand_primary_dark">#FF00695C</color>
+    <!-- Groen v2 brand palette -->
+    <color name="brand_primary">#FF1B9E57</color>
+    <color name="brand_primary_dark">#FF0E7A44</color>
     <color name="brand_accent_green">#FF34C77B</color>
-    <color name="nav_bottom_bg">#F5002A22</color>
+    <color name="brand_amber">#FFEF7C1A</color>
+    <color name="nav_bottom_bg">#FF0C1C14</color>
+    <color name="speed_badge_bg">#FF12291D</color>
+    <color name="speed_badge_text">#FF7FD3A4</color>
+
+    <!-- "Knooppunten plannen" mode button (green-tinted, not filled) -->
+    <color name="knooppunten_btn_bg">#FFEEF4EA</color>
+    <color name="knooppunten_btn_border">#FFCDE6D8</color>
 </resources>
