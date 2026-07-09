@@ -6,8 +6,8 @@
     <string name="label_from">Van</string>
     <string name="label_to">Naar</string>
     <string name="btn_find_route">Vind fietsroute</string>
-    <string name="distance_placeholder">Afstand: —</string>
-    <string name="duration_placeholder">Tijd: —</string>
+    <string name="distance_placeholder">—</string>
+    <string name="duration_placeholder">—</string>
     <string name="btn_start_navigation">Start navigatie</string>
     <string name="btn_stop_navigation">Stop navigatie</string>
     <string name="nav_turn_icon_desc">Afslagrichting</string>

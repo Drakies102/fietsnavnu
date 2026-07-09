@@ -6,8 +6,8 @@
     <string name="label_from">From</string>
     <string name="label_to">To</string>
     <string name="btn_find_route">Find bike route</string>
-    <string name="distance_placeholder">Distance: —</string>
-    <string name="duration_placeholder">Time: —</string>
+    <string name="distance_placeholder">—</string>
+    <string name="duration_placeholder">—</string>
     <string name="btn_start_navigation">Start navigation</string>
     <string name="btn_stop_navigation">Stop navigation</string>
     <string name="nav_turn_icon_desc">Turn direction</string>

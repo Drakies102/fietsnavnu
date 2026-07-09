@@ -520,8 +520,20 @@ class MapFragment : Fragment() {
                     return@collect
                 }
                 drawRoute(route.coordinates)
-                binding.tvDistance.text = "Afstand: ${"%.1f km".format(route.distanceMeters / 1000)}"
-                binding.tvDuration.text = "Tijd: ${route.durationMs / 60000} min"
+                binding.tvDistance.text = styledStat(formatDistance(route.distanceMeters))
+                binding.tvDuration.text = styledStat(formatDurationHoursUnit(route.durationMs))
+                binding.tvEta.text = "${getString(R.string.eta_prefix)} ${formatEta(route.durationMs)}"
+
+                val gain = elevationGainMeters(route.elevationProfile)
+                if (gain >= 5.0) {
+                    binding.tvElevationGain.text = styledStat("↗ ${formatDistance(gain)}")
+                    binding.tvElevationGain.visibility = View.VISIBLE
+                    binding.tvElevationCaption.visibility = View.VISIBLE
+                } else {
+                    binding.tvElevationGain.visibility = View.GONE
+                    binding.tvElevationCaption.visibility = View.GONE
+                }
+
                 binding.elevationChart.setElevations(route.elevationProfile)
                 binding.elevationChart.visibility =
                     if (binding.elevationChart.hasSignificantElevation()) View.VISIBLE else View.GONE
@@ -1207,6 +1219,37 @@ class MapFragment : Fragment() {
         val cal = java.util.Calendar.getInstance()
         cal.add(java.util.Calendar.MILLISECOND, remainingMs.coerceAtMost(Int.MAX_VALUE.toLong()).toInt())
         return "%02d:%02d".format(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE))
+    }
+
+    /** "H:MM u"/"H:MM hr" — the route-summary big time stat (distinct from the unitless nav-bar clock). */
+    private fun formatDurationHoursUnit(durationMs: Long): String =
+        "${formatDurationClock(durationMs)} ${getString(R.string.unit_hour_short)}"
+
+    private fun elevationGainMeters(profile: List<Double>): Double {
+        if (profile.size < 2) return 0.0
+        var gain = 0.0
+        for (i in 1 until profile.size) {
+            val delta = profile[i] - profile[i - 1]
+            if (delta > 0) gain += delta
+        }
+        return gain
+    }
+
+    /** Renders "value unit" with the trailing unit as a smaller, muted suffix (big Space Grotesk numerals). */
+    private fun styledStat(text: String): android.text.SpannableString {
+        val spannable = android.text.SpannableString(text)
+        val spaceIdx = text.lastIndexOf(' ')
+        if (spaceIdx in 0 until text.length) {
+            spannable.setSpan(
+                android.text.style.RelativeSizeSpan(0.5f),
+                spaceIdx, text.length, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            spannable.setSpan(
+                android.text.style.ForegroundColorSpan(ContextCompat.getColor(requireContext(), R.color.text_secondary)),
+                spaceIdx, text.length, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        return spannable
     }
 
     // ── Map layer helpers ─────────────────────────────────────────

@@ -572,6 +572,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
                     android:orientation="horizontal">
 
                     <TextView
@@ -579,7 +580,10 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:textSize="26sp"
+                        android:fontFamily="@font/space_grotesk_bold"
                         android:textStyle="bold"
+                        android:textColor="@color/text_primary"
                         android:text="@string/distance_placeholder" />
 
                     <TextView
@@ -587,11 +591,48 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:gravity="end"
+                        android:textSize="26sp"
+                        android:fontFamily="@font/space_grotesk_bold"
                         android:textStyle="bold"
+                        android:textColor="@color/text_primary"
                         android:text="@string/duration_placeholder" />
 
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="end">
+
+                        <TextView
+                            android:id="@+id/tvElevationGain"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="19sp"
+                            android:fontFamily="@font/space_grotesk_bold"
+                            android:textStyle="bold"
+                            android:textColor="@color/brand_amber"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/tvElevationCaption"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/elevation_gain_caption"
+                            android:textSize="10.5sp"
+                            android:textColor="@color/text_secondary"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tvEta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textSize="12.5sp"
+                    android:textColor="@color/text_secondary" />
 
                 <com.fietsrouten.ui.ElevationChartView
                     android:id="@+id/elevationChart"
