@@ -32,6 +32,9 @@ object RidesStore {
                     profile = o.optString("profile", "bike")
                 )
             }
+            // Filters out degenerate entries from a prior build that saved a ride on every
+            // stopped navigation, even ones with ~0 distance (e.g. stop-right-after-start).
+            .filter { it.distanceMeters >= 20.0 }
         }.getOrDefault(emptyList())
     }
 

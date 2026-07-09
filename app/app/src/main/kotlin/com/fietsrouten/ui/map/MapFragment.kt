@@ -33,6 +33,7 @@ import androidx.transition.TransitionManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.fietsrouten.AppPreferences
 import com.fietsrouten.Config
+import com.fietsrouten.MainActivity
 import com.fietsrouten.R
 import com.fietsrouten.data.model.CyclingRoute
 import com.fietsrouten.data.model.Knooppunt
@@ -70,6 +71,7 @@ class MapFragment : Fragment() {
 
     companion object {
         private const val TAG_K = "Knoopunten"
+        private const val MIN_RIDE_DISTANCE_METERS = 20.0
     }
 
     private val currentLocationLabel: String
@@ -79,6 +81,12 @@ class MapFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: MapViewModel by viewModels()
     private var map: MapLibreMap? = null
+
+    /** True once the user has tapped the search pill / a planning mode chip — shows the From/To
+     *  form or knooppunten content instead of the collapsed pill. Reset to false whenever we
+     *  return to the default Home state. This is UI-only state; it's independent of PlannerMode
+     *  (ADDRESS vs KNOOPPUNTEN), which tracks WHICH content to show once expanded. */
+    private var searchExpanded = false
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val locationCallback = object : LocationCallback() {
@@ -206,7 +214,7 @@ class MapFragment : Fragment() {
         resetTtsState()
         binding.navInstructionCard.visibility = View.GONE
         binding.navBottomBar.visibility = View.GONE
-        collapseSearchCard()
+        updateSearchAreaState()
         binding.instructionsPanel.visibility = View.VISIBLE
         repositionFabsForNavigation(false)
         viewModel.route.value?.let { route ->
@@ -266,27 +274,31 @@ class MapFragment : Fragment() {
     // ── Planner UI ────────────────────────────────────────────────
 
     private fun setupPlannerUI() {
-        binding.searchPill.setOnClickListener { showSearchForm() }
+        binding.searchPill.setOnClickListener {
+            expandSearchForm()
+            binding.actvTo.requestFocus()
+        }
         binding.btnBackToPillFromAddress.setOnClickListener {
+            searchExpanded = false
             viewModel.setMode(MapViewModel.PlannerMode.ADDRESS)
-            showHomePill()
+            updateSearchAreaState()
         }
         binding.btnModeKnooppunten.setOnClickListener {
+            searchExpanded = true
             viewModel.setMode(MapViewModel.PlannerMode.KNOOPPUNTEN)
-            TransitionManager.beginDelayedTransition(binding.searchCard as ViewGroup)
-            binding.homePillGroup.visibility = View.GONE
-            binding.modeContentContainer.visibility = View.VISIBLE
-            binding.recentRidesCard.visibility = View.GONE
+            updateSearchAreaState()
         }
         binding.btnBackToPillFromKnooppunten.setOnClickListener {
+            searchExpanded = false
             viewModel.setMode(MapViewModel.PlannerMode.ADDRESS)
-            showHomePill()
+            updateSearchAreaState()
         }
         binding.chipThuis.setOnClickListener { routeToFavorite(isHome = true) }
         binding.chipWerk.setOnClickListener { routeToFavorite(isHome = false) }
         binding.searchExpandBar.setOnClickListener {
+            searchExpanded = false
             viewModel.setMode(MapViewModel.PlannerMode.ADDRESS)
-            showHomePill()
+            updateSearchAreaState()
         }
 
         // City search autocomplete
@@ -466,12 +478,12 @@ class MapFragment : Fragment() {
                     val result = viewModel.reverseGeocode(latLng.latitude, latLng.longitude) ?: return@launch
                     when (which) {
                         0 -> {
-                            showSearchForm()
+                            expandSearchForm()
                             viewModel.fromLocation = result
                             binding.actvFrom.setText(result.displayName, false)
                         }
                         1 -> {
-                            showSearchForm()
+                            expandSearchForm()
                             viewModel.toLocation = result
                             binding.actvTo.setText(result.displayName, false)
                         }
@@ -550,8 +562,8 @@ class MapFragment : Fragment() {
                     binding.instructionsPanel.visibility = View.GONE
                     binding.fabPois.visibility = View.GONE
                     binding.poiInfoCard.visibility = View.GONE
-                    expandSearchCard()
-                    showHomePill()
+                    searchExpanded = false
+                    updateSearchAreaState()
                     return@collect
                 }
                 drawRoute(route.coordinates)
@@ -577,7 +589,7 @@ class MapFragment : Fragment() {
                     binding.plannerPanel.visibility = View.GONE
                 }
                 binding.fabPois.visibility = View.VISIBLE
-                if (!viewModel.isNavigating.value) collapseSearchCard()
+                if (!viewModel.isNavigating.value) updateSearchAreaState()
             }
         }
         lifecycleScope.launch {
@@ -602,8 +614,7 @@ class MapFragment : Fragment() {
                 setPuckForNavigation(navigating)
                 if (navigating) {
                     activity?.window?.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                    binding.searchCard.visibility = View.GONE
-                    binding.searchExpandBar.visibility = View.GONE
+                    updateSearchAreaState()
                     binding.instructionsPanel.visibility = View.GONE
                     binding.plannerPanel.visibility = View.GONE
                     binding.navInstructionCard.visibility = View.VISIBLE
@@ -642,13 +653,10 @@ class MapFragment : Fragment() {
         // Planner mode UI switching
         lifecycleScope.launch {
             viewModel.plannerMode.collect { mode ->
-                TransitionManager.beginDelayedTransition(binding.searchCard as ViewGroup)
                 when (mode) {
                     MapViewModel.PlannerMode.ADDRESS -> {
                         binding.actvPlannerCity.setText("", false)
                         binding.actvPlannerCity.clearFocus()
-                        binding.addressModeContent.visibility = View.VISIBLE
-                        binding.knooppuntenModeContent.visibility = View.GONE
                         binding.plannerPanel.visibility = View.GONE
                     }
                     MapViewModel.PlannerMode.KNOOPPUNTEN -> {
@@ -656,11 +664,10 @@ class MapFragment : Fragment() {
                         binding.actvFrom.clearFocus()
                         binding.actvTo.setText("", false)
                         binding.actvTo.clearFocus()
-                        binding.addressModeContent.visibility = View.GONE
-                        binding.knooppuntenModeContent.visibility = View.VISIBLE
                         loadKnoopuntenForCurrentViewport()
                     }
                 }
+                updateSearchAreaState()
             }
         }
 
@@ -992,17 +999,21 @@ class MapFragment : Fragment() {
     // ── Trip summary ──────────────────────────────────────────────
 
     private fun showTripSummary(summary: com.fietsrouten.data.model.TripSummary) {
-        com.fietsrouten.data.repository.RidesStore.addRide(
-            requireContext(),
-            com.fietsrouten.data.model.RideRecord(
-                timestampMs = System.currentTimeMillis(),
-                distanceMeters = summary.distanceMeters,
-                durationMs = summary.durationMs,
-                elevationGainMeters = elevationGainMeters(viewModel.route.value?.elevationProfile ?: emptyList()),
-                avgSpeedKmh = summary.avgSpeedKmh,
-                profile = viewModel.selectedProfile.value.apiName
+        // Guard against degenerate trips (e.g. navigation started then immediately stopped)
+        // showing up as a phantom "0 m · 0:00" entry in Recente ritten / Ritten.
+        if (summary.distanceMeters >= MIN_RIDE_DISTANCE_METERS) {
+            com.fietsrouten.data.repository.RidesStore.addRide(
+                requireContext(),
+                com.fietsrouten.data.model.RideRecord(
+                    timestampMs = System.currentTimeMillis(),
+                    distanceMeters = summary.distanceMeters,
+                    durationMs = summary.durationMs,
+                    elevationGainMeters = elevationGainMeters(viewModel.route.value?.elevationProfile ?: emptyList()),
+                    avgSpeedKmh = summary.avgSpeedKmh,
+                    profile = viewModel.selectedProfile.value.apiName
+                )
             )
-        )
+        }
         val distKm = formatDistance(summary.distanceMeters)
         val mins = summary.durationMs / 60000
         val secs = (summary.durationMs % 60000) / 1000
@@ -1148,41 +1159,61 @@ class MapFragment : Fragment() {
         }
     }
 
-    /** Anchors the layers/POI/recenter FAB column below the visible top card so it's never hidden behind the nav instruction banner. */
-    private fun collapseSearchCard() {
+    /**
+     * Single source of truth for the search-area UI. Recomputes and applies the FULL visibility
+     * state from scratch every call, instead of toggling flags incrementally from many call
+     * sites — the incremental approach let the pill, the address form, and the "Terug" pill all
+     * end up visible at once when several triggers (route updates, mode changes, navigation
+     * start/stop) fired in close succession. Call this after any change to isNavigating, route,
+     * plannerMode, or the local searchExpanded flag.
+     */
+    private fun updateSearchAreaState() {
         TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
-        binding.searchCard.visibility = View.GONE
-        binding.searchExpandBar.visibility = View.VISIBLE
-    }
 
-    private fun expandSearchCard() {
-        TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
-        binding.searchCard.visibility = View.VISIBLE
+        if (viewModel.isNavigating.value) {
+            binding.searchCard.visibility = View.GONE
+            binding.searchExpandBar.visibility = View.GONE
+            return
+        }
+
+        if (viewModel.route.value != null) {
+            binding.searchCard.visibility = View.GONE
+            binding.searchExpandBar.visibility = View.VISIBLE
+            return
+        }
+
         binding.searchExpandBar.visibility = View.GONE
-    }
+        binding.searchCard.visibility = View.VISIBLE
+        binding.homePillGroup.visibility = if (searchExpanded) View.GONE else View.VISIBLE
+        binding.modeContentContainer.visibility = if (searchExpanded) View.VISIBLE else View.GONE
+        binding.addressModeContent.visibility =
+            if (viewModel.plannerMode.value == MapViewModel.PlannerMode.ADDRESS) View.VISIBLE else View.GONE
+        binding.knooppuntenModeContent.visibility =
+            if (viewModel.plannerMode.value == MapViewModel.PlannerMode.KNOOPPUNTEN) View.VISIBLE else View.GONE
 
-    /** Default Home state: single search pill + Thuis/Werk/Knooppunten chips. */
-    private fun showHomePill() {
-        TransitionManager.beginDelayedTransition(binding.searchCard as ViewGroup)
-        binding.homePillGroup.visibility = View.VISIBLE
-        binding.modeContentContainer.visibility = View.GONE
+        if (!searchExpanded) {
+            // setMode() clears fromLocation/toLocation in the ViewModel; the EditTexts need
+            // clearing too since nothing else does it once we're back at the pill.
+            binding.actvFrom.setText("", false)
+            binding.actvFrom.clearFocus()
+            binding.actvTo.setText("", false)
+            binding.actvTo.clearFocus()
+        }
         refreshRecentRide()
     }
 
     /** Expands the pill into the editable From/To address form. */
-    private fun showSearchForm() {
+    private fun expandSearchForm() {
+        searchExpanded = true
         if (viewModel.plannerMode.value != MapViewModel.PlannerMode.ADDRESS) {
             viewModel.setMode(MapViewModel.PlannerMode.ADDRESS)
+        } else {
+            updateSearchAreaState()
         }
-        TransitionManager.beginDelayedTransition(binding.searchCard as ViewGroup)
-        binding.homePillGroup.visibility = View.GONE
-        binding.modeContentContainer.visibility = View.VISIBLE
-        binding.recentRidesCard.visibility = View.GONE
-        binding.actvTo.requestFocus()
     }
 
     private fun refreshRecentRide() {
-        val showRecent = binding.homePillGroup.visibility == View.VISIBLE &&
+        val showRecent = !searchExpanded &&
             viewModel.route.value == null &&
             binding.poiInfoCard.visibility != View.VISIBLE
         val latest = com.fietsrouten.data.repository.RidesStore.getRides(requireContext()).firstOrNull()
@@ -1213,7 +1244,7 @@ class MapFragment : Fragment() {
             android.widget.Toast.makeText(requireContext(), getString(R.string.location_not_ready), android.widget.Toast.LENGTH_LONG).show()
             return
         }
-        showSearchForm()
+        expandSearchForm()
         viewModel.fromLocation = current
         binding.actvFrom.setText(currentLocationLabel, false)
         viewModel.toLocation = com.fietsrouten.data.model.NominatimResult(
