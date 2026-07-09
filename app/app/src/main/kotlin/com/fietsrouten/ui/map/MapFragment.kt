@@ -69,8 +69,10 @@ class MapFragment : Fragment() {
 
     companion object {
         private const val TAG_K = "Knoopunten"
-        private const val CURRENT_LOCATION_LABEL = "📍 Mijn locatie"
     }
+
+    private val currentLocationLabel: String
+        get() = getString(R.string.current_location_label)
 
     private var _binding: FragmentMapBinding? = null
     private val binding get() = _binding!!
@@ -281,7 +283,7 @@ class MapFragment : Fragment() {
             if (pos == 0) {
                 val cur = viewModel.currentLocationResult() ?: return@setOnItemClickListener
                 viewModel.selectPlannerCity(cur)
-                binding.actvPlannerCity.setText(CURRENT_LOCATION_LABEL, false)
+                binding.actvPlannerCity.setText(currentLocationLabel, false)
             } else {
                 val result = cityResults[pos - 1]
                 viewModel.selectPlannerCity(result)
@@ -292,7 +294,7 @@ class MapFragment : Fragment() {
         lifecycleScope.launch {
             viewModel.plannerCitySuggestions.collect { suggestions ->
                 cityResults = suggestions
-                cityAdapter.update(listOf(CURRENT_LOCATION_LABEL) + suggestions.map { it.displayName })
+                cityAdapter.update(listOf(currentLocationLabel) + suggestions.map { it.displayName })
                 if (binding.actvPlannerCity.hasFocus() && suggestions.isNotEmpty()) binding.actvPlannerCity.showDropDown()
             }
         }
@@ -440,8 +442,8 @@ class MapFragment : Fragment() {
         if (viewModel.plannerMode.value != MapViewModel.PlannerMode.ADDRESS) return false
 
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Locatie instellen")
-            .setItems(arrayOf("Stel in als startpunt", "Stel in als eindpunt")) { _, which ->
+            .setTitle(R.string.set_location_title)
+            .setItems(arrayOf(getString(R.string.set_as_start), getString(R.string.set_as_destination))) { _, which ->
                 lifecycleScope.launch {
                     val result = viewModel.reverseGeocode(latLng.latitude, latLng.longitude)
                     if (result != null) {
@@ -460,13 +462,13 @@ class MapFragment : Fragment() {
     }
 
     private fun amenityLabel(amenity: String): String = when (amenity) {
-        "cafe"       -> "Café / Koffieshop"
-        "restaurant" -> "Restaurant"
-        "fast_food"  -> "Snackbar / Fast food"
-        "bar"        -> "Bar"
-        "pub"        -> "Pub"
-        "bakery"     -> "Bakkerij"
-        "ice_cream"  -> "IJssalon"
+        "cafe"       -> getString(R.string.poi_cafe)
+        "restaurant" -> getString(R.string.poi_restaurant)
+        "fast_food"  -> getString(R.string.poi_fast_food)
+        "bar"        -> getString(R.string.poi_bar)
+        "pub"        -> getString(R.string.poi_pub)
+        "bakery"     -> getString(R.string.poi_bakery)
+        "ice_cream"  -> getString(R.string.poi_ice_cream)
         else         -> amenity.replaceFirstChar { it.uppercase() }
     }
 
@@ -484,7 +486,7 @@ class MapFragment : Fragment() {
             if (pos == 0) {
                 val cur = viewModel.currentLocationResult() ?: return@setOnItemClickListener
                 viewModel.fromLocation = cur
-                binding.actvFrom.setText(CURRENT_LOCATION_LABEL, false)
+                binding.actvFrom.setText(currentLocationLabel, false)
             } else {
                 viewModel.fromLocation = fromResults[pos - 1]
                 binding.actvFrom.setText(fromResults[pos - 1].displayName, false)
@@ -501,7 +503,7 @@ class MapFragment : Fragment() {
         lifecycleScope.launch {
             viewModel.fromSuggestions.collect { suggestions ->
                 fromResults = suggestions
-                fromAdapter.update(listOf(CURRENT_LOCATION_LABEL) + suggestions.map { it.displayName })
+                fromAdapter.update(listOf(currentLocationLabel) + suggestions.map { it.displayName })
                 if (binding.actvFrom.hasFocus() && suggestions.isNotEmpty()) binding.actvFrom.showDropDown()
             }
         }
@@ -550,8 +552,8 @@ class MapFragment : Fragment() {
                 }
                 binding.fabPois.visibility = View.VISIBLE
                 binding.btnCollapseSearch.visibility = View.VISIBLE
-                val from = binding.actvFrom.text.toString().ifEmpty { "Van" }
-                val to = binding.actvTo.text.toString().ifEmpty { "Naar" }
+                val from = binding.actvFrom.text.toString().ifEmpty { getString(R.string.label_from) }
+                val to = binding.actvTo.text.toString().ifEmpty { getString(R.string.label_to) }
                 binding.tvSearchSummary.text = "$from  →  $to"
             }
         }
@@ -562,7 +564,13 @@ class MapFragment : Fragment() {
         }
         lifecycleScope.launch {
             viewModel.error.collect { error ->
-                binding.tvError.text = error ?: ""
+                binding.tvError.text = when (error) {
+                    MapViewModel.RouteError.SELECT_FROM_FIRST -> getString(R.string.select_from_first)
+                    MapViewModel.RouteError.SELECT_TO_FIRST -> getString(R.string.select_to_first)
+                    MapViewModel.RouteError.SELECT_MIN_NODES -> getString(R.string.select_min_2_nodes)
+                    MapViewModel.RouteError.ROUTE_NOT_FOUND -> getString(R.string.route_not_found)
+                    null -> ""
+                }
                 binding.tvError.visibility = if (error != null) View.VISIBLE else View.GONE
             }
         }
@@ -961,16 +969,28 @@ class MapFragment : Fragment() {
     // ── Trip summary ──────────────────────────────────────────────
 
     private fun showTripSummary(summary: com.fietsrouten.data.model.TripSummary) {
-        val distKm = "%.1f km".format(summary.distanceMeters / 1000)
+        val distKm = formatDistance(summary.distanceMeters)
         val mins = summary.durationMs / 60000
         val secs = (summary.durationMs % 60000) / 1000
-        val time = if (mins > 0) "${mins} min ${secs} sec" else "${secs} sec"
-        val avg = "%.1f km/u".format(summary.avgSpeedKmh)
-        val max = "%.1f km/u".format(summary.maxSpeedKmh)
+        val minUnit = getString(R.string.unit_minute_short)
+        val secUnit = getString(R.string.unit_second_short)
+        val time = if (mins > 0) "$mins $minUnit $secs $secUnit" else "$secs $secUnit"
+        val kmhUnit = getString(R.string.unit_speed_kmh)
+        val nf = java.text.NumberFormat.getInstance(activeLocale()).apply {
+            minimumFractionDigits = 1
+            maximumFractionDigits = 1
+        }
+        val avg = "${nf.format(summary.avgSpeedKmh)} $kmhUnit"
+        val max = "${nf.format(summary.maxSpeedKmh)} $kmhUnit"
         com.google.android.material.dialog.MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Rit voltooid")
-            .setMessage("Afstand: $distKm\nTijd: $time\nGem. snelheid: $avg\nMax. snelheid: $max")
-            .setPositiveButton("Sluiten", null)
+            .setTitle(R.string.trip_complete_title)
+            .setMessage(
+                "${getString(R.string.trip_distance_label)}: $distKm\n" +
+                "${getString(R.string.trip_time_label)}: $time\n" +
+                "${getString(R.string.trip_avg_speed_label)}: $avg\n" +
+                "${getString(R.string.trip_max_speed_label)}: $max"
+            )
+            .setPositiveButton(R.string.btn_close, null)
             .show()
     }
 
@@ -980,7 +1000,7 @@ class MapFragment : Fragment() {
         val idx = session.currentInstructionIndex
         if (session.isOffRoute && !wasOffRoute) {
             wasOffRoute = true
-            speak("Route herberekenen")
+            speak(getString(R.string.recalculating_route))
             return
         }
         if (!session.isOffRoute) wasOffRoute = false
@@ -989,12 +1009,12 @@ class MapFragment : Fragment() {
             announcedAt200m = false
             announcedAtTurn = false
             if (session.distanceToTurnMeters > 200) {
-                speak("Over ${formatDistance(session.distanceToTurnMeters)}, ${session.currentInstruction.text}")
+                speak(getString(R.string.voice_distance_prefix, formatDistance(session.distanceToTurnMeters), session.currentInstruction.text))
             }
         }
         if (!announcedAt200m && session.distanceToTurnMeters in 50.0..200.0) {
             announcedAt200m = true
-            speak("Over 200 meter, ${session.currentInstruction.text}")
+            speak(getString(R.string.voice_distance_prefix, formatDistance(200.0), session.currentInstruction.text))
         }
         if (!announcedAtTurn && session.distanceToTurnMeters < 20) {
             announcedAtTurn = true

@@ -45,8 +45,14 @@
     <string name="set_location_title">Locatie instellen</string>
     <string name="set_as_start">Stel in als startpunt</string>
     <string name="set_as_destination">Stel in als eindpunt</string>
+    <string name="poi_cafe">Café / Koffieshop</string>
     <string name="poi_restaurant">Restaurant</string>
+    <string name="poi_fast_food">Snackbar / Fast food</string>
+    <string name="poi_bar">Bar</string>
+    <string name="poi_pub">Pub</string>
     <string name="poi_bakery">Bakkerij</string>
+    <string name="poi_ice_cream">IJssalon</string>
+    <string name="select_min_2_nodes">Selecteer minimaal 2 knooppunten.</string>
     <string name="trip_complete_title">Rit voltooid</string>
     <string name="btn_close">Sluiten</string>
     <string name="recalculating_route">Route herberekenen</string>
@@ -61,4 +67,10 @@
     <string name="settings_theme_dark">Donker</string>
     <string name="settings_voice_guidance">Spraakbegeleiding</string>
     <string name="btn_back">Terug</string>
+    <string name="unit_second_short">sec</string>
+    <string name="trip_distance_label">Afstand</string>
+    <string name="trip_time_label">Tijd</string>
+    <string name="trip_avg_speed_label">Gem. snelheid</string>
+    <string name="trip_max_speed_label">Max. snelheid</string>
+    <string name="voice_distance_prefix">Over %1$s, %2$s</string>
 </resources>

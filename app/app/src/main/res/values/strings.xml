@@ -45,8 +45,14 @@
     <string name="set_location_title">Set location</string>
     <string name="set_as_start">Set as start point</string>
     <string name="set_as_destination">Set as destination</string>
+    <string name="poi_cafe">Café / Coffee shop</string>
     <string name="poi_restaurant">Restaurant</string>
+    <string name="poi_fast_food">Fast food</string>
+    <string name="poi_bar">Bar</string>
+    <string name="poi_pub">Pub</string>
     <string name="poi_bakery">Bakery</string>
+    <string name="poi_ice_cream">Ice cream parlor</string>
+    <string name="select_min_2_nodes">Select at least 2 junctions.</string>
     <string name="trip_complete_title">Trip complete</string>
     <string name="btn_close">Close</string>
     <string name="recalculating_route">Recalculating route</string>
@@ -61,4 +67,10 @@
     <string name="settings_theme_dark">Dark</string>
     <string name="settings_voice_guidance">Voice guidance</string>
     <string name="btn_back">Back</string>
+    <string name="unit_second_short">sec</string>
+    <string name="trip_distance_label">Distance</string>
+    <string name="trip_time_label">Time</string>
+    <string name="trip_avg_speed_label">Avg. speed</string>
+    <string name="trip_max_speed_label">Max. speed</string>
+    <string name="voice_distance_prefix">In %1$s, %2$s</string>
 </resources>

@@ -32,6 +32,9 @@ class MapViewModel : ViewModel() {
         BIKE("bike"), MTB("mtb"), RACING("racingbike")
     }
 
+    /** Error codes only — MapFragment resolves these to localized text via string resources. */
+    enum class RouteError { SELECT_FROM_FIRST, SELECT_TO_FIRST, SELECT_MIN_NODES, ROUTE_NOT_FOUND }
+
     private val repository = RouteRepository()
     private val overpassRepository = OverpassRepository()
     private val poiRepository = PoiServiceRepository()
@@ -79,8 +82,8 @@ class MapViewModel : ViewModel() {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error
+    private val _error = MutableStateFlow<RouteError?>(null)
+    val error: StateFlow<RouteError?> = _error
 
     private val _navigationSession = MutableStateFlow<NavigationSession?>(null)
     val navigationSession: StateFlow<NavigationSession?> = _navigationSession
@@ -242,8 +245,8 @@ class MapViewModel : ViewModel() {
     // ── Address-mode routing ──────────────────────────────────────
 
     fun calculateRoute() {
-        val from = fromLocation ?: run { _error.value = "Selecteer eerst een startadres."; return }
-        val to = toLocation ?: run { _error.value = "Selecteer eerst een bestemming."; return }
+        val from = fromLocation ?: run { _error.value = RouteError.SELECT_FROM_FIRST; return }
+        val to = toLocation ?: run { _error.value = RouteError.SELECT_TO_FIRST; return }
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
@@ -255,7 +258,7 @@ class MapViewModel : ViewModel() {
                 )
             }
             if (!applyRouteResults(results)) {
-                _error.value = "Route niet gevonden"
+                _error.value = RouteError.ROUTE_NOT_FOUND
             }
             _isLoading.value = false
         }
@@ -279,7 +282,7 @@ class MapViewModel : ViewModel() {
 
     fun calculateKnooppuntenRoute() {
         val nodes = _selectedNodes.value
-        if (nodes.size < 2) { _error.value = "Selecteer minimaal 2 knooppunten."; return }
+        if (nodes.size < 2) { _error.value = RouteError.SELECT_MIN_NODES; return }
         viewModelScope.launch {
             _isLoading.value = true
             _error.value = null
@@ -290,7 +293,7 @@ class MapViewModel : ViewModel() {
                 _visibleKnoopunten.value = _selectedNodes.value
                 _selectedNodes.value = emptyList()
             } else {
-                _error.value = "Route niet gevonden"
+                _error.value = RouteError.ROUTE_NOT_FOUND
             }
             _isLoading.value = false
         }
