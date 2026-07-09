@@ -18,7 +18,6 @@
     <string name="nav_turn_icon_desc">Turn direction</string>
     <string name="nav_then">THEN</string>
     <string name="nav_off_route">Recalculating route…</string>
-    <string name="mode_address">Address</string>
     <string name="btn_knooppunten_plannen">Plan junctions</string>
     <string name="planner_hint">Tap junctions to plan your route</string>
     <string name="planner_city_hint">Search a city or town…</string>
@@ -31,8 +30,15 @@
     <string name="fab_pois_desc">Food and drink along the route</string>
     <string name="fab_recenter_desc">Center on my location</string>
     <string name="swap_locations_desc">Swap start and destination</string>
-    <string name="collapse_search_desc">Collapse search card</string>
-    <string name="expand_search_desc">Expand search card</string>
+    <string name="search_pill_placeholder">Where do you want to go?</string>
+    <string name="chip_thuis">🏠 Home</string>
+    <string name="chip_werk">💼 Work</string>
+    <string name="btn_terug">‹ Back</string>
+    <string name="set_as_home">Set as home</string>
+    <string name="set_as_work">Set as work</string>
+    <string name="home_not_set_hint">Long-press the map to set your home location</string>
+    <string name="work_not_set_hint">Long-press the map to set your work location</string>
+    <string name="recent_rides_label">RECENT RIDES</string>
     <string name="profile_bike_label">🚲 Bike</string>
     <string name="profile_mtb_label">⛰️ MTB</string>
     <string name="profile_racingbike_label">🏁 Race</string>
@@ -45,6 +51,7 @@
     <string name="eta_prefix">Arrival</string>
     <string name="elevation_gain_caption">elevation</string>
     <string name="select_from_first">Select a start address first.</string>
+    <string name="location_not_ready">Waiting for your location…</string>
     <string name="select_to_first">Select a destination first.</string>
     <string name="route_not_found">Route not found</string>
     <string name="set_location_title">Set location</string>

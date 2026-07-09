@@ -31,6 +31,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.transition.TransitionManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.fietsrouten.AppPreferences
 import com.fietsrouten.Config
 import com.fietsrouten.R
 import com.fietsrouten.data.model.CyclingRoute
@@ -205,7 +206,7 @@ class MapFragment : Fragment() {
         resetTtsState()
         binding.navInstructionCard.visibility = View.GONE
         binding.navBottomBar.visibility = View.GONE
-        binding.searchCard.visibility = View.VISIBLE
+        collapseSearchCard()
         binding.instructionsPanel.visibility = View.VISIBLE
         repositionFabsForNavigation(false)
         viewModel.route.value?.let { route ->
@@ -265,11 +266,27 @@ class MapFragment : Fragment() {
     // ── Planner UI ────────────────────────────────────────────────
 
     private fun setupPlannerUI() {
+        binding.searchPill.setOnClickListener { showSearchForm() }
+        binding.btnBackToPillFromAddress.setOnClickListener {
+            viewModel.setMode(MapViewModel.PlannerMode.ADDRESS)
+            showHomePill()
+        }
         binding.btnModeKnooppunten.setOnClickListener {
             viewModel.setMode(MapViewModel.PlannerMode.KNOOPPUNTEN)
+            TransitionManager.beginDelayedTransition(binding.searchCard as ViewGroup)
+            binding.homePillGroup.visibility = View.GONE
+            binding.modeContentContainer.visibility = View.VISIBLE
+            binding.recentRidesCard.visibility = View.GONE
         }
-        binding.btnBackToAddress.setOnClickListener {
+        binding.btnBackToPillFromKnooppunten.setOnClickListener {
             viewModel.setMode(MapViewModel.PlannerMode.ADDRESS)
+            showHomePill()
+        }
+        binding.chipThuis.setOnClickListener { routeToFavorite(isHome = true) }
+        binding.chipWerk.setOnClickListener { routeToFavorite(isHome = false) }
+        binding.searchExpandBar.setOnClickListener {
+            viewModel.setMode(MapViewModel.PlannerMode.ADDRESS)
+            showHomePill()
         }
 
         // City search autocomplete
@@ -347,6 +364,7 @@ class MapFragment : Fragment() {
 
         binding.tvPoiClose.setOnClickListener {
             binding.poiInfoCard.visibility = View.GONE
+            refreshRecentRide()
         }
     }
 
@@ -411,6 +429,7 @@ class MapFragment : Fragment() {
             binding.tvPoiName.text = name
             binding.tvPoiType.text = amenityLabel(amenity)
             binding.poiInfoCard.visibility = View.VISIBLE
+            refreshRecentRide()
             return true
         }
 
@@ -434,19 +453,36 @@ class MapFragment : Fragment() {
         if (binding.searchCard.visibility != View.VISIBLE) return false
         if (viewModel.plannerMode.value != MapViewModel.PlannerMode.ADDRESS) return false
 
+        val options = arrayOf(
+            getString(R.string.set_as_start),
+            getString(R.string.set_as_destination),
+            getString(R.string.set_as_home),
+            getString(R.string.set_as_work)
+        )
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.set_location_title)
-            .setItems(arrayOf(getString(R.string.set_as_start), getString(R.string.set_as_destination))) { _, which ->
+            .setItems(options) { _, which ->
                 lifecycleScope.launch {
-                    val result = viewModel.reverseGeocode(latLng.latitude, latLng.longitude)
-                    if (result != null) {
-                        if (which == 0) {
+                    val result = viewModel.reverseGeocode(latLng.latitude, latLng.longitude) ?: return@launch
+                    when (which) {
+                        0 -> {
+                            showSearchForm()
                             viewModel.fromLocation = result
                             binding.actvFrom.setText(result.displayName, false)
-                        } else {
+                        }
+                        1 -> {
+                            showSearchForm()
                             viewModel.toLocation = result
                             binding.actvTo.setText(result.displayName, false)
                         }
+                        2 -> AppPreferences.setHome(
+                            requireContext(),
+                            AppPreferences.FavoriteLocation(latLng.latitude, latLng.longitude, result.displayName)
+                        )
+                        3 -> AppPreferences.setWork(
+                            requireContext(),
+                            AppPreferences.FavoriteLocation(latLng.latitude, latLng.longitude, result.displayName)
+                        )
                     }
                 }
             }
@@ -507,9 +543,6 @@ class MapFragment : Fragment() {
                 if (binding.actvTo.hasFocus() && suggestions.isNotEmpty()) binding.actvTo.showDropDown()
             }
         }
-        binding.btnCollapseSearch.setOnClickListener { collapseSearchCard() }
-        binding.searchExpandBar.setOnClickListener { expandSearchCard() }
-
         lifecycleScope.launch {
             viewModel.route.collect { route ->
                 if (route == null) {
@@ -517,8 +550,8 @@ class MapFragment : Fragment() {
                     binding.instructionsPanel.visibility = View.GONE
                     binding.fabPois.visibility = View.GONE
                     binding.poiInfoCard.visibility = View.GONE
-                    binding.btnCollapseSearch.visibility = View.GONE
                     expandSearchCard()
+                    showHomePill()
                     return@collect
                 }
                 drawRoute(route.coordinates)
@@ -544,10 +577,7 @@ class MapFragment : Fragment() {
                     binding.plannerPanel.visibility = View.GONE
                 }
                 binding.fabPois.visibility = View.VISIBLE
-                binding.btnCollapseSearch.visibility = View.VISIBLE
-                val from = binding.actvFrom.text.toString().ifEmpty { getString(R.string.label_from) }
-                val to = binding.actvTo.text.toString().ifEmpty { getString(R.string.label_to) }
-                binding.tvSearchSummary.text = "$from  →  $to"
+                if (!viewModel.isNavigating.value) collapseSearchCard()
             }
         }
         lifecycleScope.launch {
@@ -1027,7 +1057,7 @@ class MapFragment : Fragment() {
     }
 
     private fun speak(text: String) {
-        if (ttsReady && com.fietsrouten.AppPreferences.isVoiceGuidanceEnabled(requireContext())) {
+        if (ttsReady && AppPreferences.isVoiceGuidanceEnabled(requireContext())) {
             tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
         }
     }
@@ -1129,6 +1159,69 @@ class MapFragment : Fragment() {
         TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
         binding.searchCard.visibility = View.VISIBLE
         binding.searchExpandBar.visibility = View.GONE
+    }
+
+    /** Default Home state: single search pill + Thuis/Werk/Knooppunten chips. */
+    private fun showHomePill() {
+        TransitionManager.beginDelayedTransition(binding.searchCard as ViewGroup)
+        binding.homePillGroup.visibility = View.VISIBLE
+        binding.modeContentContainer.visibility = View.GONE
+        refreshRecentRide()
+    }
+
+    /** Expands the pill into the editable From/To address form. */
+    private fun showSearchForm() {
+        if (viewModel.plannerMode.value != MapViewModel.PlannerMode.ADDRESS) {
+            viewModel.setMode(MapViewModel.PlannerMode.ADDRESS)
+        }
+        TransitionManager.beginDelayedTransition(binding.searchCard as ViewGroup)
+        binding.homePillGroup.visibility = View.GONE
+        binding.modeContentContainer.visibility = View.VISIBLE
+        binding.recentRidesCard.visibility = View.GONE
+        binding.actvTo.requestFocus()
+    }
+
+    private fun refreshRecentRide() {
+        val showRecent = binding.homePillGroup.visibility == View.VISIBLE &&
+            viewModel.route.value == null &&
+            binding.poiInfoCard.visibility != View.VISIBLE
+        val latest = com.fietsrouten.data.repository.RidesStore.getRides(requireContext()).firstOrNull()
+        if (!showRecent || latest == null) {
+            binding.recentRidesCard.visibility = View.GONE
+            return
+        }
+        binding.recentRidesCard.visibility = View.VISIBLE
+        val dateStr = java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM, activeLocale())
+            .format(latest.timestampMs)
+        binding.tvRecentRideTitle.text = getString(R.string.ride_title_format, dateStr)
+        val distKm = formatDistance(latest.distanceMeters)
+        binding.tvRecentRideMeta.text = "$distKm · ${formatDurationHoursUnit(latest.durationMs)}"
+    }
+
+    private fun routeToFavorite(isHome: Boolean) {
+        val favorite = (if (isHome) AppPreferences.getHome(requireContext()) else AppPreferences.getWork(requireContext()))
+        if (favorite == null) {
+            android.widget.Toast.makeText(
+                requireContext(),
+                getString(if (isHome) R.string.home_not_set_hint else R.string.work_not_set_hint),
+                android.widget.Toast.LENGTH_LONG
+            ).show()
+            return
+        }
+        val current = viewModel.currentLocationResult()
+        if (current == null) {
+            android.widget.Toast.makeText(requireContext(), getString(R.string.location_not_ready), android.widget.Toast.LENGTH_LONG).show()
+            return
+        }
+        showSearchForm()
+        viewModel.fromLocation = current
+        binding.actvFrom.setText(currentLocationLabel, false)
+        viewModel.toLocation = com.fietsrouten.data.model.NominatimResult(
+            placeId = -2L, displayName = favorite.label,
+            lat = favorite.lat.toString(), lon = favorite.lon.toString()
+        )
+        binding.actvTo.setText(favorite.label, false)
+        viewModel.calculateRoute()
     }
 
     private fun repositionFabsForNavigation(navigating: Boolean) {

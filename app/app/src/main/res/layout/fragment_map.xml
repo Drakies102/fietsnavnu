@@ -35,11 +35,103 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+            <!-- ═══════════════════════════════════════════════════
+                 Collapsed default: single search pill + quick chips
+                 ═══════════════════════════════════════════════════ -->
+            <LinearLayout
+                android:id="@+id/homePillGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/searchPill"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/input_fields_bg"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:paddingTop="13dp"
+                    android:paddingBottom="13dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        app:srcCompat="@android:drawable/ic_menu_search"
+                        app:tint="@color/brand_primary"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="10dp"
+                        android:text="@string/search_pill_placeholder"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/chipThuis"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="8dp"
+                        android:minWidth="0dp"
+                        android:textAllCaps="false"
+                        android:textSize="12.5sp"
+                        app:cornerRadius="18dp"
+                        android:text="@string/chip_thuis" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/chipWerk"
+                        style="?attr/materialButtonOutlinedStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:minWidth="0dp"
+                        android:textAllCaps="false"
+                        android:textSize="12.5sp"
+                        app:cornerRadius="18dp"
+                        android:text="@string/chip_werk" />
+
+                </LinearLayout>
+
+                <!-- Distinct planning mode, not a favourite chip: green-tinted, own row -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnModeKnooppunten"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:textAllCaps="false"
+                    android:textColor="@color/brand_primary_dark"
+                    app:icon="@drawable/ic_knooppunten_mode"
+                    app:iconTint="@color/brand_primary_dark"
+                    app:strokeColor="@color/knooppunten_btn_border"
+                    app:backgroundTint="@color/knooppunten_btn_bg"
+                    app:cornerRadius="14dp"
+                    android:text="@string/btn_knooppunten_plannen" />
+
+            </LinearLayout>
 
             <!-- Mode content container — fixed height regardless of active mode -->
             <FrameLayout
+                android:id="@+id/modeContentContainer"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:visibility="gone">
 
             <!-- Address mode content -->
             <LinearLayout
@@ -47,6 +139,35 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/btnBackToPillFromAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="6dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:rotation="90"
+                        android:src="@drawable/ic_chevron_down"
+                        android:contentDescription="@null"
+                        app:tint="@color/text_secondary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="@string/btn_terug"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_secondary" />
+
+                </LinearLayout>
 
                 <FrameLayout
                     android:layout_width="match_parent"
@@ -185,22 +306,6 @@
                     android:layout_marginTop="8dp"
                     android:text="@string/btn_find_route" />
 
-                <!-- Distinct planning mode, not a favourite chip: green-tinted, own row -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnModeKnooppunten"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:textAllCaps="false"
-                    android:textColor="@color/brand_primary_dark"
-                    app:icon="@drawable/ic_knooppunten_mode"
-                    app:iconTint="@color/brand_primary_dark"
-                    app:strokeColor="@color/knooppunten_btn_border"
-                    app:backgroundTint="@color/knooppunten_btn_bg"
-                    app:cornerRadius="14dp"
-                    android:text="@string/btn_knooppunten_plannen" />
-
             </LinearLayout>
 
             <!-- Route Plannen mode: city search -->
@@ -212,7 +317,7 @@
                 android:visibility="invisible">
 
                 <LinearLayout
-                    android:id="@+id/btnBackToAddress"
+                    android:id="@+id/btnBackToPillFromKnooppunten"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -234,7 +339,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
-                        android:text="@string/mode_address"
+                        android:text="@string/btn_terug"
                         android:textSize="12sp"
                         android:textColor="@color/text_secondary" />
 
@@ -261,57 +366,37 @@
 
             </FrameLayout>
 
-            <!-- Shown only when a route is ready — lets user collapse the card -->
-            <ImageButton
-                android:id="@+id/btnCollapseSearch"
-                android:layout_width="match_parent"
-                android:layout_height="28dp"
-                android:layout_marginTop="4dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_chevron_up"
-                android:contentDescription="@string/collapse_search_desc"
-                android:visibility="gone" />
-
     </LinearLayout>
 
-    <!-- Compact bar shown when search card is collapsed -->
+    <!-- Compact "‹ Terug" pill shown top-left once a route exists (Route summary state) -->
     <LinearLayout
         android:id="@+id/searchExpandBar"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:background="@drawable/search_card_bg"
-        android:elevation="8dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="12dp"
+        android:background="@drawable/pill_bg"
+        android:elevation="6dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginStart="16dp"
+        android:paddingStart="18dp"
+        android:paddingEnd="18dp"
         android:paddingTop="10dp"
-        android:paddingBottom="14dp"
+        android:paddingBottom="10dp"
         android:clickable="true"
         android:focusable="true"
         android:foreground="?attr/selectableItemBackground"
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintStart_toStartOf="parent">
 
         <TextView
-            android:id="@+id/tvSearchSummary"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:text="@string/btn_terug"
             android:textSize="14sp"
-            android:textColor="@color/text_primary"
-            android:singleLine="true"
-            android:ellipsize="end" />
-
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="8dp"
-            android:src="@drawable/ic_chevron_down"
-            android:alpha="0.5"
-            android:contentDescription="@string/expand_search_desc" />
+            android:textStyle="bold"
+            android:textColor="@color/text_primary" />
 
     </LinearLayout>
 
@@ -536,6 +621,88 @@
                 android:padding="4dp" />
 
         </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- ═══════════════════════════════════════════════════════════
+         RECENTE RITTEN — shown only in the default home state
+         ═══════════════════════════════════════════════════════════ -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/recentRidesCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:visibility="gone"
+        app:cardElevation="6dp"
+        app:cardCornerRadius="18dp"
+        app:cardBackgroundColor="@color/surface_card_solid"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="14dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/recent_rides_label"
+                android:textSize="10.5sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:textColor="@color/text_secondary" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <FrameLayout
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/ride_thumb_gradient">
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="11dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_route_line"
+                        android:contentDescription="@null" />
+
+                </FrameLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tvRecentRideTitle"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/text_primary" />
+
+                    <TextView
+                        android:id="@+id/tvRecentRideMeta"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="11.5sp"
+                        android:textColor="@color/text_secondary" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
     </androidx.cardview.widget.CardView>
 
     <!-- ═══════════════════════════════════════════════════════════

@@ -18,7 +18,6 @@
     <string name="nav_turn_icon_desc">Afslagrichting</string>
     <string name="nav_then">DAN</string>
     <string name="nav_off_route">Herberekenen route…</string>
-    <string name="mode_address">Adres</string>
     <string name="btn_knooppunten_plannen">Knooppunten plannen</string>
     <string name="planner_hint">Tik op knooppunten om je route te plannen</string>
     <string name="planner_city_hint">Zoek een stad of gemeente…</string>
@@ -31,8 +30,15 @@
     <string name="fab_pois_desc">Eten en drinken langs route</string>
     <string name="fab_recenter_desc">Centreer op mijn locatie</string>
     <string name="swap_locations_desc">Verwissel start en bestemming</string>
-    <string name="collapse_search_desc">Zoekkaart inklappen</string>
-    <string name="expand_search_desc">Zoekkaart uitklappen</string>
+    <string name="search_pill_placeholder">Waar wil je heen?</string>
+    <string name="chip_thuis">🏠 Thuis</string>
+    <string name="chip_werk">💼 Werk</string>
+    <string name="btn_terug">‹ Terug</string>
+    <string name="set_as_home">Stel in als thuis</string>
+    <string name="set_as_work">Stel in als werk</string>
+    <string name="home_not_set_hint">Houd de kaart ingedrukt om je thuislocatie in te stellen</string>
+    <string name="work_not_set_hint">Houd de kaart ingedrukt om je werklocatie in te stellen</string>
+    <string name="recent_rides_label">RECENTE RITTEN</string>
     <string name="profile_bike_label">🚲 Fiets</string>
     <string name="profile_mtb_label">⛰️ MTB</string>
     <string name="profile_racingbike_label">🏁 Race</string>
@@ -45,6 +51,7 @@
     <string name="eta_prefix">Aankomst</string>
     <string name="elevation_gain_caption">hoogte</string>
     <string name="select_from_first">Selecteer eerst een startadres.</string>
+    <string name="location_not_ready">Wachten op je locatie…</string>
     <string name="select_to_first">Selecteer eerst een bestemming.</string>
     <string name="route_not_found">Route niet gevonden</string>
     <string name="set_location_title">Locatie instellen</string>
