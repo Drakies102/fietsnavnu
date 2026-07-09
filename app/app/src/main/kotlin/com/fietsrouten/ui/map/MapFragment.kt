@@ -123,7 +123,7 @@ class MapFragment : Fragment() {
         tts = TextToSpeech(requireContext()) { status ->
             if (status == TextToSpeech.SUCCESS) {
                 ttsReady = true
-                tts?.language = Locale("nl", "NL")
+                tts?.language = if (activeLocale().language == "nl") Locale("nl", "NL") else Locale.US
             }
         }
 
@@ -317,6 +317,13 @@ class MapFragment : Fragment() {
 
         binding.btnCalculatePlannerRoute.setOnClickListener {
             viewModel.calculateKnooppuntenRoute()
+        }
+
+        binding.fabSettings.setOnClickListener {
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainer, com.fietsrouten.ui.profile.ProfileFragment())
+                .addToBackStack("profile")
+                .commit()
         }
 
         binding.fabLayers.setOnClickListener {
@@ -570,6 +577,7 @@ class MapFragment : Fragment() {
                     binding.plannerPanel.visibility = View.GONE
                     binding.navInstructionCard.visibility = View.VISIBLE
                     binding.navBottomBar.visibility = View.VISIBLE
+                    binding.fabSettings.visibility = View.GONE
                     repositionFabsForNavigation(true)
                     viewModel.route.value?.let { route ->
                         val first = route.instructions.firstOrNull()
@@ -583,6 +591,7 @@ class MapFragment : Fragment() {
                     }
                 } else {
                     activity?.window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                    binding.fabSettings.visibility = View.VISIBLE
                 }
             }
         }
@@ -994,7 +1003,9 @@ class MapFragment : Fragment() {
     }
 
     private fun speak(text: String) {
-        if (ttsReady) tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+        if (ttsReady && com.fietsrouten.AppPreferences.isVoiceGuidanceEnabled(requireContext())) {
+            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+        }
     }
 
     private fun resetTtsState() {
@@ -1097,7 +1108,7 @@ class MapFragment : Fragment() {
     }
 
     private fun repositionFabsForNavigation(navigating: Boolean) {
-        val anchor = if (navigating) R.id.navInstructionCard else R.id.searchTopBarrier
+        val anchor = if (navigating) R.id.navInstructionCard else R.id.fabSettings
         val params = binding.fabLayers.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
         params.topToBottom = anchor
         binding.fabLayers.layoutParams = params
