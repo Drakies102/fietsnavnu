@@ -35,33 +35,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-            <!-- Mode toggle -->
-            <com.google.android.material.button.MaterialButtonToggleGroup
-                android:id="@+id/modeToggle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                app:singleSelection="true"
-                app:selectionRequired="true"
-                app:checkedButton="@id/btnModeAddress">
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnModeAddress"
-                    style="?attr/materialButtonOutlinedStyle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/mode_address" />
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnModeKnooppunten"
-                    style="?attr/materialButtonOutlinedStyle"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="@string/mode_knooppunten" />
-
-            </com.google.android.material.button.MaterialButtonToggleGroup>
 
             <!-- Mode content container — fixed height regardless of active mode -->
             <FrameLayout
@@ -212,6 +185,22 @@
                     android:layout_marginTop="8dp"
                     android:text="@string/btn_find_route" />
 
+                <!-- Distinct planning mode, not a favourite chip: green-tinted, own row -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnModeKnooppunten"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textAllCaps="false"
+                    android:textColor="@color/brand_primary_dark"
+                    app:icon="@drawable/ic_knooppunten_mode"
+                    app:iconTint="@color/brand_primary_dark"
+                    app:strokeColor="@color/knooppunten_btn_border"
+                    app:backgroundTint="@color/knooppunten_btn_bg"
+                    app:cornerRadius="14dp"
+                    android:text="@string/btn_knooppunten_plannen" />
+
             </LinearLayout>
 
             <!-- Route Plannen mode: city search -->
@@ -221,6 +210,35 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:visibility="invisible">
+
+                <LinearLayout
+                    android:id="@+id/btnBackToAddress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingBottom="6dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:rotation="90"
+                        android:src="@drawable/ic_chevron_down"
+                        android:contentDescription="@null"
+                        app:tint="@color/text_secondary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:text="@string/mode_address"
+                        android:textSize="12sp"
+                        android:textColor="@color/text_secondary" />
+
+                </LinearLayout>
 
                 <AutoCompleteTextView
                     android:id="@+id/actvPlannerCity"

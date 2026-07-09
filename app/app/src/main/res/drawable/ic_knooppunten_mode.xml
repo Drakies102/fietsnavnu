@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="20dp"
+    android:height="20dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Junction-network glyph: three connected nodes; tinted via app:iconTint at usage site -->
+
+    <path
+        android:strokeColor="#FF000000"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:pathData="M5.5,17.5 L12,7 L18.5,17.5" />
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M5.5,17.5 m-2.4,0 a2.4,2.4 0,1 1,4.8 0 a2.4,2.4 0,1 1,-4.8 0" />
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M12,7 m-2.4,0 a2.4,2.4 0,1 1,4.8 0 a2.4,2.4 0,1 1,-4.8 0" />
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M18.5,17.5 m-2.4,0 a2.4,2.4 0,1 1,4.8 0 a2.4,2.4 0,1 1,-4.8 0" />
+</vector>

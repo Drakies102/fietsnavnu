@@ -14,7 +14,6 @@
     <string name="nav_then">then</string>
     <string name="nav_off_route">Recalculating route…</string>
     <string name="mode_address">Address</string>
-    <string name="mode_knooppunten">Plan route</string>
     <string name="btn_knooppunten_plannen">Plan junctions</string>
     <string name="planner_hint">Tap junctions to plan your route</string>
     <string name="planner_city_hint">Search a city or town…</string>

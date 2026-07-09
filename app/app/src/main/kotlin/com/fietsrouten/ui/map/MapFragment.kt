@@ -263,15 +263,11 @@ class MapFragment : Fragment() {
     // ── Planner UI ────────────────────────────────────────────────
 
     private fun setupPlannerUI() {
-        binding.modeToggle.check(R.id.btnModeAddress)
-
-        binding.modeToggle.addOnButtonCheckedListener { _, checkedId, isChecked ->
-            if (!isChecked) return@addOnButtonCheckedListener
-            val newMode = when (checkedId) {
-                R.id.btnModeAddress -> MapViewModel.PlannerMode.ADDRESS
-                else -> MapViewModel.PlannerMode.KNOOPPUNTEN
-            }
-            if (newMode != viewModel.plannerMode.value) viewModel.setMode(newMode)
+        binding.btnModeKnooppunten.setOnClickListener {
+            viewModel.setMode(MapViewModel.PlannerMode.KNOOPPUNTEN)
+        }
+        binding.btnBackToAddress.setOnClickListener {
+            viewModel.setMode(MapViewModel.PlannerMode.ADDRESS)
         }
 
         // City search autocomplete
