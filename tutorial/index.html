@@ -1,0 +1,2122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kotlin Crash Course — FietsNavNu</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
+  <style>
+    /* ── Reset & base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --kpurple: #7F52FF;
+      --kred:    #E44857;
+      --java:    #F89820;
+      --sidebar: #13141F;
+      --sidebar-hover: #1E2035;
+      --bg:      #F3F4FA;
+      --card:    #FFFFFF;
+      --text:    #1A1A2E;
+      --muted:   #6B6B8A;
+      --border:  #E0E0F0;
+      --code-bg: #1E1E2E;
+      --green:   #22C55E;
+      --sw: 260px;
+      --hh: 64px;
+      --radius: 10px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    /* ── Header ──────────────────────────────────────────────── */
+    .site-header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--hh);
+      background: var(--sidebar);
+      display: flex; align-items: center; padding: 0 24px;
+      border-bottom: 1px solid #2a2b3d;
+    }
+
+    .logo {
+      display: flex; align-items: center; gap: 12px;
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--kpurple), var(--kred));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+
+    .logo-text { color: #fff; font-weight: 700; font-size: 16px; }
+    .logo-sub  { color: #9090B0; font-size: 12px; font-weight: 400; }
+
+    .header-progress {
+      margin-left: auto; display: flex; align-items: center; gap: 10px;
+      color: #9090B0; font-size: 13px;
+    }
+
+    .progress-bar-wrap {
+      width: 140px; height: 6px; background: #2a2b3d; border-radius: 99px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--kpurple), var(--kred));
+      border-radius: 99px;
+      transition: width .4s ease;
+    }
+
+    /* ── Sidebar ─────────────────────────────────────────────── */
+    .sidebar {
+      position: fixed; top: var(--hh); left: 0; bottom: 0;
+      width: var(--sw);
+      background: var(--sidebar);
+      overflow-y: auto; padding: 20px 0;
+      border-right: 1px solid #2a2b3d;
+    }
+
+    .sidebar-label {
+      color: #4A4B6A; font-size: 11px; font-weight: 600;
+      letter-spacing: .1em; text-transform: uppercase;
+      padding: 0 20px 8px;
+    }
+
+    .chapter-link {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 20px;
+      cursor: pointer; color: #8080A0;
+      font-size: 13.5px; font-weight: 500;
+      transition: background .15s, color .15s;
+      text-decoration: none;
+      border-left: 3px solid transparent;
+    }
+
+    .chapter-link:hover { background: var(--sidebar-hover); color: #ccc; }
+    .chapter-link.active {
+      color: #fff;
+      border-left-color: var(--kpurple);
+      background: rgba(127,82,255,.12);
+    }
+
+    .chapter-num {
+      min-width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+      background: #2a2b3d; color: #6B6B8A;
+    }
+
+    .chapter-link.done .chapter-num {
+      background: var(--green); color: #fff;
+    }
+    .chapter-link.done .chapter-num::before { content: "✓"; }
+    .chapter-link.done .chapter-num-txt { display: none; }
+
+    /* ── Main content ────────────────────────────────────────── */
+    .content {
+      margin-left: var(--sw);
+      margin-top: var(--hh);
+      padding: 48px 56px 80px;
+      max-width: 860px;
+    }
+
+    /* ── Chapter section ─────────────────────────────────────── */
+    .chapter {
+      margin-bottom: 80px;
+      scroll-margin-top: calc(var(--hh) + 24px);
+    }
+
+    .chapter-header {
+      display: flex; align-items: center; gap: 14px; margin-bottom: 28px;
+    }
+
+    .chapter-badge {
+      padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700;
+      background: linear-gradient(135deg, var(--kpurple), var(--kred));
+      color: #fff; white-space: nowrap;
+    }
+
+    .chapter-title { font-size: 26px; font-weight: 700; color: var(--text); }
+
+    .chapter-intro {
+      font-size: 15px; color: var(--muted); margin-bottom: 28px;
+      border-left: 3px solid var(--kpurple);
+      padding-left: 16px; line-height: 1.8;
+    }
+
+    /* ── Section headings inside chapter ────────────────────── */
+    .section-title {
+      font-size: 18px; font-weight: 700; margin: 36px 0 14px;
+      color: var(--text);
+    }
+
+    p { margin-bottom: 14px; color: var(--text); }
+
+    /* ── Inline code ─────────────────────────────────────────── */
+    code:not([class]) {
+      background: #EEEEFA; color: var(--kpurple);
+      padding: 2px 6px; border-radius: 4px;
+      font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+      font-size: 13px;
+    }
+
+    /* ── Code blocks ─────────────────────────────────────────── */
+    .code-wrap {
+      position: relative; margin: 20px 0; border-radius: var(--radius);
+      overflow: hidden; border: 1px solid #2a2b3d;
+    }
+
+    .code-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 14px;
+      background: #181825;
+      border-bottom: 1px solid #2a2b3d;
+    }
+
+    .code-lang {
+      font-size: 12px; font-weight: 600; letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .lang-kotlin { color: var(--kpurple); }
+    .lang-java   { color: var(--java); }
+    .lang-generic { color: #6B6B8A; }
+
+    .copy-btn {
+      background: none; border: 1px solid #3a3b5a;
+      color: #8080A0; font-size: 12px; padding: 3px 10px;
+      border-radius: 5px; cursor: pointer; transition: all .15s;
+    }
+    .copy-btn:hover { border-color: var(--kpurple); color: var(--kpurple); }
+    .copy-btn.copied { border-color: var(--green); color: var(--green); }
+
+    .code-wrap pre[class*="language-"] {
+      margin: 0; border-radius: 0; border: none;
+      background: var(--code-bg) !important;
+      font-size: 13.5px;
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      padding: 18px 20px;
+    }
+
+    /* ── Comparison tabs ─────────────────────────────────────── */
+    .compare-wrap { margin: 20px 0; border-radius: var(--radius); overflow: hidden; border: 1px solid #2a2b3d; }
+
+    .compare-tabs {
+      display: flex; background: #181825; border-bottom: 1px solid #2a2b3d;
+    }
+
+    .compare-tab {
+      padding: 9px 18px; font-size: 13px; font-weight: 600;
+      cursor: pointer; border: none; background: none;
+      color: #6B6B8A; letter-spacing: .03em;
+      border-bottom: 2px solid transparent; margin-bottom: -1px;
+      transition: color .15s;
+    }
+    .compare-tab.active[data-lang="java"]   { color: var(--java);    border-bottom-color: var(--java); }
+    .compare-tab.active[data-lang="kotlin"] { color: var(--kpurple); border-bottom-color: var(--kpurple); }
+
+    .compare-panel { display: none; }
+    .compare-panel.active { display: block; }
+
+    .compare-panel pre[class*="language-"] {
+      margin: 0; border-radius: 0; border: none;
+      background: var(--code-bg) !important;
+      font-size: 13.5px;
+      font-family: "JetBrains Mono", "Fira Code", monospace;
+      padding: 18px 20px;
+    }
+
+    /* ── App callout ─────────────────────────────────────────── */
+    .app-callout {
+      display: flex; gap: 14px; margin: 20px 0;
+      background: linear-gradient(135deg, rgba(127,82,255,.06), rgba(228,72,87,.04));
+      border: 1px solid rgba(127,82,255,.2);
+      border-radius: var(--radius); padding: 16px 18px;
+    }
+    .app-callout-icon { font-size: 22px; flex-shrink: 0; }
+    .app-callout-body { font-size: 14px; color: var(--text); line-height: 1.7; }
+    .app-callout-body strong { color: var(--kpurple); }
+
+    /* ── Info / tip boxes ────────────────────────────────────── */
+    .tip {
+      margin: 16px 0; padding: 14px 18px;
+      background: #EEF8FF; border-left: 4px solid #3B82F6;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      font-size: 14px; color: #1E3A5F;
+    }
+
+    /* ── Table ───────────────────────────────────────────────── */
+    table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px; }
+    th {
+      background: var(--sidebar); color: #9090B0;
+      font-size: 12px; text-transform: uppercase; letter-spacing: .06em;
+      padding: 10px 14px; text-align: left;
+    }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(127,82,255,.03); }
+
+    /* ── Exercise ────────────────────────────────────────────── */
+    .exercise {
+      margin: 32px 0 0;
+      border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden;
+    }
+
+    .exercise-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 18px;
+      background: #F9F9FF;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .exercise-label {
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 700; font-size: 14px; color: var(--kpurple);
+    }
+
+    .reveal-btn {
+      background: none; border: 1px solid var(--kpurple);
+      color: var(--kpurple); padding: 5px 14px; border-radius: 6px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: all .15s;
+    }
+    .reveal-btn:hover { background: var(--kpurple); color: #fff; }
+
+    .exercise-body { padding: 16px 18px; }
+    .exercise-q { font-size: 14px; margin-bottom: 0; }
+
+    .exercise-answer {
+      display: none; margin-top: 14px; padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+    .exercise-answer.open { display: block; }
+    .exercise-answer-label {
+      font-size: 12px; font-weight: 700; color: var(--green);
+      text-transform: uppercase; letter-spacing: .08em; margin-bottom: 8px;
+    }
+
+    /* ── Chapter complete button ─────────────────────────────── */
+    .mark-done-wrap { margin-top: 40px; display: flex; justify-content: flex-end; }
+    .mark-done-btn {
+      background: var(--sidebar); color: #8080A0;
+      border: 1px solid #3a3b5a; padding: 9px 20px;
+      border-radius: 8px; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 8px;
+    }
+    .mark-done-btn:hover { border-color: var(--green); color: var(--green); }
+    .mark-done-btn.done { border-color: var(--green); color: var(--green); background: rgba(34,197,94,.08); }
+
+    /* ── Divider ─────────────────────────────────────────────── */
+    .chapter-divider { border: none; border-top: 1px solid var(--border); margin: 0 0 80px; }
+
+    /* ── Scrollbar ───────────────────────────────────────────── */
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: #3a3b5a; border-radius: 99px; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════════════════════════ -->
+<header class="site-header">
+  <a class="logo" href="#">
+    <div class="logo-icon">🚲</div>
+    <div>
+      <div class="logo-text">Kotlin Crash Course</div>
+      <div class="logo-sub">FietsNavNu Edition</div>
+    </div>
+  </a>
+  <div class="header-progress">
+    <span id="progress-text">0 / 11</span>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════════════════════════════ -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-label">Chapters</div>
+
+  <a class="chapter-link" href="#ch1" data-ch="1">
+    <div class="chapter-num"><span class="chapter-num-txt">1</span></div>
+    Variables &amp; Type Inference
+  </a>
+  <a class="chapter-link" href="#ch2" data-ch="2">
+    <div class="chapter-num"><span class="chapter-num-txt">2</span></div>
+    Functions
+  </a>
+  <a class="chapter-link" href="#ch3" data-ch="3">
+    <div class="chapter-num"><span class="chapter-num-txt">3</span></div>
+    String Templates
+  </a>
+  <a class="chapter-link" href="#ch4" data-ch="4">
+    <div class="chapter-num"><span class="chapter-num-txt">4</span></div>
+    Data Classes
+  </a>
+  <a class="chapter-link" href="#ch5" data-ch="5">
+    <div class="chapter-num"><span class="chapter-num-txt">5</span></div>
+    Null Safety
+  </a>
+  <a class="chapter-link" href="#ch6" data-ch="6">
+    <div class="chapter-num"><span class="chapter-num-txt">6</span></div>
+    Higher-Order Functions
+  </a>
+  <a class="chapter-link" href="#ch7" data-ch="7">
+    <div class="chapter-num"><span class="chapter-num-txt">7</span></div>
+    Object-Oriented Kotlin
+  </a>
+  <a class="chapter-link" href="#ch8" data-ch="8">
+    <div class="chapter-num"><span class="chapter-num-txt">8</span></div>
+    Scope Functions
+  </a>
+  <a class="chapter-link" href="#ch9" data-ch="9">
+    <div class="chapter-num"><span class="chapter-num-txt">9</span></div>
+    Coroutines
+  </a>
+  <a class="chapter-link" href="#ch10" data-ch="10">
+    <div class="chapter-num"><span class="chapter-num-txt">10</span></div>
+    Flow &amp; StateFlow
+  </a>
+  <a class="chapter-link" href="#ch11" data-ch="11">
+    <div class="chapter-num"><span class="chapter-num-txt">11</span></div>
+    Java Interop
+  </a>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════════════════════════════════ -->
+<main class="content">
+
+<!-- ─────────────────────────────────────────── CHAPTER 1 ──── -->
+<section class="chapter" id="ch1">
+  <div class="chapter-header">
+    <span class="chapter-badge">Chapter 1</span>
+    <h2 class="chapter-title">Variables &amp; Type Inference</h2>
+  </div>
+  <p class="chapter-intro">
+    Kotlin replaces Java's verbose variable declarations with two keywords: <code>val</code> and <code>var</code>.
+    The compiler infers types from the right-hand side, so you rarely write them explicitly.
+  </p>
+
+  <h3 class="section-title">val vs var</h3>
+  <p><code>val</code> is equivalent to Java's <code>final</code> — it cannot be reassigned after initialisation.
+  <code>var</code> is mutable. Prefer <code>val</code> by default; reach for <code>var</code> only when you genuinely need reassignment.</p>
+
+  <div class="compare-wrap" data-id="0">
+    <div class="compare-tabs">
+      <button class="compare-tab active" data-lang="java">Java</button>
+      <button class="compare-tab" data-lang="kotlin">Kotlin</button>
+    </div>
+    <div class="compare-panel active" data-lang="java">
+<pre><code class="language-java">final double south = 52.1;
+double north = 52.4;
+north = 52.5; // ok
+// south = 0;  // compile error</code></pre>
+    </div>
+    <div class="compare-panel" data-lang="kotlin">
+<pre><code class="language-kotlin">val south = 52.1   // inferred as Double, immutable
+var north = 52.4
+north = 52.5       // ok
+// south = 0.0     // compile error</code></pre>
+    </div>
+  </div>
+
+  <h3 class="section-title">Type inference</h3>
+  <p>The type is inferred from the initialiser. You can always write it explicitly, but you usually don't need to.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">val query    = ""          // String
+val limit    = 5           // Int
+val loading  = false       // Boolean
+val pois     = emptyList&lt;Poi&gt;()   // List&lt;Poi&gt;
+
+// Suffixes disambiguate numeric literals
+private var lastBearing         = 0f   // Float  (NavigationEngine.kt)
+private var recalcCooldownUntil = 0L   // Long   (MapViewModel.kt)</code></pre>
+  </div>
+
+  <h3 class="section-title">Compile-time constants with <code>const val</code></h3>
+  <p>For primitive/String constants that are known at compile time, use <code>const val</code> inside an <code>object</code> or <code>companion object</code>. These are inlined at call sites — more efficient than <code>static final</code> in Java.</p>
+
+  <div class="compare-wrap" data-id="1">
+    <div class="compare-tabs">
+      <button class="compare-tab active" data-lang="java">Java</button>
+      <button class="compare-tab" data-lang="kotlin">Kotlin</button>
+    </div>
+    <div class="compare-panel active" data-lang="java">
+<pre><code class="language-java">// NavigationEngine.java
+private static final double OFF_ROUTE_THRESHOLD_METERS = 30.0;</code></pre>
+    </div>
+    <div class="compare-panel" data-lang="kotlin">
+<pre><code class="language-kotlin">// NavigationEngine.kt
+companion object {
+    private const val OFF_ROUTE_THRESHOLD_METERS = 30.0
+}</code></pre>
+    </div>
+  </div>
+
+  <div class="app-callout">
+    <div class="app-callout-icon">🚲</div>
+    <div class="app-callout-body">
+      <strong>In FietsNavNu:</strong> <code>NavigationEngine.kt</code> uses <code>const val OFF_ROUTE_THRESHOLD_METERS = 30.0</code>
+      to decide when the cyclist has drifted off the planned route. Because it's <code>const</code>, the compiler
+      replaces every reference to it with the literal <code>30.0</code> — zero runtime overhead.
+    </div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="exercise-label">💡 Exercise</div>
+      <button class="reveal-btn">Show Answer</button>
+    </div>
+    <div class="exercise-body">
+      <p class="exercise-q">
+        You need a speed-limit variable (fixed at 30 km/h) and a current-speed variable that updates every second.
+        Which keyword should each use, and why?
+      </p>
+      <div class="exercise-answer">
+        <div class="exercise-answer-label">Answer</div>
+        <p>Use <code>const val SPEED_LIMIT = 30</code> for the fixed limit — it never changes and is known at compile time.
+        Use <code>var currentSpeed = 0.0</code> for the live speed — it must be updated on each GPS tick.
+        Making the limit <code>const val</code> (rather than <code>var</code>) means the compiler can catch any accidental
+        reassignment.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mark-done-wrap">
+    <button class="mark-done-btn" data-ch="1">✓ Mark complete</button>
+  </div>
+</section>
+<hr class="chapter-divider" />
+
+<!-- ─────────────────────────────────────────── CHAPTER 2 ──── -->
+<section class="chapter" id="ch2">
+  <div class="chapter-header">
+    <span class="chapter-badge">Chapter 2</span>
+    <h2 class="chapter-title">Functions</h2>
+  </div>
+  <p class="chapter-intro">
+    Kotlin functions have a concise syntax, support default parameter values, named arguments,
+    and can be written as single expressions — eliminating most Java boilerplate.
+  </p>
+
+  <h3 class="section-title">Basic syntax</h3>
+  <p>Return type comes after the parameter list with a colon. When the body is a single expression, the <code>return</code> keyword and braces are replaced by <code>=</code>.</p>
+
+  <div class="compare-wrap" data-id="2">
+    <div class="compare-tabs">
+      <button class="compare-tab active" data-lang="java">Java</button>
+      <button class="compare-tab" data-lang="kotlin">Kotlin</button>
+    </div>
+    <div class="compare-panel active" data-lang="java">
+<pre><code class="language-java">// Block body — always needs return
+public double haversineMeters(LatLng a, LatLng b) {
+    double r = 6371000.0;
+    // ... math ...
+    return 2 * r * Math.asin(Math.sqrt(h));
+}</code></pre>
+    </div>
+    <div class="compare-panel" data-lang="kotlin">
+<pre><code class="language-kotlin">// Expression body — no return keyword
+private fun haversineMeters(a: LatLng, b: LatLng): Double {
+    val r = 6371000.0
+    // ... math ...
+    return 2 * r * asin(sqrt(h))
+}
+
+// Short version as expression body (return type inferred)
+fun Double.toRadians() = this * Math.PI / 180</code></pre>
+    </div>
+  </div>
+
+  <h3 class="section-title">Default parameter values</h3>
+  <p>No more overload chains. Parameters can declare a default, and callers that are happy with the default simply omit that argument.</p>
+
+  <div class="compare-wrap" data-id="3">
+    <div class="compare-tabs">
+      <button class="compare-tab active" data-lang="java">Java</button>
+      <button class="compare-tab" data-lang="kotlin">Kotlin</button>
+    </div>
+    <div class="compare-panel active" data-lang="java">
+<pre><code class="language-java">// Two overloads just to provide a default
+public RouteResult getRoute(List&lt;Pair&lt;Double,Double&gt;&gt; waypoints) {
+    return getRoute(waypoints, "bike");
+}
+public RouteResult getRoute(List&lt;Pair&lt;Double,Double&gt;&gt; waypoints, String profile) {
+    // real implementation
+}</code></pre>
+    </div>
+    <div class="compare-panel" data-lang="kotlin">
+<pre><code class="language-kotlin">// RouteRepository.kt — one function, profile defaults to "bike"
+suspend fun getRoute(
+    waypoints: List&lt;Pair&lt;Double, Double&gt;&gt;,
+    profile: String = "bike"
+): RouteResult { ... }
+
+// Callers can omit profile:
+repository.getRoute(listOf(52.37 to 4.89, 52.40 to 4.91))</code></pre>
+    </div>
+  </div>
+
+  <h3 class="section-title">Named arguments</h3>
+  <p>Call sites can name each argument, making them self-documenting and allowing any order.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — MapViewModel.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">repository.getRoute(
+    fromLat = from.lat.toDouble(),
+    fromLon = from.lon.toDouble(),
+    toLat   = to.lat.toDouble(),
+    toLon   = to.lon.toDouble(),
+    profile = profile
+)</code></pre>
+  </div>
+
+  <div class="tip">Compare this to the Java call: <code>getRoute(from.getLat(), from.getLon(), to.getLat(), to.getLon(), profile)</code> — four bare <code>double</code> values in a row. Swap two and the bug is invisible at the call site.</div>
+
+  <h3 class="section-title">Retrofit interfaces — suspend functions</h3>
+  <p>Retrofit API interfaces with <code>suspend</code> functions are a perfect fit for expression bodies.
+  The <code>suspend</code> keyword is covered in Chapter 9.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — GraphHopperApi.kt &amp; NominatimApi.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">interface GraphHopperApi {
+    @POST("route")
+    suspend fun getRoute(@Body request: GraphHopperRequest): GraphHopperResponse
+}
+
+interface NominatimApi {
+    @GET("search")
+    suspend fun search(
+        @Query("q") query: String,
+        @Query("format") format: String = "json",
+        @Query("limit") limit: Int = 5,
+        @Query("countrycodes") countryCodes: String = "nl"
+    ): List&lt;NominatimResult&gt;
+}</code></pre>
+  </div>
+
+  <h3 class="section-title">Extension functions</h3>
+  <p>You can add functions to any class — including ones you don't own — without subclassing. The function receives the object as <code>this</code>.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// Haversine distance as an extension on LatLng
+fun LatLng.distanceTo(other: LatLng): Double {
+    val r = 6371000.0
+    val lat1 = Math.toRadians(this.latitude)
+    val lat2 = Math.toRadians(other.latitude)
+    val dLat = Math.toRadians(other.latitude - this.latitude)
+    val dLon = Math.toRadians(other.longitude - this.longitude)
+    val h = sin(dLat / 2).pow(2) + cos(lat1) * cos(lat2) * sin(dLon / 2).pow(2)
+    return 2 * r * asin(sqrt(h))
+}
+
+// Reads naturally at the call site:
+val dist = snappedPoint.distanceTo(route[i + 1])</code></pre>
+  </div>
+
+  <div class="app-callout">
+    <div class="app-callout-icon">🚲</div>
+    <div class="app-callout-body">
+      <strong>In FietsNavNu:</strong> <code>haversineMeters</code> is duplicated as a private function in
+      <code>NavigationEngine.kt</code>, <code>PoiServiceRepository.kt</code>, and <code>MapViewModel.kt</code>.
+      Refactoring it into a single extension function on <code>LatLng</code> would eliminate all three copies.
+    </div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="exercise-label">💡 Exercise</div>
+      <button class="reveal-btn">Show Answer</button>
+    </div>
+    <div class="exercise-body">
+      <p class="exercise-q">
+        <code>RouteRepository.kt</code> has two <code>getRoute</code> functions — one that takes a list of waypoints and
+        one that takes individual lat/lon pairs. How does the second call the first?
+        Could you express the two as a single function with defaults?
+      </p>
+      <div class="exercise-answer">
+        <div class="exercise-answer-label">Answer</div>
+        <p>The second overload delegates to the first:<br>
+        <code>suspend fun getRoute(fromLat: Double, fromLon: Double, toLat: Double, toLon: Double, profile: String = "bike") = getRoute(listOf(fromLat to fromLon, toLat to toLon), profile)</code><br>
+        They can't be merged into one function with defaults because the parameter <em>types</em> differ
+        (<code>List&lt;Pair&gt;</code> vs four <code>Double</code>s) — these are true overloads, not default-value variants.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mark-done-wrap">
+    <button class="mark-done-btn" data-ch="2">✓ Mark complete</button>
+  </div>
+</section>
+<hr class="chapter-divider" />
+
+<!-- ─────────────────────────────────────────── CHAPTER 3 ──── -->
+<section class="chapter" id="ch3">
+  <div class="chapter-header">
+    <span class="chapter-badge">Chapter 3</span>
+    <h2 class="chapter-title">String Templates</h2>
+  </div>
+  <p class="chapter-intro">
+    Kotlin has built-in string interpolation. You embed values directly in string literals using
+    <code>$variable</code> or <code>${expression}</code> — no <code>String.format()</code> needed.
+  </p>
+
+  <h3 class="section-title">Variable interpolation</h3>
+
+  <div class="compare-wrap" data-id="4">
+    <div class="compare-tabs">
+      <button class="compare-tab active" data-lang="java">Java</button>
+      <button class="compare-tab" data-lang="kotlin">Kotlin</button>
+    </div>
+    <div class="compare-panel active" data-lang="java">
+<pre><code class="language-java">String bbox = south + "," + west + "," + north + "," + east;
+Log.w("MapViewModel", "POI load failed: " + it.getMessage());</code></pre>
+    </div>
+    <div class="compare-panel" data-lang="kotlin">
+<pre><code class="language-kotlin">// OverpassRepository.kt
+val bbox = "$south,$west,$north,$east"
+
+// MapViewModel.kt
+Log.w("MapViewModel", "POI load failed: ${it.message}")</code></pre>
+    </div>
+  </div>
+
+  <h3 class="section-title">Expression interpolation with <code>${}</code></h3>
+  <p>Wrap any expression in <code>${}</code> to embed it inline.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// Format remaining distance with one decimal
+val label = "Remaining: ${"%.1f".format(remainingMeters / 1000.0)} km"
+
+// Current instruction number out of total
+val status = "Step ${currentIndex + 1} of ${instructions.size}"
+
+// Nested property access
+val msg = "Nearest junction: ${nearestNode.ref} at ${nearestNode.lat}, ${nearestNode.lon}"</code></pre>
+  </div>
+
+  <h3 class="section-title">Raw strings (triple quotes)</h3>
+  <p>Triple-quoted strings span multiple lines and don't need escaping. Perfect for Overpass QL queries.</p>
+
+  <div class="compare-wrap" data-id="5">
+    <div class="compare-tabs">
+      <button class="compare-tab active" data-lang="java">Java</button>
+      <button class="compare-tab" data-lang="kotlin">Kotlin</button>
+    </div>
+    <div class="compare-panel active" data-lang="java">
+<pre><code class="language-java">// Ugly escaping required
+String query = "[out:json];relation[route=bicycle][network~\"ncn|rcn|lcn\"](" + bbox + ");out geom;";</code></pre>
+    </div>
+    <div class="compare-panel" data-lang="kotlin">
+<pre><code class="language-kotlin">// OverpassRepository.kt — no escaping, template still works
+val query = """[out:json];relation[route=bicycle][network~"ncn|rcn|lcn"]($bbox);out geom;"""</code></pre>
+    </div>
+  </div>
+
+  <div class="app-callout">
+    <div class="app-callout-icon">🚲</div>
+    <div class="app-callout-body">
+      <strong>In FietsNavNu:</strong> <code>OverpassRepository.kt</code> uses raw strings for two Overpass QL queries —
+      one that fetches cycling junction nodes (<code>rcn_ref</code>) and one that fetches named cycling routes.
+      The quotes inside the query don't need backslash-escaping.
+    </div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="exercise-label">💡 Exercise</div>
+      <button class="reveal-btn">Show Answer</button>
+    </div>
+    <div class="exercise-body">
+      <p class="exercise-q">
+        Write a string template that produces a navigation instruction like:<br>
+        <em>"In 250 m: Turn left onto Overtoom"</em><br>
+        given <code>val distanceM = 250</code> and <code>val text = "Turn left onto Overtoom"</code>.
+      </p>
+      <div class="exercise-answer">
+        <div class="exercise-answer-label">Answer</div>
+        <div class="code-wrap" style="margin:0">
+          <div class="code-header"><span class="code-lang lang-kotlin">Kotlin</span></div>
+<pre><code class="language-kotlin">val instruction = "In $distanceM m: $text"
+// or, for formatting the number:
+val instruction = "In ${"%,d".format(distanceM)} m: $text"</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mark-done-wrap">
+    <button class="mark-done-btn" data-ch="3">✓ Mark complete</button>
+  </div>
+</section>
+<hr class="chapter-divider" />
+
+<!-- ─────────────────────────────────────────── CHAPTER 4 ──── -->
+<section class="chapter" id="ch4">
+  <div class="chapter-header">
+    <span class="chapter-badge">Chapter 4</span>
+    <h2 class="chapter-title">Data Classes</h2>
+  </div>
+  <p class="chapter-intro">
+    A data class is Kotlin's answer to the Java POJO. One line per field replaces 30+ lines of
+    constructor, getters, <code>equals()</code>, <code>hashCode()</code>, and <code>toString()</code>.
+  </p>
+
+  <h3 class="section-title">Java POJO → Kotlin data class</h3>
+  <p>The Java <code>Poi</code> in <code>pois-service</code> is a textbook POJO:</p>
+
+  <div class="compare-wrap" data-id="6">
+    <div class="compare-tabs">
+      <button class="compare-tab active" data-lang="java">Java (30 lines)</button>
+      <button class="compare-tab" data-lang="kotlin">Kotlin (6 lines)</button>
+    </div>
+    <div class="compare-panel active" data-lang="java">
+<pre><code class="language-java">// pois-service/src/main/java/com/fietsrouten/pois/model/Poi.java
+public class Poi {
+    private long id;
+    private String name;
+    private String amenity;
+    private double lat;
+    private double lon;
+
+    public Poi(long id, String name, String amenity, double lat, double lon) {
+        this.id = id; this.name = name; this.amenity = amenity;
+        this.lat = lat; this.lon = lon;
+    }
+
+    public long getId()        { return id; }
+    public String getName()    { return name; }
+    public String getAmenity() { return amenity; }
+    public double getLat()     { return lat; }
+    public double getLon()     { return lon; }
+    // no equals/hashCode/toString — you'd add those too
+}</code></pre>
+    </div>
+    <div class="compare-panel" data-lang="kotlin">
+<pre><code class="language-kotlin">// app/src/main/kotlin/com/fietsrouten/data/model/Models.kt
+data class Poi(
+    val id: Long,
+    val name: String,
+    val amenity: String,
+    val lat: Double,
+    val lon: Double
+)
+// Compiler generates: constructor, getters, equals, hashCode, toString, copy</code></pre>
+    </div>
+  </div>
+
+  <h3 class="section-title">Default values in data classes</h3>
+  <p>Fields can have defaults — callers that don't care about a field omit it.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — Models.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">data class RouteResult(
+    val coordinates: List&lt;List&lt;Double&gt;&gt;,
+    val distanceMeters: Double,
+    val durationMs: Long,
+    val instructions: List&lt;RouteInstruction&gt;,
+    val elevationProfile: List&lt;Double&gt; = emptyList()  // optional
+)
+
+// Callers that don't need elevation:
+val result = RouteResult(coords, 12500.0, 3_600_000L, instructions)</code></pre>
+  </div>
+
+  <h3 class="section-title">Serialization annotations</h3>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — Models.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// JSON field "place_id" maps to Kotlin property placeId
+data class NominatimResult(
+    @SerializedName("place_id")    val placeId: Long,
+    @SerializedName("display_name") val displayName: String,
+    val lat: String,
+    val lon: String
+)</code></pre>
+  </div>
+
+  <h3 class="section-title">Destructuring</h3>
+  <p>Data classes generate <code>component1()</code>, <code>component2()</code>… functions, enabling destructuring declarations.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — NavigationEngine.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// SegmentResult is a private data class with three fields
+private data class SegmentResult(
+    val index: Int,
+    val snappedPoint: LatLng,
+    val distanceMeters: Double
+)
+
+// Destructure the returned SegmentResult in one line:
+val (nearestIndex, snappedPoint, snapDistance) = findNearestSegment(userLatLng, routeLatLngs)
+
+// Pairs also destructure — used in RouteRepository.kt:
+points = waypoints.map { (lat, lon) -> listOf(lon, lat) }</code></pre>
+  </div>
+
+  <h3 class="section-title"><code>copy()</code> — non-destructive updates</h3>
+  <p>Because data class fields are <code>val</code>, you never mutate them — you create a modified copy instead.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">val original = Poi(1L, "Café Central", "cafe", 52.37, 4.89)
+val renamed  = original.copy(name = "Café Noord")   // only name changes
+// original is unchanged</code></pre>
+  </div>
+
+  <div class="app-callout">
+    <div class="app-callout-icon">🚲</div>
+    <div class="app-callout-body">
+      <strong>In FietsNavNu:</strong> <code>Models.kt</code> defines 12 data classes — from <code>NominatimResult</code>
+      to <code>CyclingRoute</code> — all without a single getter method or constructor body. The file is 95 lines
+      where the Java equivalent would be ~500.
+    </div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="exercise-label">💡 Exercise</div>
+      <button class="reveal-btn">Show Answer</button>
+    </div>
+    <div class="exercise-body">
+      <p class="exercise-q">
+        Convert this Java class to a Kotlin data class. Preserve the default value for <code>speed</code>.<br><br>
+        <code>public class LocationSnapshot { private double lat; private double lon; private float speed; public LocationSnapshot(double lat, double lon) { this(lat, lon, 0f); } public LocationSnapshot(double lat, double lon, float speed) { ... } /* getters */ }</code>
+      </p>
+      <div class="exercise-answer">
+        <div class="exercise-answer-label">Answer</div>
+        <div class="code-wrap" style="margin:0">
+          <div class="code-header"><span class="code-lang lang-kotlin">Kotlin</span></div>
+<pre><code class="language-kotlin">data class LocationSnapshot(
+    val lat: Double,
+    val lon: Double,
+    val speed: Float = 0f
+)</code></pre>
+        </div>
+        <p style="margin-top:10px">The two-argument Java constructor becomes the default value on <code>speed</code>. No explicit constructor body or getters needed.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mark-done-wrap">
+    <button class="mark-done-btn" data-ch="4">✓ Mark complete</button>
+  </div>
+</section>
+<hr class="chapter-divider" />
+
+<!-- ─────────────────────────────────────────── CHAPTER 5 ──── -->
+<section class="chapter" id="ch5">
+  <div class="chapter-header">
+    <span class="chapter-badge">Chapter 5</span>
+    <h2 class="chapter-title">Null Safety</h2>
+  </div>
+  <p class="chapter-intro">
+    Kotlin's type system distinguishes nullable from non-nullable references at compile time.
+    Most <code>NullPointerException</code>s become compile errors instead of runtime crashes.
+  </p>
+
+  <h3 class="section-title">Nullable types</h3>
+  <p>A type is non-nullable by default. Appending <code>?</code> allows <code>null</code>.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">val name: String  = "Café"   // can never be null
+val name: String? = null     // ok
+
+// From NavigationSession.kt:
+val nextInstruction: RouteInstruction?  // null when on the last instruction
+
+// From MapViewModel.kt:
+private val _userLocation = MutableStateFlow&lt;Pair&lt;Double, Double&gt;?&gt;(null)</code></pre>
+  </div>
+
+  <div class="tip">The compiler prevents calling methods on a nullable without a guard — <code>nextInstruction.text</code> is a compile error if the type is <code>RouteInstruction?</code>.</div>
+
+  <h3 class="section-title">Safe call <code>?.</code></h3>
+  <p>Returns <code>null</code> instead of throwing if the receiver is <code>null</code>.</p>
+
+  <div class="compare-wrap" data-id="7">
+    <div class="compare-tabs">
+      <button class="compare-tab active" data-lang="java">Java</button>
+      <button class="compare-tab" data-lang="kotlin">Kotlin</button>
+    </div>
+    <div class="compare-panel active" data-lang="java">
+<pre><code class="language-java">// Explicit null guard every time
+String ref = (el.getTags() != null) ? el.getTags().get("rcn_ref") : null;</code></pre>
+    </div>
+    <div class="compare-panel" data-lang="kotlin">
+<pre><code class="language-kotlin">// OverpassRepository.kt
+val ref = el.tags?.get("rcn_ref")   // null if tags is null, otherwise the value</code></pre>
+    </div>
+  </div>
+
+  <h3 class="section-title">Elvis operator <code>?:</code></h3>
+  <p>Provides a fallback value when the left side is <code>null</code>.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — OverpassRepository.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// Try "name" tag, fall back to "ref", bail out if both are null
+val name = el.tags?.get("name") ?: el.tags?.get("ref") ?: return@mapNotNull null
+
+// Provide a default string
+val network = el.tags?.get("network") ?: "lcn"</code></pre>
+  </div>
+
+  <h3 class="section-title"><code>let</code> for null-conditional blocks</h3>
+  <p>Execute a block only when the value is non-null, and use the value safely inside.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — MapViewModel.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// Returns null if _userLocation.value is null; otherwise builds a NominatimResult
+fun currentLocationResult(): NominatimResult? =
+    _userLocation.value?.let { (lat, lon) ->
+        NominatimResult(
+            placeId     = -1L,
+            displayName = "Mijn locatie",
+            lat         = lat.toString(),
+            lon         = lon.toString()
+        )
+    }</code></pre>
+  </div>
+
+  <h3 class="section-title"><code>takeIf</code> — inline guard</h3>
+  <p>Returns the value if the predicate holds, otherwise <code>null</code>. Chains naturally with <code>?.</code>.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — OverpassRepository.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// Drop geometries with fewer than 2 points, then map the rest
+member.geometry
+    ?.takeIf { it.size >= 2 }
+    ?.map { pt -> listOf(pt.lon, pt.lat) }</code></pre>
+  </div>
+
+  <h3 class="section-title"><code>lateinit var</code></h3>
+  <p>For non-nullable properties that can't be initialised in the constructor — common with Android view binding.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — MainActivity.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">class MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding  // not null, but set later
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)  // initialised here
+        setContentView(binding.root)
+    }
+}</code></pre>
+  </div>
+
+  <div class="app-callout">
+    <div class="app-callout-icon">🚲</div>
+    <div class="app-callout-body">
+      <strong>In FietsNavNu:</strong> <code>MapViewModel.kt</code> exposes nearly all its state as nullable types
+      (<code>RouteResult?</code>, <code>NavigationSession?</code>, etc.) because they start empty and are populated
+      asynchronously. The compiler forces every call site to handle the null case — no more crashes when the route hasn't
+      loaded yet.
+    </div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="exercise-label">💡 Exercise</div>
+      <button class="reveal-btn">Show Answer</button>
+    </div>
+    <div class="exercise-body">
+      <p class="exercise-q">
+        Fix this code so it doesn't crash when <code>session</code> is null. The fallback should use <code>route.distanceMeters</code> instead.
+        <br><br>
+        <code>val traveled = route.distanceMeters - session.remainingDistanceMeters</code>
+      </p>
+      <div class="exercise-answer">
+        <div class="exercise-answer-label">Answer</div>
+        <div class="code-wrap" style="margin:0">
+          <div class="code-header"><span class="code-lang lang-kotlin">Kotlin</span></div>
+<pre><code class="language-kotlin">// Exactly how MapViewModel.kt does it:
+val traveled = route.distanceMeters - (session?.remainingDistanceMeters ?: route.distanceMeters)</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mark-done-wrap">
+    <button class="mark-done-btn" data-ch="5">✓ Mark complete</button>
+  </div>
+</section>
+<hr class="chapter-divider" />
+
+<!-- ─────────────────────────────────────────── CHAPTER 6 ──── -->
+<section class="chapter" id="ch6">
+  <div class="chapter-header">
+    <span class="chapter-badge">Chapter 6</span>
+    <h2 class="chapter-title">Higher-Order Functions &amp; Lambdas</h2>
+  </div>
+  <p class="chapter-intro">
+    Functions are first-class citizens in Kotlin. You can pass them as arguments, store them in variables,
+    and return them. The collection API is built entirely on this — and the app uses it everywhere.
+  </p>
+
+  <h3 class="section-title">Lambda syntax</h3>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// Full form
+val double: (Int) -> Int = { x: Int -> x * 2 }
+
+// Type inferred from context
+val double = { x: Int -> x * 2 }
+
+// Single parameter — use implicit 'it'
+pois.filter { it.amenity == "cafe" }
+
+// Trailing lambda: when the last argument is a lambda, move it outside ()
+nodes.filter { node -> node.lat > 52.0 }
+viewModelScope.launch { /* coroutine body */ }</code></pre>
+  </div>
+
+  <h3 class="section-title">Collection operations from the app</h3>
+
+  <table>
+    <tr><th>Function</th><th>What it does</th></tr>
+    <tr><td><code>map { }</code></td><td>Transform every element, return new list</td></tr>
+    <tr><td><code>filter { }</code></td><td>Keep elements where predicate is true</td></tr>
+    <tr><td><code>any { }</code></td><td>True if at least one element matches</td></tr>
+    <tr><td><code>mapNotNull { }</code></td><td>Map + drop nulls in one step</td></tr>
+    <tr><td><code>filterIndexed { i, v }</code></td><td>Filter with access to index</td></tr>
+    <tr><td><code>zipWithNext { a, b }</code></td><td>Pair each element with the next</td></tr>
+    <tr><td><code>minOf / maxOf { }</code></td><td>Min/max by a property</td></tr>
+    <tr><td><code>toMap()</code></td><td>Build a Map from a list of Pairs</td></tr>
+  </table>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — PoiServiceRepository.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// map — transform GeoJSON features into Poi objects
+api.getPois(south, west, north, east).features.map { f ->
+    Poi(
+        id      = f.properties.id,
+        name    = f.properties.name,
+        amenity = f.properties.amenity,
+        lat     = f.geometry.coordinates[1],
+        lon     = f.geometry.coordinates[0]
+    )
+}
+
+// filter + any — keep only POIs within 150 m of the route
+val sample = routeCoords.filterIndexed { i, _ -> i % 5 == 0 }
+return pois.filter { poi ->
+    sample.any { pt -> haversineMeters(poi.lat, poi.lon, pt[1], pt[0]) &lt;= 150.0 }
+}</code></pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — MapViewModel.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// zipWithNext — distance of each leg between selected knooppunten
+fun getLegDistances(nodes: List&lt;Knooppunt&gt;): List&lt;Double&gt; =
+    nodes.zipWithNext { a, b -> haversineMeters(a.lat, a.lon, b.lat, b.lon) }
+
+// minOf / maxOf — bounding box around a route
+val south = coords.minOf { it[1] }
+val north = coords.maxOf { it[1] }
+val west  = coords.minOf { it[0] }
+val east  = coords.maxOf { it[0] }</code></pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — OverpassRepository.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// mapNotNull — map and skip null results in one pass
+api.query(query).elements.mapNotNull { el ->
+    if (el.type == "node" && el.lat != null && el.lon != null) {
+        val ref = el.tags?.get("rcn_ref") ?: return@mapNotNull null
+        Knooppunt(el.id, el.lat, el.lon, ref)
+    } else null
+}</code></pre>
+  </div>
+
+  <h3 class="section-title">Labelled return inside a lambda</h3>
+  <p>Inside a lambda, bare <code>return</code> is not allowed — it would return from the <em>enclosing</em> function.
+  Use <code>return@label</code> to exit only the lambda (continue to the next iteration).</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — OverpassRepository.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">elements.mapNotNull { el ->
+    if (el.type != "relation") return@mapNotNull null  // skip this element
+    val name = el.tags?.get("name") ?: return@mapNotNull null
+    // ...
+    CyclingRoute(el.id, name, network, segments)
+}</code></pre>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="exercise-label">💡 Exercise</div>
+      <button class="reveal-btn">Show Answer</button>
+    </div>
+    <div class="exercise-body">
+      <p class="exercise-q">
+        Given a <code>List&lt;OverpassElement&gt;</code>, write a one-liner using <code>mapNotNull</code>
+        that extracts only the <code>"rcn_ref"</code> tag values, skipping elements that don't have the tag.
+      </p>
+      <div class="exercise-answer">
+        <div class="exercise-answer-label">Answer</div>
+        <div class="code-wrap" style="margin:0">
+          <div class="code-header"><span class="code-lang lang-kotlin">Kotlin</span></div>
+<pre><code class="language-kotlin">val refs: List&lt;String&gt; = elements.mapNotNull { it.tags?.get("rcn_ref") }</code></pre>
+        </div>
+        <p style="margin-top:10px"><code>mapNotNull</code> applies the lambda and drops any <code>null</code> result — so elements without <code>"rcn_ref"</code> (where <code>tags?.get()</code> returns <code>null</code>) are automatically excluded.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mark-done-wrap">
+    <button class="mark-done-btn" data-ch="6">✓ Mark complete</button>
+  </div>
+</section>
+<hr class="chapter-divider" />
+
+<!-- ─────────────────────────────────────────── CHAPTER 7 ──── -->
+<section class="chapter" id="ch7">
+  <div class="chapter-header">
+    <span class="chapter-badge">Chapter 7</span>
+    <h2 class="chapter-title">Object-Oriented Kotlin</h2>
+  </div>
+  <p class="chapter-intro">
+    Kotlin classes are <code>public</code> and <code>final</code> by default. There is no <code>static</code> keyword —
+    singletons use <code>object</code>, and static members use <code>companion object</code>.
+  </p>
+
+  <h3 class="section-title">Singleton objects</h3>
+  <p>A top-level <code>object</code> declaration creates a thread-safe singleton, instantiated lazily on first use.</p>
+
+  <div class="compare-wrap" data-id="8">
+    <div class="compare-tabs">
+      <button class="compare-tab active" data-lang="java">Java</button>
+      <button class="compare-tab" data-lang="kotlin">Kotlin</button>
+    </div>
+    <div class="compare-panel active" data-lang="java">
+<pre><code class="language-java">public class Config {
+    public static final String GRAPHHOPPER_BASE_URL = "https://fietsnav-routing.learndelingo.nl";
+    public static final String NOMINATIM_BASE_URL   = "https://fietsnav-geocoding.learndelingo.nl";
+    // ...
+    private Config() {}  // prevent instantiation
+}</code></pre>
+    </div>
+    <div class="compare-panel" data-lang="kotlin">
+<pre><code class="language-kotlin">// Config.kt — accessed as Config.GRAPHHOPPER_BASE_URL, no instantiation
+object Config {
+    const val GRAPHHOPPER_BASE_URL = "https://fietsnav-routing.learndelingo.nl"
+    const val NOMINATIM_BASE_URL   = "https://fietsnav-geocoding.learndelingo.nl"
+    const val OVERPASS_BASE_URL    = "https://overpass-api.de/"
+    const val POI_BASE_URL         = "https://fietsnav-pois.learndelingo.nl"
+    const val MAP_STYLE_URL        = "https://tiles.openfreemap.org/styles/bright"
+    const val MAP_STYLE_DARK_URL   = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json"
+}</code></pre>
+    </div>
+  </div>
+
+  <h3 class="section-title"><code>companion object</code> — static members</h3>
+  <p>Static members live inside a <code>companion object</code> within the class. There is one companion per class.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — NavigationEngine.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">class NavigationEngine {
+    companion object {
+        private const val OFF_ROUTE_THRESHOLD_METERS = 30.0
+    }
+
+    private var lastBearing = 0f
+
+    fun update(location: Location, route: RouteResult): NavigationSession { ... }
+}</code></pre>
+  </div>
+
+  <h3 class="section-title">Enums with properties</h3>
+  <p>Kotlin enums are full classes — each constant can carry data.</p>
+
+  <div class="compare-wrap" data-id="9">
+    <div class="compare-tabs">
+      <button class="compare-tab active" data-lang="java">Java</button>
+      <button class="compare-tab" data-lang="kotlin">Kotlin</button>
+    </div>
+    <div class="compare-panel active" data-lang="java">
+<pre><code class="language-java">public enum CyclingProfile {
+    BIKE("bike"), MTB("mtb"), RACING("racingbike");
+    private final String apiName;
+    CyclingProfile(String apiName) { this.apiName = apiName; }
+    public String getApiName() { return apiName; }
+}</code></pre>
+    </div>
+    <div class="compare-panel" data-lang="kotlin">
+<pre><code class="language-kotlin">// MapViewModel.kt
+enum class CyclingProfile(val apiName: String) {
+    BIKE("bike"), MTB("mtb"), RACING("racingbike")
+}
+
+// Access: CyclingProfile.BIKE.apiName  →  "bike"
+// Iterate all: CyclingProfile.values()</code></pre>
+    </div>
+  </div>
+
+  <h3 class="section-title"><code>when</code> — smarter switch</h3>
+  <p><code>when</code> replaces <code>switch</code> and long <code>if/else if</code> chains. Crucially, it is an <em>expression</em> — it returns a value.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// GraphHopper sign codes → drawable resource
+val icon = when (instruction.sign) {
+     0   -> R.drawable.ic_straight
+    -2   -> R.drawable.ic_turn_left
+     2   -> R.drawable.ic_turn_right
+    -3   -> R.drawable.ic_sharp_left
+     3   -> R.drawable.ic_sharp_right
+    else -> R.drawable.ic_straight
+}
+
+// when with type checks
+val message = when (error) {
+    is IOException         -> "Network error"
+    is IllegalStateException -> "App error: ${error.message}"
+    else                   -> "Unknown error"
+}
+
+// when as a statement (no value needed)
+when (plannerMode) {
+    PlannerMode.ADDRESS     -> showAddressPanel()
+    PlannerMode.KNOOPPUNTEN -> showKnooppuntenPanel()
+}</code></pre>
+  </div>
+
+  <div class="app-callout">
+    <div class="app-callout-icon">🚲</div>
+    <div class="app-callout-body">
+      <strong>In FietsNavNu:</strong> <code>CyclingProfile.values()</code> is used in <code>MapViewModel.fetchAllProfiles()</code>
+      to launch three parallel network requests — one per profile — using <code>async</code>. The enum's <code>apiName</code>
+      property is passed directly to the GraphHopper API call. No string constants duplicated in multiple places.
+    </div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="exercise-label">💡 Exercise</div>
+      <button class="reveal-btn">Show Answer</button>
+    </div>
+    <div class="exercise-body">
+      <p class="exercise-q">
+        Write a <code>when</code> expression that converts a <code>CyclingProfile</code> to a Dutch label string:
+        <code>BIKE</code> → <em>"Fiets"</em>, <code>MTB</code> → <em>"Mountainbike"</em>, <code>RACING</code> → <em>"Racefiets"</em>.
+      </p>
+      <div class="exercise-answer">
+        <div class="exercise-answer-label">Answer</div>
+        <div class="code-wrap" style="margin:0">
+          <div class="code-header"><span class="code-lang lang-kotlin">Kotlin</span></div>
+<pre><code class="language-kotlin">val label = when (profile) {
+    CyclingProfile.BIKE   -> "Fiets"
+    CyclingProfile.MTB    -> "Mountainbike"
+    CyclingProfile.RACING -> "Racefiets"
+}
+// No 'else' needed — the compiler checks all enum cases are covered</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mark-done-wrap">
+    <button class="mark-done-btn" data-ch="7">✓ Mark complete</button>
+  </div>
+</section>
+<hr class="chapter-divider" />
+
+<!-- ─────────────────────────────────────────── CHAPTER 8 ──── -->
+<section class="chapter" id="ch8">
+  <div class="chapter-header">
+    <span class="chapter-badge">Chapter 8</span>
+    <h2 class="chapter-title">Scope Functions</h2>
+  </div>
+  <p class="chapter-intro">
+    Scope functions let you run a block <em>in the context of</em> an object — avoiding repeated variable
+    names and making initialization chains more readable.
+  </p>
+
+  <table>
+    <tr><th>Function</th><th>Object as</th><th>Returns</th><th>Typical use</th></tr>
+    <tr><td><code>let</code></td><td><code>it</code></td><td>lambda result</td><td>null-safe transform</td></tr>
+    <tr><td><code>apply</code></td><td><code>this</code></td><td>the object</td><td>builder / initialisation</td></tr>
+    <tr><td><code>run</code></td><td><code>this</code></td><td>lambda result</td><td>transform with this</td></tr>
+    <tr><td><code>also</code></td><td><code>it</code></td><td>the object</td><td>side-effects in a chain</td></tr>
+    <tr><td><code>with</code></td><td><code>this</code></td><td>lambda result</td><td>grouping calls on one object</td></tr>
+  </table>
+
+  <h3 class="section-title"><code>let</code> — null-safe transform</h3>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — MapViewModel.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// Block runs only when _userLocation.value is non-null
+fun currentLocationResult(): NominatimResult? =
+    _userLocation.value?.let { (lat, lon) ->
+        NominatimResult(
+            placeId     = -1L,
+            displayName = "Mijn locatie",
+            lat         = lat.toString(),
+            lon         = lon.toString()
+        )
+    }</code></pre>
+  </div>
+
+  <h3 class="section-title"><code>apply</code> — builder pattern</h3>
+  <p><code>apply</code> passes the object as <code>this</code> inside the block, then returns the object itself.
+  Perfect for configuring builders.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — OverpassRepository.kt (with apply)</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">val client = OkHttpClient.Builder().apply {
+    addInterceptor { chain ->
+        chain.proceed(
+            chain.request().newBuilder()
+                .header("Accept", "*/*")
+                .header("User-Agent", "FietsNavNu/1.0 Android")
+                .build()
+        )
+    }
+}.build()
+// apply returns the Builder, so .build() chains naturally</code></pre>
+  </div>
+
+  <h3 class="section-title"><code>runCatching</code> — functional error handling</h3>
+  <p>Wraps a block in a try/catch and returns a <code>Result&lt;T&gt;</code>. Chain <code>.onSuccess</code>,
+  <code>.onFailure</code>, or <code>.getOrDefault</code> to handle each case.</p>
+
+  <div class="compare-wrap" data-id="10">
+    <div class="compare-tabs">
+      <button class="compare-tab active" data-lang="java">Java</button>
+      <button class="compare-tab" data-lang="kotlin">Kotlin</button>
+    </div>
+    <div class="compare-panel active" data-lang="java">
+<pre><code class="language-java">try {
+    List&lt;Poi&gt; all = poiRepository.getPoisInBbox(south, west, north, east);
+    pois.setValue(poiRepository.filterNearRoute(all, coords));
+} catch (Exception e) {
+    Log.w("MapViewModel", "POI load failed: " + e.getMessage());
+    poisVisible.setValue(false);
+}</code></pre>
+    </div>
+    <div class="compare-panel" data-lang="kotlin">
+<pre><code class="language-kotlin">// MapViewModel.kt
+runCatching {
+    poiRepository.getPoisInBbox(south, west, north, east)
+}.onSuccess { all ->
+    _pois.value = poiRepository.filterNearRoute(all, coords)
+}.onFailure {
+    Log.w("MapViewModel", "POI load failed: ${it.message}")
+    _poisVisible.value = false
+}</code></pre>
+    </div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — MapViewModel.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// getOrDefault — inline fallback value
+emit(
+    runCatching { repository.searchAddress(query) }
+        .getOrDefault(emptyList())
+)</code></pre>
+  </div>
+
+  <div class="app-callout">
+    <div class="app-callout-icon">🚲</div>
+    <div class="app-callout-body">
+      <strong>In FietsNavNu:</strong> <code>runCatching</code> is used in four places in <code>MapViewModel.kt</code>
+      — for POI loading, cycling routes, address search, and route recalculation. Each wraps a network call and
+      gracefully degrades (hides the overlay, clears the error, shows a log warning) rather than crashing.
+    </div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="exercise-label">💡 Exercise</div>
+      <button class="reveal-btn">Show Answer</button>
+    </div>
+    <div class="exercise-body">
+      <p class="exercise-q">
+        Rewrite this code using <code>runCatching</code> with <code>onSuccess</code> and <code>onFailure</code>:
+        <br><br>
+        <code>try { _cyclingRoutes.value = overpassRepository.getCyclingRoutes(s,w,n,e); } catch(Exception e) { _showCyclingRoutes.value = false; }</code>
+      </p>
+      <div class="exercise-answer">
+        <div class="exercise-answer-label">Answer</div>
+        <div class="code-wrap" style="margin:0">
+          <div class="code-header"><span class="code-lang lang-kotlin">Kotlin</span></div>
+<pre><code class="language-kotlin">runCatching {
+    overpassRepository.getCyclingRoutes(s, w, n, e)
+}.onSuccess {
+    _cyclingRoutes.value = it
+}.onFailure {
+    _showCyclingRoutes.value = false
+}</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mark-done-wrap">
+    <button class="mark-done-btn" data-ch="8">✓ Mark complete</button>
+  </div>
+</section>
+<hr class="chapter-divider" />
+
+<!-- ─────────────────────────────────────────── CHAPTER 9 ──── -->
+<section class="chapter" id="ch9">
+  <div class="chapter-header">
+    <span class="chapter-badge">Chapter 9</span>
+    <h2 class="chapter-title">Coroutines</h2>
+  </div>
+  <p class="chapter-intro">
+    Coroutines are Kotlin's answer to async programming. A suspending function can pause without blocking a thread,
+    then resume when its result is ready — so async code looks and reads like synchronous code.
+  </p>
+
+  <h3 class="section-title">The <code>suspend</code> keyword</h3>
+  <p>Marking a function <code>suspend</code> lets it pause mid-execution. From the caller's perspective it still
+  looks like a normal blocking call — no callbacks, no <code>.then()</code>.</p>
+
+  <div class="compare-wrap" data-id="11">
+    <div class="compare-tabs">
+      <button class="compare-tab active" data-lang="java">Java (callback style)</button>
+      <button class="compare-tab" data-lang="kotlin">Kotlin (suspend)</button>
+    </div>
+    <div class="compare-panel active" data-lang="java">
+<pre><code class="language-java">// Java Retrofit — callback hell
+api.search(query).enqueue(new Callback&lt;List&lt;NominatimResult&gt;&gt;() {
+    @Override public void onResponse(Call&lt;...&gt; call, Response&lt;...&gt; response) {
+        List&lt;NominatimResult&gt; results = response.body();
+        // do something
+    }
+    @Override public void onFailure(Call&lt;...&gt; call, Throwable t) { }
+});</code></pre>
+    </div>
+    <div class="compare-panel" data-lang="kotlin">
+<pre><code class="language-kotlin">// Kotlin Retrofit — reads like synchronous code
+// RouteRepository.kt
+suspend fun searchAddress(query: String): List&lt;NominatimResult&gt; =
+    nominatimApi.search(query)   // pauses here, resumes with the list</code></pre>
+    </div>
+  </div>
+
+  <h3 class="section-title">Coroutine builders: <code>launch</code></h3>
+  <p><code>suspend</code> functions can only be called from another <code>suspend</code> function or a
+  <em>coroutine builder</em>. <code>launch</code> starts a fire-and-forget coroutine scoped to a lifecycle.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — MapViewModel.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">fun calculateRoute() {
+    val from = fromLocation ?: run { _error.value = "Selecteer eerst een startadres."; return }
+    val to   = toLocation   ?: run { _error.value = "Selecteer eerst een bestemming."; return }
+
+    viewModelScope.launch {          // starts a coroutine in the ViewModel's scope
+        _isLoading.value = true
+        _error.value = null
+
+        val results = fetchAllProfiles { profile ->   // suspend call — ok inside launch
+            repository.getRoute(
+                fromLat = from.lat.toDouble(), fromLon = from.lon.toDouble(),
+                toLat   = to.lat.toDouble(),   toLon   = to.lon.toDouble(),
+                profile = profile
+            )
+        }
+
+        if (!applyRouteResults(results)) _error.value = "Route niet gevonden"
+        _isLoading.value = false
+    }
+    // launch returns immediately; the body runs asynchronously
+}</code></pre>
+  </div>
+
+  <div class="tip"><strong>viewModelScope</strong> is cancelled automatically when the ViewModel is cleared — any in-flight network requests are cancelled too. No memory leaks.</div>
+
+  <h3 class="section-title"><code>async</code> / <code>await</code> — parallel work</h3>
+  <p><code>async</code> starts a coroutine that returns a <code>Deferred&lt;T&gt;</code>. Call <code>.await()</code>
+  to collect the result. Multiple <code>async</code> blocks run concurrently — total time equals the slowest, not the sum.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — MapViewModel.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// Fetch all three cycling profiles in parallel
+private suspend fun fetchAllProfiles(
+    request: suspend (profile: String) -> RouteResult
+): Map&lt;CyclingProfile, RouteResult&gt; = coroutineScope {
+    CyclingProfile.values()
+        .map { profile ->
+            // Each async block starts immediately — all three run concurrently
+            profile to async { runCatching { request(profile.apiName) } }
+        }
+        .mapNotNull { (profile, deferred) ->
+            deferred.await().getOrNull()?.let { profile to it }
+        }
+        .toMap()
+}
+// coroutineScope waits for all children before returning</code></pre>
+  </div>
+
+  <h3 class="section-title">Structured concurrency</h3>
+  <p>Coroutines form a parent-child tree. When a parent is cancelled, all children are cancelled too.
+  This prevents resource leaks automatically.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-generic">Scope tree in FietsNavNu</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">viewModelScope                        // cancelled when ViewModel clears
+  └── launch { calculateRoute }
+        └── coroutineScope { fetchAllProfiles }
+              ├── async { bike route request }
+              ├── async { mtb route request }
+              └── async { racingbike route request }</code></pre>
+  </div>
+
+  <div class="app-callout">
+    <div class="app-callout-icon">🚲</div>
+    <div class="app-callout-body">
+      <strong>In FietsNavNu:</strong> without <code>async</code>, fetching all three cycling profiles would take
+      ~3× longer (sequential). With <code>async</code>, all three GraphHopper API calls fly in parallel.
+      If the user navigates away mid-request, <code>viewModelScope</code> cancels everything — no orphaned threads.
+    </div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="exercise-label">💡 Exercise</div>
+      <button class="reveal-btn">Show Answer</button>
+    </div>
+    <div class="exercise-body">
+      <p class="exercise-q">
+        What would happen if <code>calculateRoute()</code> called <code>repository.getRoute()</code>
+        <em>without</em> wrapping it in <code>viewModelScope.launch { }</code>?
+      </p>
+      <div class="exercise-answer">
+        <div class="exercise-answer-label">Answer</div>
+        <p>A <strong>compile error</strong>. <code>repository.getRoute()</code> is a <code>suspend</code> function
+        and can only be called from a coroutine or another <code>suspend</code> function.
+        <code>calculateRoute()</code> is a regular function called from the UI, so it is not in a coroutine context.
+        <code>viewModelScope.launch { }</code> creates the coroutine that makes the <code>suspend</code> call legal.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mark-done-wrap">
+    <button class="mark-done-btn" data-ch="9">✓ Mark complete</button>
+  </div>
+</section>
+<hr class="chapter-divider" />
+
+<!-- ─────────────────────────────────────────── CHAPTER 10 ─── -->
+<section class="chapter" id="ch10">
+  <div class="chapter-header">
+    <span class="chapter-badge">Chapter 10</span>
+    <h2 class="chapter-title">Flow &amp; StateFlow</h2>
+  </div>
+  <p class="chapter-intro">
+    Coroutines handle a single async value. <strong>Flow</strong> handles a stream of values over time.
+    <strong>StateFlow</strong> is a hot Flow that always holds the latest value — reactive state for the UI.
+  </p>
+
+  <h3 class="section-title">StateFlow as UI state</h3>
+  <p>Every piece of observable state in <code>MapViewModel</code> follows the same pattern:</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — MapViewModel.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// Internal — writable
+private val _isLoading = MutableStateFlow(false)
+private val _route     = MutableStateFlow&lt;RouteResult?&gt;(null)
+private val _pois      = MutableStateFlow&lt;List&lt;Poi&gt;&gt;(emptyList())
+
+// Public — read-only view exposed to the Fragment
+val isLoading: StateFlow&lt;Boolean&gt;      = _isLoading
+val route:     StateFlow&lt;RouteResult?&gt; = _route
+val pois:      StateFlow&lt;List&lt;Poi&gt;&gt;   = _pois
+
+// Writing (ViewModel only):
+_isLoading.value = true
+
+// Reading (Fragment):
+viewLifecycleOwner.lifecycleScope.launch {
+    viewModel.isLoading.collect { loading ->
+        progressBar.isVisible = loading
+    }
+}</code></pre>
+  </div>
+
+  <div class="tip">The underscore prefix (<code>_isLoading</code> / <code>isLoading</code>) is a Kotlin convention. It makes the encapsulation visible at a glance.</div>
+
+  <h3 class="section-title">Building a reactive search with operators</h3>
+  <p>The address search in <code>MapViewModel</code> chains three Flow operators to debounce keystrokes, cancel stale requests, and emit results.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — MapViewModel.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">private val fromQuery = MutableStateFlow("")
+
+init {
+    viewModelScope.launch {
+        fromQuery
+            .debounce(300)           // 1. wait 300 ms of silence before acting
+            .flatMapLatest { query ->
+                flow {               // 2. for each new query, start a fresh search
+                    if (query.length >= 3)
+                        emit(runCatching { repository.searchAddress(query) }
+                                .getOrDefault(emptyList()))
+                    else
+                        emit(emptyList())
+                }
+            }                        // flatMapLatest cancels the previous inner flow
+            .collect { _fromSuggestions.value = it }  // 3. push results to UI
+    }
+}
+
+// Called by the Fragment on every keystroke:
+fun searchFrom(query: String) { fromQuery.value = query }</code></pre>
+  </div>
+
+  <table>
+    <tr><th>Operator</th><th>What it does here</th></tr>
+    <tr><td><code>debounce(300)</code></td><td>Drops emissions arriving within 300 ms — avoids a network call per keystroke</td></tr>
+    <tr><td><code>flatMapLatest { }</code></td><td>Starts a new inner flow per query; cancels the previous one if a newer query arrives</td></tr>
+    <tr><td><code>collect { }</code></td><td>Receives each final value and writes it to the backing StateFlow</td></tr>
+  </table>
+
+  <h3 class="section-title"><code>flow { }</code> builder</h3>
+  <p>Creates a <em>cold</em> stream — it only starts running when collected, and each collector gets its own independent execution.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// A cold flow that emits one search result
+flow {
+    emit(repository.searchAddress(query))  // suspends here during the network call
+}
+
+// vs StateFlow — hot, starts running immediately, replays latest to new collectors
+val isLoading: StateFlow&lt;Boolean&gt; = _isLoading</code></pre>
+  </div>
+
+  <div class="app-callout">
+    <div class="app-callout-icon">🚲</div>
+    <div class="app-callout-body">
+      <strong>In FietsNavNu:</strong> <code>MapViewModel</code> has 14 <code>StateFlow</code> properties —
+      route, navigation session, loading state, POI list, cycling routes, planner mode, selected nodes, and more.
+      Every UI update is driven by collecting these flows in the Fragment rather than imperatively calling
+      setter methods. Adding a new UI element only requires one new <code>collect</code> call.
+    </div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="exercise-label">💡 Exercise</div>
+      <button class="reveal-btn">Show Answer</button>
+    </div>
+    <div class="exercise-body">
+      <p class="exercise-q">
+        Why is <code>_fromSuggestions</code> declared as <code>MutableStateFlow</code> privately,
+        while the public <code>fromSuggestions</code> is typed as <code>StateFlow</code>?
+        What happens if the Fragment tries to cast it back to <code>MutableStateFlow</code>?
+      </p>
+      <div class="exercise-answer">
+        <div class="exercise-answer-label">Answer</div>
+        <p><strong>Encapsulation.</strong> The ViewModel owns the mutation; the Fragment should only observe.
+        Typing the public property as the read-only <code>StateFlow</code> interface enforces this at the type level.
+        <br><br>
+        A Fragment <em>can</em> cast it: <code>(viewModel.fromSuggestions as MutableStateFlow).value = ...</code>
+        — but that is an explicit, ugly workaround that signals a design violation. In production code, you'd add
+        a <code>@Suppress("UNCHECKED_CAST")</code> lint suppression, making the intent clear.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mark-done-wrap">
+    <button class="mark-done-btn" data-ch="10">✓ Mark complete</button>
+  </div>
+</section>
+<hr class="chapter-divider" />
+
+<!-- ─────────────────────────────────────────── CHAPTER 11 ─── -->
+<section class="chapter" id="ch11">
+  <div class="chapter-header">
+    <span class="chapter-badge">Chapter 11</span>
+    <h2 class="chapter-title">Java Interop</h2>
+  </div>
+  <p class="chapter-intro">
+    Kotlin runs on the JVM alongside Java. Mixing both in one project — as FietsNavNu does — is seamless.
+    This chapter covers the edge cases you'll hit when converting the Java <code>pois-service</code> to Kotlin.
+  </p>
+
+  <h3 class="section-title">Calling Java from Kotlin</h3>
+  <p>Kotlin calls Java classes directly. Getters and setters are exposed as properties.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin calling Java</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// Java Location class — Kotlin exposes getters as properties
+val speed   = location.speed        // calls location.getSpeed()
+val bearing = location.bearing      // calls location.getBearing()
+val lat     = location.latitude     // calls location.getLatitude()
+
+// Android Log — static Java methods called directly
+Log.w("Tag", "message")</code></pre>
+  </div>
+
+  <h3 class="section-title">Platform types</h3>
+  <p>When Java code has no nullability annotations, Kotlin exposes the return as a <em>platform type</em>
+  (written <code>String!</code>). You are responsible for null checks — the compiler doesn't enforce them.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin — NavigationEngine.kt</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">// location.hasBearing() is a Java method — guard before using .bearing
+if (location.hasBearing() && location.speed > 0.5f) {
+    lastBearing = location.bearing
+}</code></pre>
+  </div>
+
+  <h3 class="section-title"><code>@JvmStatic</code> and <code>@JvmField</code></h3>
+  <p>When Java code needs to call a <code>companion object</code> member, annotate it so it appears
+  as a true static from Java's perspective.</p>
+
+  <div class="code-wrap">
+    <div class="code-header">
+      <span class="code-lang lang-kotlin">Kotlin</span>
+      <button class="copy-btn">Copy</button>
+    </div>
+<pre><code class="language-kotlin">class NavigationEngine {
+    companion object {
+        @JvmField  // Java: NavigationEngine.OFF_ROUTE_THRESHOLD_METERS
+        val OFF_ROUTE_THRESHOLD_METERS = 30.0
+
+        @JvmStatic  // Java: NavigationEngine.create()
+        fun create(): NavigationEngine = NavigationEngine()
+    }
+}
+
+// Without @JvmStatic, Java would need:
+// NavigationEngine.Companion.create()</code></pre>
+  </div>
+
+  <h3 class="section-title">Converting <code>pois-service</code> to Kotlin</h3>
+  <p>The full backend conversion — three files change entirely. Spring annotations work identically in Kotlin.</p>
+
+  <div class="compare-wrap" data-id="12">
+    <div class="compare-tabs">
+      <button class="compare-tab active" data-lang="java">Java — PoiController.java</button>
+      <button class="compare-tab" data-lang="kotlin">Kotlin — PoiController.kt</button>
+    </div>
+    <div class="compare-panel active" data-lang="java">
+<pre><code class="language-java">@RestController
+@RequestMapping("/api/pois")
+public class PoiController {
+    private final PoiRepository repository;
+
+    public PoiController(PoiRepository repository) {
+        this.repository = repository;
+    }
+
+    @GetMapping
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; getPois(
+            @RequestParam double south, @RequestParam double west,
+            @RequestParam double north, @RequestParam double east,
+            @RequestParam(defaultValue = "cafe,restaurant,fast_food") String types) {
+        List&lt;String&gt; typeList = Arrays.asList(types.split(","));
+        List&lt;Poi&gt; pois = repository.findInBbox(south, west, north, east, typeList);
+        List&lt;Map&lt;String, Object&gt;&gt; features = pois.stream()
+                .map(poi -> Map.of(
+                        "type", "Feature",
+                        "geometry", Map.of("type", "Point",
+                                "coordinates", new double[]{poi.getLon(), poi.getLat()}),
+                        "properties", Map.of("id", poi.getId(),
+                                "name", poi.getName(), "amenity", poi.getAmenity())))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(Map.of("type", "FeatureCollection", "features", features));
+    }
+}</code></pre>
+    </div>
+    <div class="compare-panel" data-lang="kotlin">
+<pre><code class="language-kotlin">@RestController
+@RequestMapping("/api/pois")
+class PoiController(private val repository: PoiRepository) {  // constructor injection in header
+
+    @GetMapping
+    fun getPois(
+        @RequestParam south: Double,
+        @RequestParam west: Double,
+        @RequestParam north: Double,
+        @RequestParam east: Double,
+        @RequestParam(defaultValue = "cafe,restaurant,fast_food") types: String
+    ): ResponseEntity&lt;Map&lt;String, Any&gt;&gt; {
+        val pois = repository.findInBbox(south, west, north, east, types.split(","))
+
+        val features = pois.map { poi ->
+            mapOf(
+                "type"       to "Feature",
+                "geometry"   to mapOf("type" to "Point",
+                                      "coordinates" to doubleArrayOf(poi.lon, poi.lat)),
+                "properties" to mapOf("id" to poi.id, "name" to poi.name,
+                                      "amenity" to poi.amenity)
+            )
+        }
+
+        return ResponseEntity.ok(mapOf("type" to "FeatureCollection", "features" to features))
+    }
+}</code></pre>
+    </div>
+  </div>
+
+  <div class="app-callout">
+    <div class="app-callout-icon">🚲</div>
+    <div class="app-callout-body">
+      <strong>In FietsNavNu:</strong> the Kotlin app already uses Java libraries everywhere —
+      Android SDK, Play Services, MapLibre, Retrofit, OkHttp — and calls them all without adapters.
+      This is the real-world power of Kotlin/JVM interop: you don't give up the Java ecosystem;
+      you get a better language on top of it.
+    </div>
+  </div>
+
+  <div class="exercise">
+    <div class="exercise-head">
+      <div class="exercise-label">💡 Exercise</div>
+      <button class="reveal-btn">Show Answer</button>
+    </div>
+    <div class="exercise-body">
+      <p class="exercise-q">
+        If you convert <code>Poi.java</code> to a Kotlin data class, does the existing Java <code>PoiRepository</code>
+        that calls <code>poi.getId()</code> and <code>poi.getName()</code> still compile without changes?
+      </p>
+      <div class="exercise-answer">
+        <div class="exercise-answer-label">Answer</div>
+        <p><strong>Yes.</strong> Kotlin data classes generate standard JVM getters (<code>getId()</code>, <code>getName()</code>…)
+        for each <code>val</code> property. Java code that calls these getters sees no difference.
+        <br><br>
+        The only time you'd need to add <code>@JvmField</code> is if Java code tries to access the field
+        <em>directly</em> without a getter — e.g. <code>poi.id</code> — which is uncommon in Spring/JPA patterns.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mark-done-wrap">
+    <button class="mark-done-btn" data-ch="11">✓ Mark complete</button>
+  </div>
+</section>
+
+</main>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════════════════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-kotlin.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-java.min.js"></script>
+<script>
+(function () {
+  const TOTAL = 11;
+
+  /* ── Progress ─────────────────────────────────────────────── */
+  function loadDone() {
+    try { return JSON.parse(localStorage.getItem('kt-done') || '{}'); }
+    catch { return {}; }
+  }
+  function saveDone(d) {
+    try { localStorage.setItem('kt-done', JSON.stringify(d)); } catch {}
+  }
+
+  function updateProgress() {
+    const done = loadDone();
+    const count = Object.keys(done).length;
+    document.getElementById('progress-text').textContent = count + ' / ' + TOTAL;
+    document.getElementById('progress-fill').style.width = (count / TOTAL * 100) + '%';
+
+    document.querySelectorAll('.chapter-link').forEach(link => {
+      const ch = link.dataset.ch;
+      link.classList.toggle('done', !!done[ch]);
+    });
+
+    document.querySelectorAll('.mark-done-btn').forEach(btn => {
+      const ch = btn.dataset.ch;
+      btn.classList.toggle('done', !!done[ch]);
+      btn.textContent = done[ch] ? '✓ Completed' : '✓ Mark complete';
+    });
+  }
+
+  document.querySelectorAll('.mark-done-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const done = loadDone();
+      const ch = btn.dataset.ch;
+      if (done[ch]) delete done[ch]; else done[ch] = true;
+      saveDone(done);
+      updateProgress();
+    });
+  });
+
+  updateProgress();
+
+  /* ── Active sidebar link on scroll ───────────────────────── */
+  const chapters = document.querySelectorAll('.chapter');
+  const links = document.querySelectorAll('.chapter-link');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const id = e.target.id;
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + id));
+      }
+    });
+  }, { rootMargin: '-60px 0px -60% 0px', threshold: 0 });
+
+  chapters.forEach(c => observer.observe(c));
+
+  /* ── Comparison tabs ──────────────────────────────────────── */
+  document.querySelectorAll('.compare-wrap').forEach(wrap => {
+    const tabs = wrap.querySelectorAll('.compare-tab');
+    const panels = wrap.querySelectorAll('.compare-panel');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const lang = tab.dataset.lang;
+        tabs.forEach(t => t.classList.toggle('active', t.dataset.lang === lang));
+        panels.forEach(p => p.classList.toggle('active', p.dataset.lang === lang));
+        Prism.highlightAllUnder(wrap);
+      });
+    });
+  });
+
+  /* ── Copy buttons ─────────────────────────────────────────── */
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const wrap = btn.closest('.code-wrap');
+      const code = wrap.querySelector('code');
+      if (!code) return;
+      navigator.clipboard.writeText(code.textContent).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1800);
+      });
+    });
+  });
+
+  /* ── Exercise reveal ──────────────────────────────────────── */
+  document.querySelectorAll('.reveal-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const answer = btn.closest('.exercise').querySelector('.exercise-answer');
+      const open = answer.classList.toggle('open');
+      btn.textContent = open ? 'Hide Answer' : 'Show Answer';
+    });
+  });
+
+  /* ── Re-highlight after tab switch ───────────────────────── */
+  Prism.highlightAll();
+})();
+</script>
+</body>
+</html>
