@@ -565,9 +565,9 @@ class MapFragment : Fragment() {
                             binding.tvCurrentInstruction.text = first.text
                             setTurnIcon(binding.ivTurnIcon, first.sign, large = true)
                         }
-                        binding.tvNavRemaining.text = formatDistance(route.distanceMeters)
-                        binding.tvNavEta.text = "ETA …"
-                        binding.tvSpeed.text = "0 km/h"
+                        binding.tvNavRemaining.text = formatDurationClock(route.durationMs)
+                        binding.tvNavEta.text = "${getString(R.string.eta_prefix)} ${formatEta(route.durationMs)} · ${formatDistance(route.distanceMeters)}"
+                        binding.tvSpeed.text = "0 ${getString(R.string.unit_speed_kmh)}"
                     }
                 } else {
                     activity?.window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -895,8 +895,9 @@ class MapFragment : Fragment() {
             binding.ivNextTurnIcon.visibility = View.INVISIBLE
         }
 
-        binding.tvNavRemaining.text = formatDistance(session.remainingDistanceMeters)
-        binding.tvNavEta.text = "ETA ${formatEta(session.remainingDurationMs)}"
+        binding.tvNavRemaining.text = formatDurationClock(session.remainingDurationMs)
+        binding.tvNavEta.text = "${getString(R.string.eta_prefix)} ${formatEta(session.remainingDurationMs)} · " +
+            formatDistance(session.remainingDistanceMeters)
 
         announceIfNeeded(session)
 
@@ -913,21 +914,27 @@ class MapFragment : Fragment() {
         )
     }
 
+    /** GraphHopper roundabout signs (com.graphhopper.util.Instruction) — rendered with a dedicated glyph. */
+    private fun isRoundaboutSign(sign: Int): Boolean = sign == 6 || sign == -6
+
     private fun setTurnIcon(imageView: android.widget.ImageView, sign: Int, large: Boolean) {
-        if (sign == 4) {
-            imageView.setImageResource(R.drawable.ic_nav_arrive)
-            imageView.rotation = 0f
-        } else {
-            imageView.setImageResource(R.drawable.ic_nav_arrow)
-            imageView.rotation = signToRotation(sign)
+        when {
+            sign == 4 -> {
+                imageView.setImageResource(R.drawable.ic_nav_arrive)
+                imageView.rotation = 0f
+            }
+            isRoundaboutSign(sign) -> {
+                imageView.setImageResource(R.drawable.ic_nav_roundabout)
+                imageView.rotation = 0f
+            }
+            else -> {
+                imageView.setImageResource(R.drawable.ic_nav_arrow)
+                imageView.rotation = signToRotation(sign)
+            }
         }
-        if (!large) {
-            imageView.imageTintList = android.content.res.ColorStateList.valueOf(
-                ContextCompat.getColor(requireContext(), R.color.brand_primary)
-            )
-        } else {
-            imageView.imageTintList = null
-        }
+        imageView.imageTintList = android.content.res.ColorStateList.valueOf(
+            ContextCompat.getColor(requireContext(), if (large) R.color.white else R.color.speed_badge_text)
+        )
     }
 
     // ── Trip summary ──────────────────────────────────────────────
@@ -1148,16 +1155,19 @@ class MapFragment : Fragment() {
         }
     }
 
+    /** Rotation for the single rotatable turn-arrow glyph, keyed off GraphHopper's Instruction sign values. */
     private fun signToRotation(sign: Int): Float = when (sign) {
-        0 -> 0f
-        2 -> 45f
-        3 -> 90f
-        6 -> 135f
-        8, -98 -> 180f
-        -2 -> -45f
-        -3 -> -90f
-        -6 -> -135f
-        -8 -> 180f
+        0, 5 -> 0f                  // CONTINUE_ON_STREET / REACHED_VIA
+        1 -> 30f                    // TURN_SLIGHT_RIGHT
+        7 -> 20f                    // KEEP_RIGHT
+        2 -> 90f                    // TURN_RIGHT
+        3 -> 135f                   // TURN_SHARP_RIGHT
+        8 -> 180f                   // U_TURN_RIGHT
+        -1 -> -30f                  // TURN_SLIGHT_LEFT
+        -7 -> -20f                  // KEEP_LEFT
+        -2 -> -90f                  // TURN_LEFT
+        -3 -> -135f                 // TURN_SHARP_LEFT
+        -8, -98, -99 -> 180f        // U_TURN_LEFT / U_TURN_UNKNOWN / UNKNOWN
         else -> 0f
     }
 

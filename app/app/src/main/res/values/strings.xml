@@ -11,7 +11,7 @@
     <string name="btn_start_navigation">Start navigation</string>
     <string name="btn_stop_navigation">Stop navigation</string>
     <string name="nav_turn_icon_desc">Turn direction</string>
-    <string name="nav_then">then</string>
+    <string name="nav_then">THEN</string>
     <string name="nav_off_route">Recalculating route…</string>
     <string name="mode_address">Address</string>
     <string name="btn_knooppunten_plannen">Plan junctions</string>
@@ -37,7 +37,6 @@
     <string name="unit_meter_short">m</string>
     <string name="unit_speed_kmh">km/h</string>
     <string name="current_location_label">📍 My location</string>
-    <string name="nav_next_label">THEN</string>
     <string name="eta_prefix">Arrival</string>
     <string name="elevation_gain_caption">elevation</string>
     <string name="select_from_first">Select a start address first.</string>

@@ -332,11 +332,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:background="@drawable/nav_instruction_bg"
-        android:elevation="8dp"
+        android:elevation="6dp"
         android:visibility="gone"
-        android:layout_marginTop="12dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -350,8 +347,8 @@
 
             <ImageView
                 android:id="@+id/ivTurnIcon"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
                 android:contentDescription="@string/nav_turn_icon_desc" />
 
         </LinearLayout>
@@ -368,8 +365,9 @@
                 android:id="@+id/tvCurrentInstruction"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:textColor="@color/text_primary"
+                android:textSize="14sp"
+                android:textColor="@color/white"
+                android:alpha="0.92"
                 android:maxLines="2"
                 android:ellipsize="end" />
 
@@ -377,11 +375,11 @@
                 android:id="@+id/tvDistanceToTurn"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="2dp"
                 android:textSize="30sp"
                 android:fontFamily="@font/space_grotesk_bold"
                 android:textStyle="bold"
-                android:textColor="@color/brand_primary" />
+                android:textColor="@color/white" />
 
         </LinearLayout>
 
@@ -398,12 +396,14 @@
                 android:layout_height="wrap_content"
                 android:text="@string/nav_then"
                 android:textSize="10sp"
-                android:textColor="@color/text_secondary" />
+                android:textStyle="bold"
+                android:letterSpacing="0.08"
+                android:textColor="@color/speed_badge_text" />
 
             <ImageView
                 android:id="@+id/ivNextTurnIcon"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_marginTop="4dp"
                 android:visibility="invisible"
                 android:contentDescription="@string/nav_turn_icon_desc" />
@@ -722,31 +722,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <TextView
-            android:id="@+id/tvNavRemaining"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:fontFamily="@font/space_grotesk_bold"
-            android:textStyle="bold" />
+            android:layout_weight="1.4"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvNavEta"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textColor="@color/nav_secondary_text"
-            android:textSize="16sp"
-            android:gravity="center" />
+            <TextView
+                android:id="@+id/tvNavRemaining"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:fontFamily="@font/space_grotesk_bold"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvNavEta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/nav_secondary_text"
+                android:textSize="12sp" />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tvSpeed"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginEnd="8dp"
+            android:layout_marginEnd="12dp"
             android:background="@drawable/speed_badge_bg"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"
@@ -755,13 +760,14 @@
             android:textStyle="bold"
             android:gravity="center" />
 
-        <Button
+        <ImageButton
             android:id="@+id/btnStopNavigation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/btn_stop_navigation"
-            android:backgroundTint="@color/error_red"
-            android:textColor="@color/white" />
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            android:background="@drawable/stop_button_bg"
+            android:src="@drawable/ic_stop_square"
+            android:scaleType="center"
+            android:contentDescription="@string/btn_stop_navigation" />
 
     </LinearLayout>
 

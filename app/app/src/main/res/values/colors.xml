@@ -14,8 +14,6 @@
     <color name="nav_secondary_text">#FFAAAACC</color>
     <color name="surface_card">#D9FFFFFF</color>
     <color name="surface_card_solid">#FFFFFFFF</color>
-    <color name="surface_nav_instruction">#E0FFFFFF</color>
-    <color name="nav_next_surface">#CCE0F2F1</color>
     <color name="fab_bg">#D9FFFFFF</color>
 
     <color name="input_field_bg">#0A000000</color>

@@ -11,7 +11,7 @@
     <string name="btn_start_navigation">Start navigatie</string>
     <string name="btn_stop_navigation">Stop navigatie</string>
     <string name="nav_turn_icon_desc">Afslagrichting</string>
-    <string name="nav_then">dan</string>
+    <string name="nav_then">DAN</string>
     <string name="nav_off_route">Herberekenen route…</string>
     <string name="mode_address">Adres</string>
     <string name="btn_knooppunten_plannen">Knooppunten plannen</string>
@@ -37,7 +37,6 @@
     <string name="unit_meter_short">m</string>
     <string name="unit_speed_kmh">km/u</string>
     <string name="current_location_label">📍 Mijn locatie</string>
-    <string name="nav_next_label">DAN</string>
     <string name="eta_prefix">Aankomst</string>
     <string name="elevation_gain_caption">hoogte</string>
     <string name="select_from_first">Selecteer eerst een startadres.</string>
