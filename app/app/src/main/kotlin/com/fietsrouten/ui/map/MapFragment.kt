@@ -321,13 +321,6 @@ class MapFragment : Fragment() {
             viewModel.calculateKnooppuntenRoute()
         }
 
-        binding.fabSettings.setOnClickListener {
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, com.fietsrouten.ui.profile.ProfileFragment())
-                .addToBackStack("profile")
-                .commit()
-        }
-
         binding.fabLayers.setOnClickListener {
             val m = map ?: return@setOnClickListener
             val bounds = m.projection.visibleRegion.latLngBounds
@@ -585,7 +578,7 @@ class MapFragment : Fragment() {
                     binding.plannerPanel.visibility = View.GONE
                     binding.navInstructionCard.visibility = View.VISIBLE
                     binding.navBottomBar.visibility = View.VISIBLE
-                    binding.fabSettings.visibility = View.GONE
+                    (activity as? MainActivity)?.setTabBarVisible(false)
                     repositionFabsForNavigation(true)
                     viewModel.route.value?.let { route ->
                         val first = route.instructions.firstOrNull()
@@ -599,7 +592,7 @@ class MapFragment : Fragment() {
                     }
                 } else {
                     activity?.window?.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-                    binding.fabSettings.visibility = View.VISIBLE
+                    (activity as? MainActivity)?.setTabBarVisible(true)
                 }
             }
         }
@@ -969,6 +962,17 @@ class MapFragment : Fragment() {
     // ── Trip summary ──────────────────────────────────────────────
 
     private fun showTripSummary(summary: com.fietsrouten.data.model.TripSummary) {
+        com.fietsrouten.data.repository.RidesStore.addRide(
+            requireContext(),
+            com.fietsrouten.data.model.RideRecord(
+                timestampMs = System.currentTimeMillis(),
+                distanceMeters = summary.distanceMeters,
+                durationMs = summary.durationMs,
+                elevationGainMeters = elevationGainMeters(viewModel.route.value?.elevationProfile ?: emptyList()),
+                avgSpeedKmh = summary.avgSpeedKmh,
+                profile = viewModel.selectedProfile.value.apiName
+            )
+        )
         val distKm = formatDistance(summary.distanceMeters)
         val mins = summary.durationMs / 60000
         val secs = (summary.durationMs % 60000) / 1000
@@ -1128,7 +1132,7 @@ class MapFragment : Fragment() {
     }
 
     private fun repositionFabsForNavigation(navigating: Boolean) {
-        val anchor = if (navigating) R.id.navInstructionCard else R.id.fabSettings
+        val anchor = if (navigating) R.id.navInstructionCard else R.id.searchTopBarrier
         val params = binding.fabLayers.layoutParams as androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
         params.topToBottom = anchor
         binding.fabLayers.layoutParams = params

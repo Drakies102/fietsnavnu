@@ -437,33 +437,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Settings / Profiel entry point -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabSettings"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:contentDescription="@string/settings_desc"
-        app:srcCompat="@drawable/ic_settings"
-        app:tint="@color/brand_primary"
-        app:fabSize="mini"
-        app:backgroundTint="@color/fab_bg"
-        app:layout_constraintTop_toBottomOf="@id/searchTopBarrier"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <!-- Cycling routes layer FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabLayers"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:contentDescription="@string/fab_layers_desc"
         app:srcCompat="@drawable/ic_layers"
         app:fabSize="mini"
         app:backgroundTint="@color/fab_bg"
-        app:layout_constraintTop_toBottomOf="@id/fabSettings"
+        app:layout_constraintTop_toBottomOf="@id/searchTopBarrier"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- POI along route FAB — only visible when route is active -->

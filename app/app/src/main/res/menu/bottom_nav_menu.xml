@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/tabKaart"
+        android:icon="@drawable/ic_tab_map"
+        android:title="@string/tab_kaart" />
+    <item
+        android:id="@+id/tabRitten"
+        android:icon="@drawable/ic_tab_rides"
+        android:title="@string/tab_ritten" />
+    <item
+        android:id="@+id/tabProfiel"
+        android:icon="@drawable/ic_tab_profile"
+        android:title="@string/profile_title" />
+</menu>

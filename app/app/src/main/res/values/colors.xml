@@ -30,4 +30,7 @@
     <!-- "Knooppunten plannen" mode button (green-tinted, not filled) -->
     <color name="knooppunten_btn_bg">#FFEEF4EA</color>
     <color name="knooppunten_btn_border">#FFCDE6D8</color>
+
+    <!-- Bottom tab bar -->
+    <color name="tab_inactive">#FF9AA69E</color>
 </resources>

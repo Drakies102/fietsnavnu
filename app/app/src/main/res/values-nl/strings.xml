@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Fiets Routen</string>
+    <string name="tab_kaart">Kaart</string>
+    <string name="tab_ritten">Ritten</string>
+    <string name="rides_title">Mijn ritten</string>
+    <string name="rides_empty">Nog geen ritten — voltooi een navigatie om deze hier te zien.</string>
+    <string name="ride_title_format">Rit · %1$s</string>
     <string name="hint_from">Van (startadres)</string>
     <string name="hint_to">Naar (bestemming)</string>
     <string name="label_from">Van</string>
@@ -56,7 +61,6 @@
     <string name="trip_complete_title">Rit voltooid</string>
     <string name="btn_close">Sluiten</string>
     <string name="recalculating_route">Route herberekenen</string>
-    <string name="settings_desc">Instellingen</string>
     <string name="profile_title">Profiel</string>
     <string name="settings_language">Taal</string>
     <string name="settings_language_nl">Nederlands</string>
@@ -66,7 +70,6 @@
     <string name="settings_theme_light">Licht</string>
     <string name="settings_theme_dark">Donker</string>
     <string name="settings_voice_guidance">Spraakbegeleiding</string>
-    <string name="btn_back">Terug</string>
     <string name="unit_second_short">sec</string>
     <string name="trip_distance_label">Afstand</string>
     <string name="trip_time_label">Tijd</string>
