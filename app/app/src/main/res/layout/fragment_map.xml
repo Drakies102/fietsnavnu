@@ -361,6 +361,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:textSize="30sp"
+                android:fontFamily="@font/space_grotesk_bold"
                 android:textStyle="bold"
                 android:textColor="@color/brand_primary" />
 
@@ -710,6 +711,7 @@
             android:layout_weight="1"
             android:textColor="@color/white"
             android:textSize="20sp"
+            android:fontFamily="@font/space_grotesk_bold"
             android:textStyle="bold" />
 
         <TextView

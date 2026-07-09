@@ -85,7 +85,8 @@ class MapFragment : Fragment() {
                 viewModel.updateUserLocation(loc.latitude, loc.longitude)
                 updateUserRadius(loc.latitude, loc.longitude)
                 if (binding.navBottomBar.visibility == View.VISIBLE) {
-                    binding.tvSpeed.text = "%.0f km/h".format(loc.speed * 3.6f)
+                    val kmh = java.text.NumberFormat.getIntegerInstance(activeLocale()).format(loc.speed * 3.6f)
+                    binding.tvSpeed.text = "$kmh ${getString(R.string.unit_speed_kmh)}"
                 }
             }
         }
@@ -1164,17 +1165,36 @@ class MapFragment : Fragment() {
         else -> 0f
     }
 
+    /** The active app locale (reflects the per-app language override once set — see ProfileFragment). */
+    private fun activeLocale(): Locale = resources.configuration.locales[0]
+
     private fun formatDistance(meters: Double): String = when {
         meters < 100 -> "${meters.toInt()} m"
         meters < 1000 -> "${(meters / 10).toInt() * 10} m"
-        else -> "%.1f km".format(meters / 1000)
+        else -> {
+            val nf = java.text.NumberFormat.getInstance(activeLocale()).apply {
+                minimumFractionDigits = 1
+                maximumFractionDigits = 1
+            }
+            "${nf.format(meters / 1000)} km"
+        }
+    }
+
+    /** "H:MM" with no unit suffix — used in contexts where the unit is implied (e.g. the nav bottom bar). */
+    private fun formatDurationClock(durationMs: Long): String {
+        val totalMinutes = (durationMs / 60000).toInt()
+        val hours = totalMinutes / 60
+        val minutes = totalMinutes % 60
+        return "%d:%02d".format(hours, minutes)
     }
 
     private fun formatDuration(durationMs: Long): String {
         val totalMinutes = (durationMs / 60000).toInt()
         val hours = totalMinutes / 60
         val minutes = totalMinutes % 60
-        return if (hours > 0) "${hours}u ${minutes}min" else "$minutes min"
+        val hourUnit = getString(R.string.unit_hour_short)
+        val minUnit = getString(R.string.unit_minute_short)
+        return if (hours > 0) "${hours}$hourUnit ${minutes}$minUnit" else "$minutes $minUnit"
     }
 
     private fun formatEta(remainingMs: Long): String {
