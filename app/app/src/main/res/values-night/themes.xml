@@ -6,8 +6,8 @@
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorSecondary">@color/brand_primary</item>
         <item name="colorOnSecondary">@color/white</item>
-        <item name="android:statusBarColor">#FF121212</item>
-        <item name="android:windowBackground">#FF121212</item>
+        <item name="android:statusBarColor">#FF0A180F</item>
+        <item name="android:windowBackground">#FF0A180F</item>
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.FietsRouten.SmallComponent</item>
     </style>
 </resources>

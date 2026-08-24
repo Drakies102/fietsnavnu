@@ -7,6 +7,8 @@
         <item name="colorSecondary">@color/brand_primary</item>
         <item name="colorOnSecondary">@color/white</item>
         <item name="android:statusBarColor">@color/brand_primary_dark</item>
+        <item name="android:fontFamily">@font/nunito</item>
+        <item name="fontFamily">@font/nunito</item>
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.FietsRouten.SmallComponent</item>
     </style>
 
